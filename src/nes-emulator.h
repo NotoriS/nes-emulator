@@ -4,10 +4,10 @@ class NesEmulator
 {
 public:
 
-	NesEmulator();
-	~NesEmulator();
+    NesEmulator();
+    ~NesEmulator();
 
-	void Run();
+    void Run();
 
 private:
 

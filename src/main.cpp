@@ -2,8 +2,8 @@
 
 int main()
 {
-	NesEmulator emulator = NesEmulator();
-	emulator.Run();
+    NesEmulator emulator = NesEmulator();
+    emulator.Run();
 
-	return 0;
+    return 0;
 }

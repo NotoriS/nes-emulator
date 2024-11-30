@@ -7,14 +7,14 @@ class CPU
 {
 public:
 
-	CPU();
-	~CPU();
+    CPU();
+    ~CPU();
 
-	void Clock();
+    void Clock();
 
 private:
 
-	std::queue<std::function<void()>> m_microInstructionQueue;
+    std::queue<std::function<void()>> m_microInstructionQueue;
 
-	void QueueNextInstuction();
+    void QueueNextInstuction();
 };
