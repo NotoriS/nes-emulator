@@ -9,14 +9,14 @@
 class CPU
 {
 public:
-
     CPU();
     ~CPU();
+
+    void ConnectBus(IBus* bus) { m_bus = bus; }
 
     void Clock();
 
 private:
-
     IBus* m_bus = nullptr;
 
     // Contains "per cycle" instructions that will execute when clock is called.
