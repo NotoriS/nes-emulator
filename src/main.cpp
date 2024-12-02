@@ -1,8 +1,16 @@
+#include <iostream>
+
 #include "nes-emulator.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    NesEmulator emulator = NesEmulator();
+    if (argc < 2)
+    {
+        std::cerr << "No filename provided" << std::endl;
+        return -1;
+    }
+
+    NesEmulator emulator = NesEmulator(argv[1]);
     emulator.Run();
 
     return 0;
