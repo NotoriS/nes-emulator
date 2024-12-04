@@ -5,8 +5,6 @@
 
 Cartridge::Cartridge()
 {
-    m_mapperID = 0;
-    m_romLoadedSuccessfully = false;
 }
 
 Cartridge::~Cartridge()
@@ -36,9 +34,6 @@ void Cartridge::LoadROM(const std::string& filename)
     if (m_header.flags6 & 0x04)
         file.seekg(512, std::ios_base::cur);
 
-    // Fetch the mapper ID
-    m_mapperID = (m_header.flags6 & 0xF0) & (m_header.flags7 >> 4);
-
     // Load PRG ROM
     size_t prgSize = m_header.prgRomSize * 16 * 1024;
     m_prgRom.resize(prgSize);
@@ -51,25 +46,23 @@ void Cartridge::LoadROM(const std::string& filename)
 
     file.close();
 
-    m_romLoadedSuccessfully = true;
+    // Fetch the mapper ID and create the mapper
+    uint8_t mapperID = (m_header.flags6 & 0xF0) & (m_header.flags7 >> 4);
+    CreateMapper(mapperID);
+
     std::cout << "Loaded " << prgSize << " bytes of PRG ROM and "
         << chrSize << " bytes of CHR ROM from " << filename << std::endl;
 }
 
-uint8_t Cartridge::CpuRead(uint16_t address)
+void Cartridge::CreateMapper(uint8_t mapperID)
 {
-    return 0;
-}
-
-void Cartridge::CpuWrite(uint16_t address, uint8_t data)
-{
-}
-
-uint8_t Cartridge::PpuRead(uint16_t address)
-{
-    return 0;
-}
-
-void Cartridge::PpuWrite(uint16_t address, uint8_t data)
-{
+    switch (mapperID)
+    {
+        case 0:
+            m_mapper = std::make_unique<Mapper000>(m_prgRom, m_chrRom);
+            break;
+        default:
+            std::cerr << "The mapper required by this ROM is unsuported." << std::endl;
+            break;
+    }
 }

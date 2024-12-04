@@ -3,6 +3,11 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
+#include <iostream>
+
+#include "mappers/mapper.h"
+#include "mappers/mapper-000.h"
 
 class Cartridge
 {
@@ -11,6 +16,12 @@ public:
     ~Cartridge();
 
     void LoadROM(const std::string& filename);
+
+    uint8_t CpuRead(uint16_t address) { return m_mapper->CpuRead(address); }
+    void CpuWrite(uint16_t address, uint8_t data) { m_mapper->CpuWrite(address, data); }
+
+    uint8_t PpuRead(uint16_t address) { return m_mapper->PpuRead(address); }
+    void PpuWrite(uint16_t address, uint8_t data) { m_mapper->PpuWrite(address, data); }
 
 private:
     struct RomHeader {
@@ -27,15 +38,10 @@ private:
 
     RomHeader m_header{};
 
-    bool m_romLoadedSuccessfully;
-    uint8_t m_mapperID;
+    std::unique_ptr<Mapper> m_mapper;
 
     std::vector<uint8_t> m_prgRom;  // PRG ROM data
     std::vector<uint8_t> m_chrRom;  // CHR ROM data
 
-    uint8_t CpuRead(uint16_t address);
-    void CpuWrite(uint16_t address, uint8_t data);
-
-    uint8_t PpuRead(uint16_t address);
-    void PpuWrite(uint16_t address, uint8_t data);
+    void CreateMapper(uint8_t mapperID);
 };

@@ -20,6 +20,7 @@ void NesEmulator::Run()
     Cartridge cartridge = Cartridge();
 
     cpu.ConnectBus(&cpuBus);
+    cpuBus.ConnectCartridge(&cartridge);
 
     try
     {
