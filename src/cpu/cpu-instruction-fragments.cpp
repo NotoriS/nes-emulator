@@ -38,3 +38,16 @@ void CPU::ReturnFromInterrupt()
         });
     m_microInstructionQueue.push([this]() { reg_pc |= StackPop(); });
 }
+
+void CPU::ReturnFromSubroutine()
+{
+    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_microInstructionQueue.push([this]() { reg_s++; });
+    m_microInstructionQueue.push([this]()
+        {
+            reg_pc = StackPop();
+            reg_s++;
+        });
+    m_microInstructionQueue.push([this]() { reg_pc |= StackPop(); });
+    m_microInstructionQueue.push([this]() { reg_pc++; });
+}

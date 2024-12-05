@@ -131,6 +131,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x60 to 0x6F
         case 0x60: // RTS
+            ReturnFromSubroutine();
             break;
         case 0x61: // ADC (Indirect,X)
             break;
