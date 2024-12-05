@@ -59,6 +59,7 @@ void CPU::QueueNextInstuction()
         case 0x26: // ROL Zero Page
             break;
         case 0x28: // PLP
+            PullP();
             break;
         case 0x29: // AND Immediate
             break;
@@ -142,6 +143,7 @@ void CPU::QueueNextInstuction()
         case 0x66: // ROR Zero Page
             break;
         case 0x68: // PLA
+            PullA();
             break;
         case 0x69: // ADC Immediate
             break;

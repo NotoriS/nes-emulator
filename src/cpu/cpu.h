@@ -58,4 +58,6 @@ private:
     void ReturnFromSubroutine();
     void PushA();
     void PushP();
+    void PullA();
+    void PullP();
 };

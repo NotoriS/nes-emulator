@@ -71,3 +71,23 @@ void CPU::PushP()
             reg_s--;
         });
 }
+
+void CPU::PullA()
+{
+    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_microInstructionQueue.push([this]() { reg_s++; });
+    m_microInstructionQueue.push([this]()
+        {
+            reg_a = StackPop();
+        });
+}
+
+void CPU::PullP()
+{
+    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_microInstructionQueue.push([this]() { reg_s++; });
+    m_microInstructionQueue.push([this]()
+        {
+            reg_p = StackPop();
+        });
+}
