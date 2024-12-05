@@ -18,6 +18,7 @@ void CPU::QueueNextInstuction()
         case 0x06: // ASL Zero Page
             break;
         case 0x08: // PHP
+            PushP();
             break;
         case 0x09: // ORA Immediate
             break;
@@ -99,6 +100,7 @@ void CPU::QueueNextInstuction()
         case 0x46: // LSR Zero Page
             break;
         case 0x48: // PHA
+            PushA();
             break;
         case 0x49: // EOR Immediate
             break;

@@ -51,3 +51,23 @@ void CPU::ReturnFromSubroutine()
     m_microInstructionQueue.push([this]() { reg_pc |= StackPop(); });
     m_microInstructionQueue.push([this]() { reg_pc++; });
 }
+
+void CPU::PushA()
+{
+    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_microInstructionQueue.push([this]()
+        {
+            StackPush(reg_a);
+            reg_s--;
+        });
+}
+
+void CPU::PushP()
+{
+    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_microInstructionQueue.push([this]()
+        {
+            StackPush(reg_p);
+            reg_s--;
+        });
+}

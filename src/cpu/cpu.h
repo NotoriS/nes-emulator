@@ -56,4 +56,6 @@ private:
     void Break();
     void ReturnFromInterrupt();
     void ReturnFromSubroutine();
+    void PushA();
+    void PushP();
 };
