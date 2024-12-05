@@ -5,7 +5,7 @@ void CPU::Break()
     m_microInstructionQueue.push([this]() { reg_pc++; });
     m_microInstructionQueue.push([this]()
         {
-            StackPush(reg_pc >> 2);
+            StackPush(reg_pc >> 8);
             reg_s--;
         });
     m_microInstructionQueue.push([this]()
