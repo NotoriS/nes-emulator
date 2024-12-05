@@ -90,6 +90,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x40 to 0x4F
         case 0x40: // RTI
+            ReturnFromInterrupt();
             break;
         case 0x41: // EOR (Indirect,X)
             break;

@@ -54,4 +54,5 @@ private:
 
     // Instruction Queuing Fragments
     void Break();
+    void ReturnFromInterrupt();
 };
