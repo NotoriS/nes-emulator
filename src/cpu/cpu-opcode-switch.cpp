@@ -49,6 +49,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x20 to 0x2F
         case 0x20: // JSR
+            JumpToSubroutine();
             break;
         case 0x21: // AND (Indirect,X)
             break;

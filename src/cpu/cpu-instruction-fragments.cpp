@@ -91,3 +91,24 @@ void CPU::PullP()
             reg_p = StackPop();
         });
 }
+
+void CPU::JumpToSubroutine()
+{
+    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_microInstructionQueue.push([this]()
+        {
+            StackPush(reg_pc >> 8);
+            reg_s--;
+        });
+    m_microInstructionQueue.push([this]()
+        {
+            StackPush(reg_pc & 0x00FF);
+            reg_s--;
+        });
+    m_microInstructionQueue.push([this]()
+        {
+            m_targetAddress |= Read(reg_pc) << 8;
+            reg_pc = m_targetAddress;
+        });
+}

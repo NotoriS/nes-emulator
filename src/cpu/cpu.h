@@ -29,6 +29,8 @@ private:
     uint8_t  reg_s = 0xFD;      // Stack Pointer
     uint8_t  reg_p = 0x20;      // Status Register
 
+    uint16_t m_targetAddress = 0x0000;
+
     void QueueNextInstuction();
 
     void Write(uint16_t address, uint8_t data);
@@ -60,4 +62,5 @@ private:
     void PushP();
     void PullA();
     void PullP();
+    void JumpToSubroutine();
 };
