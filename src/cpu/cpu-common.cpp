@@ -37,3 +37,15 @@ void CPU::SetFlag(Flag flag, bool value)
     if (value) reg_p |= static_cast<uint8_t>(flag);
     else reg_p &= ~static_cast<uint8_t>(flag);
 }
+
+void CPU::StackPush(uint8_t value)
+{
+    Write(0x0100 | reg_s, value);
+    reg_s--;
+}
+
+uint8_t CPU::StackPop()
+{
+    reg_s++;
+    return Read(0x0100 | reg_s);
+}

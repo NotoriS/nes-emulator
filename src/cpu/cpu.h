@@ -48,4 +48,10 @@ private:
 
     uint8_t GetFlag(Flag flag);
     void SetFlag(Flag flag, bool value);
+
+    void StackPush(uint8_t value);
+    uint8_t StackPop();
+
+    // Instruction Queuing Fragments
+    void Break();
 };
