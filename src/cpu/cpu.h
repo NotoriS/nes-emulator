@@ -30,6 +30,7 @@ private:
     uint8_t  reg_p = 0x20;      // Status Register
 
     uint16_t m_targetAddress = 0x0000;
+    uint8_t m_operand = 0x00;
 
     void QueueNextInstuction();
 
@@ -55,6 +56,7 @@ private:
     uint8_t StackPop();
 
     // Instruction Queuing Fragments
+
     void Break();
     void ReturnFromInterrupt();
     void ReturnFromSubroutine();
@@ -63,4 +65,6 @@ private:
     void PullA();
     void PullP();
     void JumpToSubroutine();
+
+    void AbsoluteReadOnly(std::function<void()> operation);
 };
