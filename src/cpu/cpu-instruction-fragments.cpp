@@ -83,6 +83,8 @@ void CPU::PullA()
     m_microInstructionQueue.push([this]()
         {
             reg_a = StackPop();
+            SetFlag(Flag::Z, reg_a == 0);
+            SetFlag(Flag::N, reg_a & 0x80);
         });
 }
 
