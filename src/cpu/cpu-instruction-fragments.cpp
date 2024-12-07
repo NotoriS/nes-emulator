@@ -18,7 +18,11 @@ void CPU::Break()
             StackPush(reg_p | static_cast<uint8_t>(Flag::B));
             reg_s--;
         });
-    m_microInstructionQueue.push([this]() { reg_pc = Read(0xFFFE); });
+    m_microInstructionQueue.push([this]()
+        {
+            reg_pc = Read(0xFFFE);
+            SetFlag(Flag::I, true);
+        });
     m_microInstructionQueue.push([this]() { reg_pc |= Read(0xFFFF); });
 }
 
