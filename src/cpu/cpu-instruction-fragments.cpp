@@ -71,7 +71,7 @@ void CPU::PushP()
     m_microInstructionQueue.push([]() { /* Skip cycle */ });
     m_microInstructionQueue.push([this]()
         {
-            StackPush(reg_p);
+            StackPush(reg_p | static_cast<uint8_t>(Flag::B));
             reg_s--;
         });
 }
