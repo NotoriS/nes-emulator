@@ -67,4 +67,5 @@ private:
     void JumpToSubroutine();
 
     void AbsoluteReadOnly(std::function<void()> operation);
+    void AbsoluteReadModifyWrite(std::function<void()> operation);
 };
