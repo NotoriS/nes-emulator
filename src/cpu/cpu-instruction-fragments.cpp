@@ -122,10 +122,7 @@ void CPU::JumpToSubroutine()
 void CPU::AbsoluteReadOnly(std::function<void()> operation)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
-    m_microInstructionQueue.push([this]()
-        {
-            m_targetAddress |= Read(reg_pc) << 8;
-        });
+    m_microInstructionQueue.push([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
     m_microInstructionQueue.push([this, operation]()
         {
             m_operand = Read(m_targetAddress);
