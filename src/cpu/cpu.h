@@ -68,4 +68,5 @@ private:
 
     void AbsoluteReadOnly(std::function<void()> operation);
     void AbsoluteReadModifyWrite(std::function<void()> operation);
+    void AbsoluteWriteOnly(std::function<void()> operation);
 };

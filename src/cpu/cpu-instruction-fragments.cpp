@@ -138,3 +138,10 @@ void CPU::AbsoluteReadModifyWrite(std::function<void()> operation)
     m_microInstructionQueue.push([this, operation]() { operation(); });
     m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
 }
+
+void CPU::AbsoluteWriteOnly(std::function<void()> operation)
+{
+    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
+    m_microInstructionQueue.push([this, operation]() { operation(); });
+}
