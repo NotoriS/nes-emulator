@@ -155,3 +155,11 @@ void CPU::ZeroPageReadOnly(std::function<void()> operation)
             operation();
         });
 }
+
+void CPU::ZeroPageReadModifyWrite(std::function<void()> operation)
+{
+    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
+    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
+}

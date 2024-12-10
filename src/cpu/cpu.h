@@ -71,4 +71,5 @@ private:
     void AbsoluteWriteOnly(std::function<void()> operation);
 
     void ZeroPageReadOnly(std::function<void()> operation);
+    void ZeroPageReadModifyWrite(std::function<void()> operation);
 };
