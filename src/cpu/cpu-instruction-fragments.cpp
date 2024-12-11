@@ -146,9 +146,26 @@ void CPU::AbsoluteWriteOnly(std::function<void()> operation)
     m_microInstructionQueue.push([this, operation]() { operation(); });
 }
 
-void CPU::ZeroPageReadOnly(std::function<void()> operation)
+void CPU::ZeroPageReadOnly(std::function<void()> operation, AddressIndex indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+
+    switch (indexType)
+    {
+        case AddressIndex::None:
+            // Do nothing
+            break;
+        case AddressIndex::X:
+            m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
+            break;
+        case AddressIndex::Y:
+            m_microInstructionQueue.push([this]() { m_targetAddress += reg_y; });
+            break;
+        default:
+            throw std::runtime_error("Unexpected address index type.");
+            break;
+    }
+
     m_microInstructionQueue.push([this, operation]()
         {
             m_operand = Read(m_targetAddress);
@@ -156,16 +173,48 @@ void CPU::ZeroPageReadOnly(std::function<void()> operation)
         });
 }
 
-void CPU::ZeroPageReadModifyWrite(std::function<void()> operation)
+void CPU::ZeroPageReadModifyWrite(std::function<void()> operation, AddressIndex indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+
+    switch (indexType)
+    {
+        case AddressIndex::None:
+            // Do nothing
+            break;
+        case AddressIndex::X:
+            m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
+            break;
+        case AddressIndex::Y: // Unexpected
+        default:
+            throw std::runtime_error("Unexpected address index type.");
+            break;
+    }
+
     m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
     m_microInstructionQueue.push([this, operation]() { operation(); });
     m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
 }
 
-void CPU::ZeroPageWriteOnly(std::function<void()> operation)
+void CPU::ZeroPageWriteOnly(std::function<void()> operation, AddressIndex indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+
+    switch (indexType)
+    {
+        case AddressIndex::None:
+            // Do nothing
+            break;
+        case AddressIndex::X:
+            m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
+            break;
+        case AddressIndex::Y:
+            m_microInstructionQueue.push([this]() { m_targetAddress += reg_y; });
+            break;
+        default:
+            throw std::runtime_error("Unexpected address index type.");
+            break;
+    }
+
     m_microInstructionQueue.push([this, operation]() { operation(); });
 }

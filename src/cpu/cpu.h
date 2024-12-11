@@ -3,6 +3,7 @@
 #include <queue>
 #include <functional>
 #include <cstdint>
+#include <iostream>
 
 #include "../interfaces/i-bus.h"
 
@@ -17,6 +18,25 @@ public:
     void Clock();
 
 private:
+    enum class Flag : uint8_t
+    {
+        C = 1,          // Carry
+        Z = (1 << 1),   // Zero
+        I = (1 << 2),   // Interrupt Disable
+        D = (1 << 3),   // Decimal Mode
+        B = (1 << 4),   // Break
+        U = (1 << 5),   // Unused
+        V = (1 << 6),   // Overflow
+        N = (1 << 7),   // Negative
+    };
+
+    enum class AddressIndex : uint8_t
+    {
+        None = 0,
+        X = 1,
+        Y = 2,
+    };
+
     IBus* m_bus = nullptr;
 
     // Contains "per cycle" instructions that will execute when clock is called.
@@ -36,18 +56,6 @@ private:
 
     void Write(uint16_t address, uint8_t data);
     uint8_t Read(uint16_t address);
-
-    enum class Flag : uint8_t
-    {
-        C = 1,          // Carry
-        Z = (1 << 1),   // Zero
-        I = (1 << 2),   // Interrupt Disable
-        D = (1 << 3),   // Decimal Mode
-        B = (1 << 4),   // Break
-        U = (1 << 5),   // Unused
-        V = (1 << 6),   // Overflow
-        N = (1 << 7),   // Negative
-    };
 
     uint8_t GetFlag(Flag flag);
     void SetFlag(Flag flag, bool value);
@@ -70,7 +78,7 @@ private:
     void AbsoluteReadModifyWrite(std::function<void()> operation);
     void AbsoluteWriteOnly(std::function<void()> operation);
 
-    void ZeroPageReadOnly(std::function<void()> operation);
-    void ZeroPageReadModifyWrite(std::function<void()> operation);
-    void ZeroPageWriteOnly(std::function<void()> operation);
+    void ZeroPageReadOnly(std::function<void()> operation, AddressIndex indexType);
+    void ZeroPageReadModifyWrite(std::function<void()> operation, AddressIndex indexType);
+    void ZeroPageWriteOnly(std::function<void()> operation, AddressIndex indexType);
 };
