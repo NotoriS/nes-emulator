@@ -294,3 +294,17 @@ void CPU::ZeroPageWriteOnly(std::function<void()> operation, AddressIndex indexT
 
     m_microInstructionQueue.push([this, operation]() { operation(); });
 }
+
+void CPU::IndexedIndirectReadOnly(std::function<void()> operation)
+{
+    // Temporarily uses the operand variable to store a pointer
+    m_microInstructionQueue.push([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push([this]() { m_operand += reg_x; });
+    m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
+    m_microInstructionQueue.push([this]() { m_targetAddress |= Read(m_operand) << 8; });
+    m_microInstructionQueue.push([this, operation]()
+        {
+            m_operand = Read(m_targetAddress);
+            operation();
+        });
+}
