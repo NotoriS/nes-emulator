@@ -122,6 +122,15 @@ void CPU::JumpToSubroutine()
         });
 }
 
+void CPU::ImmediateReadOnly(std::function<void()> operation)
+{
+    m_microInstructionQueue.push([this, operation]()
+        {
+            m_operand = Read(reg_pc++);
+            operation();
+        });
+}
+
 void CPU::AbsoluteReadOnly(std::function<void()> operation, AddressIndex indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });

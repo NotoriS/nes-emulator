@@ -76,6 +76,8 @@ private:
     void PullP();
     void JumpToSubroutine();
 
+    void ImmediateReadOnly(std::function<void()> operation);
+
     void AbsoluteReadOnly(std::function<void()> operation, AddressIndex indexType);
     void AbsoluteReadModifyWrite(std::function<void()> operation, AddressIndex indexType);
     void AbsoluteWriteOnly(std::function<void()> operation, AddressIndex indexType);
