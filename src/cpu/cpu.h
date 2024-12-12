@@ -88,4 +88,5 @@ private:
 
     void IndexedIndirectReadOnly(std::function<void()> operation); // (Indirect,X)
     void IndexedIndirectReadModifyWrite(std::function<void()> operation); // (Indirect,X)
+    void IndexedIndirectWriteOnly(std::function<void()> operation); // (Indirect,X)
 };
