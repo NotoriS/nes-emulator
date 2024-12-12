@@ -52,6 +52,8 @@ private:
     uint16_t m_targetAddress = 0x0000;
     uint8_t m_operand = 0x00;
 
+    bool m_skipNextCycle = false;
+
     void QueueNextInstuction();
 
     void Write(uint16_t address, uint8_t data);
@@ -74,9 +76,9 @@ private:
     void PullP();
     void JumpToSubroutine();
 
-    void AbsoluteReadOnly(std::function<void()> operation);
-    void AbsoluteReadModifyWrite(std::function<void()> operation);
-    void AbsoluteWriteOnly(std::function<void()> operation);
+    void AbsoluteReadOnly(std::function<void()> operation, AddressIndex indexType);
+    void AbsoluteReadModifyWrite(std::function<void()> operation, AddressIndex indexType);
+    void AbsoluteWriteOnly(std::function<void()> operation, AddressIndex indexType);
 
     void ZeroPageReadOnly(std::function<void()> operation, AddressIndex indexType);
     void ZeroPageReadModifyWrite(std::function<void()> operation, AddressIndex indexType);

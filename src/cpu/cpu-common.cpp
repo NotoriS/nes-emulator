@@ -6,6 +6,12 @@ CPU::~CPU() {}
 
 void CPU::Clock()
 {
+    if (m_skipNextCycle)
+    {
+        m_skipNextCycle = false;
+        return;
+    }
+
     if (m_microInstructionQueue.empty())
     {
         QueueNextInstuction();
