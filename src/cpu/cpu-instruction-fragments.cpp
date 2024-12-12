@@ -28,7 +28,7 @@ void CPU::Break()
 
 void CPU::ReturnFromInterrupt()
 {
-    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_skipNextCycle = true;
     m_microInstructionQueue.push([this]() { reg_s++; });
     m_microInstructionQueue.push([this]()
         {
@@ -45,7 +45,7 @@ void CPU::ReturnFromInterrupt()
 
 void CPU::ReturnFromSubroutine()
 {
-    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_skipNextCycle = true;
     m_microInstructionQueue.push([this]() { reg_s++; });
     m_microInstructionQueue.push([this]()
         {
@@ -58,7 +58,7 @@ void CPU::ReturnFromSubroutine()
 
 void CPU::PushA()
 {
-    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_skipNextCycle = true;
     m_microInstructionQueue.push([this]()
         {
             StackPush(reg_a);
@@ -68,7 +68,7 @@ void CPU::PushA()
 
 void CPU::PushP()
 {
-    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_skipNextCycle = true;
     m_microInstructionQueue.push([this]()
         {
             StackPush(reg_p | static_cast<uint8_t>(Flag::B));
@@ -78,7 +78,7 @@ void CPU::PushP()
 
 void CPU::PullA()
 {
-    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_skipNextCycle = true;
     m_microInstructionQueue.push([this]() { reg_s++; });
     m_microInstructionQueue.push([this]()
         {
@@ -90,7 +90,7 @@ void CPU::PullA()
 
 void CPU::PullP()
 {
-    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_skipNextCycle = true;
     m_microInstructionQueue.push([this]() { reg_s++; });
     m_microInstructionQueue.push([this]()
         {
@@ -100,8 +100,11 @@ void CPU::PullP()
 
 void CPU::JumpToSubroutine()
 {
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
-    m_microInstructionQueue.push([]() { /* Skip cycle */ });
+    m_microInstructionQueue.push([this]()
+        {
+            m_targetAddress = Read(reg_pc++);
+            m_skipNextCycle = true;
+        });
     m_microInstructionQueue.push([this]()
         {
             StackPush(reg_pc >> 8);
