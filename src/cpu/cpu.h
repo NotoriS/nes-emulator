@@ -87,4 +87,5 @@ private:
     void ZeroPageWriteOnly(std::function<void()> operation, AddressIndex indexType);
 
     void IndexedIndirectReadOnly(std::function<void()> operation); // (Indirect,X)
+    void IndexedIndirectReadModifyWrite(std::function<void()> operation); // (Indirect,X)
 };

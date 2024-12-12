@@ -308,3 +308,15 @@ void CPU::IndexedIndirectReadOnly(std::function<void()> operation)
             operation();
         });
 }
+
+void CPU::IndexedIndirectReadModifyWrite(std::function<void()> operation)
+{
+    // Temporarily uses the operand variable to store a pointer
+    m_microInstructionQueue.push([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push([this]() { m_operand += reg_x; });
+    m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
+    m_microInstructionQueue.push([this]() { m_targetAddress |= Read(m_operand) << 8; });
+    m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
+    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
+}
