@@ -9,7 +9,7 @@ void CPU::QueueNextInstuction()
     {
         // Opcodes 0x00 to 0x0F
         case 0x00: // BRK
-            Break();
+            BRK();
             break;
         case 0x01: // ORA (Indirect,X)
             break;
@@ -18,7 +18,7 @@ void CPU::QueueNextInstuction()
         case 0x06: // ASL Zero Page
             break;
         case 0x08: // PHP
-            PushP();
+            PHP();
             break;
         case 0x09: // ORA Immediate
             break;
@@ -49,7 +49,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x20 to 0x2F
         case 0x20: // JSR
-            JumpToSubroutine();
+            JSR();
             break;
         case 0x21: // AND (Indirect,X)
             break;
@@ -60,7 +60,7 @@ void CPU::QueueNextInstuction()
         case 0x26: // ROL Zero Page
             break;
         case 0x28: // PLP
-            PullP();
+            PLP();
             break;
         case 0x29: // AND Immediate
             break;
@@ -93,7 +93,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x40 to 0x4F
         case 0x40: // RTI
-            ReturnFromInterrupt();
+            RTI();
             break;
         case 0x41: // EOR (Indirect,X)
             break;
@@ -102,7 +102,7 @@ void CPU::QueueNextInstuction()
         case 0x46: // LSR Zero Page
             break;
         case 0x48: // PHA
-            PushA();
+            PHA();
             break;
         case 0x49: // EOR Immediate
             break;
@@ -135,7 +135,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x60 to 0x6F
         case 0x60: // RTS
-            ReturnFromSubroutine();
+            RTS();
             break;
         case 0x61: // ADC (Indirect,X)
             break;
@@ -144,7 +144,7 @@ void CPU::QueueNextInstuction()
         case 0x66: // ROR Zero Page
             break;
         case 0x68: // PLA
-            PullA();
+            PLA();
             break;
         case 0x69: // ADC Immediate
             break;
