@@ -131,7 +131,7 @@ void CPU::ImmediateReadOnly(std::function<void()> operation)
         });
 }
 
-void CPU::AbsoluteReadOnly(std::function<void()> operation, AddressIndex indexType)
+void CPU::AbsoluteReadOnly(std::function<void()> operation, IndexType indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
     m_microInstructionQueue.push([this, indexType]()
@@ -141,12 +141,12 @@ void CPU::AbsoluteReadOnly(std::function<void()> operation, AddressIndex indexTy
 
             switch (indexType)
             {
-                case AddressIndex::None:
+                case IndexType::None:
                     return; // No need to continue
-                case AddressIndex::X:
+                case IndexType::X:
                     m_targetAddress += reg_x;
                     break;
-                case AddressIndex::Y:
+                case IndexType::Y:
                     m_targetAddress += reg_y;
                     break;
                 default:
@@ -166,16 +166,16 @@ void CPU::AbsoluteReadOnly(std::function<void()> operation, AddressIndex indexTy
         });
 }
 
-void CPU::AbsoluteReadModifyWrite(std::function<void()> operation, AddressIndex indexType)
+void CPU::AbsoluteReadModifyWrite(std::function<void()> operation, IndexType indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
 
     switch (indexType)
     {
-        case AddressIndex::None:
+        case IndexType::None:
             m_microInstructionQueue.push([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
             break;
-        case AddressIndex::X:
+        case IndexType::X:
             m_microInstructionQueue.push([this]()
                 {
                     m_targetAddress |= Read(reg_pc++) << 8;
@@ -183,7 +183,7 @@ void CPU::AbsoluteReadModifyWrite(std::function<void()> operation, AddressIndex 
                     m_skipNextCycle = true;
                 });
             break;
-        case AddressIndex::Y: // Unexpected
+        case IndexType::Y: // Unexpected
         default:
             throw std::runtime_error("Unexpected address index type.");
     }
@@ -193,16 +193,16 @@ void CPU::AbsoluteReadModifyWrite(std::function<void()> operation, AddressIndex 
     m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
 }
 
-void CPU::AbsoluteWriteOnly(std::function<void()> operation, AddressIndex indexType)
+void CPU::AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
     
     switch (indexType)
     {
-        case AddressIndex::None:
+        case IndexType::None:
             m_microInstructionQueue.push([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
             break;
-        case AddressIndex::X:
+        case IndexType::X:
             m_microInstructionQueue.push([this]()
                 {
                     m_targetAddress |= Read(reg_pc++) << 8;
@@ -210,7 +210,7 @@ void CPU::AbsoluteWriteOnly(std::function<void()> operation, AddressIndex indexT
                     m_skipNextCycle = true;
                 });
             break;
-        case AddressIndex::Y:
+        case IndexType::Y:
             m_microInstructionQueue.push([this]()
                 {
                     m_targetAddress |= Read(reg_pc++) << 8;
@@ -225,19 +225,19 @@ void CPU::AbsoluteWriteOnly(std::function<void()> operation, AddressIndex indexT
     m_microInstructionQueue.push([this, operation]() { operation(); });
 }
 
-void CPU::ZeroPageReadOnly(std::function<void()> operation, AddressIndex indexType)
+void CPU::ZeroPageReadOnly(std::function<void()> operation, IndexType indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
 
     switch (indexType)
     {
-        case AddressIndex::None:
+        case IndexType::None:
             // Do nothing
             break;
-        case AddressIndex::X:
+        case IndexType::X:
             m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
             break;
-        case AddressIndex::Y:
+        case IndexType::Y:
             m_microInstructionQueue.push([this]() { m_targetAddress += reg_y; });
             break;
         default:
@@ -251,19 +251,19 @@ void CPU::ZeroPageReadOnly(std::function<void()> operation, AddressIndex indexTy
         });
 }
 
-void CPU::ZeroPageReadModifyWrite(std::function<void()> operation, AddressIndex indexType)
+void CPU::ZeroPageReadModifyWrite(std::function<void()> operation, IndexType indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
 
     switch (indexType)
     {
-        case AddressIndex::None:
+        case IndexType::None:
             // Do nothing
             break;
-        case AddressIndex::X:
+        case IndexType::X:
             m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
             break;
-        case AddressIndex::Y: // Unexpected
+        case IndexType::Y: // Unexpected
         default:
             throw std::runtime_error("Unexpected address index type.");
     }
@@ -273,19 +273,19 @@ void CPU::ZeroPageReadModifyWrite(std::function<void()> operation, AddressIndex 
     m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
 }
 
-void CPU::ZeroPageWriteOnly(std::function<void()> operation, AddressIndex indexType)
+void CPU::ZeroPageWriteOnly(std::function<void()> operation, IndexType indexType)
 {
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
 
     switch (indexType)
     {
-        case AddressIndex::None:
+        case IndexType::None:
             // Do nothing
             break;
-        case AddressIndex::X:
+        case IndexType::X:
             m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
             break;
-        case AddressIndex::Y:
+        case IndexType::Y:
             m_microInstructionQueue.push([this]() { m_targetAddress += reg_y; });
             break;
         default:

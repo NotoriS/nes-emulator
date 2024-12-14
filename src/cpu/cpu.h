@@ -30,7 +30,7 @@ private:
         N = (1 << 7),   // Negative
     };
 
-    enum class AddressIndex : uint8_t
+    enum class IndexType : uint8_t
     {
         None = 0,
         X = 1,
@@ -79,13 +79,13 @@ private:
 #pragma region Instruction Queuing Function Addressing Mode Wrappers
     void ImmediateReadOnly(std::function<void()> operation);
 
-    void AbsoluteReadOnly(std::function<void()> operation, AddressIndex indexType);
-    void AbsoluteReadModifyWrite(std::function<void()> operation, AddressIndex indexType);
-    void AbsoluteWriteOnly(std::function<void()> operation, AddressIndex indexType);
+    void AbsoluteReadOnly(std::function<void()> operation, IndexType indexType);
+    void AbsoluteReadModifyWrite(std::function<void()> operation, IndexType indexType);
+    void AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType);
 
-    void ZeroPageReadOnly(std::function<void()> operation, AddressIndex indexType);
-    void ZeroPageReadModifyWrite(std::function<void()> operation, AddressIndex indexType);
-    void ZeroPageWriteOnly(std::function<void()> operation, AddressIndex indexType);
+    void ZeroPageReadOnly(std::function<void()> operation, IndexType indexType);
+    void ZeroPageReadModifyWrite(std::function<void()> operation, IndexType indexType);
+    void ZeroPageWriteOnly(std::function<void()> operation, IndexType indexType);
 
     void IndexedIndirectReadOnly(std::function<void()> operation); // (Indirect,X)
     void IndexedIndirectReadModifyWrite(std::function<void()> operation); // (Indirect,X)
