@@ -65,8 +65,7 @@ private:
     void StackPush(uint8_t value);
     uint8_t StackPop();
 
-    // Instruction Queuing Fragments
-
+#pragma region Standalone Instruction Queuing Functions
     void Break();
     void ReturnFromInterrupt();
     void ReturnFromSubroutine();
@@ -75,7 +74,9 @@ private:
     void PullA();
     void PullP();
     void JumpToSubroutine();
+#pragma endregion
 
+#pragma region Instruction Queuing Function Addressing Mode Wrappers
     void ImmediateReadOnly(std::function<void()> operation);
 
     void AbsoluteReadOnly(std::function<void()> operation, AddressIndex indexType);
@@ -93,4 +94,5 @@ private:
     void IndirectIndexedReadOnly(std::function<void()> operation); // (Indirect),Y
     void IndirectIndexedReadModifyWrite(std::function<void()> operation); // (Indirect),Y
     void IndirectIndexedWriteOnly(std::function<void()> operation); // (Indirect),Y
+#pragma endregion
 };
