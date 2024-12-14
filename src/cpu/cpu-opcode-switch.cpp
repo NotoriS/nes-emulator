@@ -138,8 +138,10 @@ void CPU::QueueNextInstuction()
             RTS();
             break;
         case 0x61: // ADC (Indirect,X)
+            IndexedIndirectReadOnly([this]() { ADC(); });
             break;
         case 0x65: // ADC Zero Page
+            ZeroPageReadOnly([this]() { ADC(); }, IndexType::None);
             break;
         case 0x66: // ROR Zero Page
             break;
@@ -147,12 +149,14 @@ void CPU::QueueNextInstuction()
             PLA();
             break;
         case 0x69: // ADC Immediate
+            ImmediateReadOnly([this]() { ADC(); });
             break;
         case 0x6A: // ROR Accumulator
             break;
         case 0x6C: // JMP (Indirect)
             break;
         case 0x6D: // ADC Absolute
+            AbsoluteReadOnly([this]() { ADC(); }, IndexType::None);
             break;
         case 0x6E: // ROR Absolute
             break;
@@ -161,16 +165,20 @@ void CPU::QueueNextInstuction()
         case 0x70: // BVS
             break;
         case 0x71: // ADC (Indirect),Y
+            IndirectIndexedReadOnly([this]() { ADC(); });
             break;
         case 0x75: // ADC Zero Page,X
+            ZeroPageReadOnly([this]() { ADC(); }, IndexType::X);
             break;
         case 0x76: // ROR Zero Page,X
             break;
         case 0x78: // SEI
             break;
         case 0x79: // ADC Absolute,Y
+            AbsoluteReadOnly([this]() { ADC(); }, IndexType::Y);
             break;
         case 0x7D: // ADC Absolute,X
+            AbsoluteReadOnly([this]() { ADC(); }, IndexType::X);
             break;
         case 0x7E: // ROR Absolute,X
             break;

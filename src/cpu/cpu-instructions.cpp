@@ -264,6 +264,18 @@ void CPU::IndirectIndexedWriteOnly(std::function<void()> operation)
     m_microInstructionQueue.push([this, operation]() { operation(); });
 }
 
+void CPU::ADC()
+{
+    uint16_t result = reg_a + m_operand + GetFlag(Flag::C);
+
+    SetFlag(Flag::C, result > 0xFF);
+    SetFlag(Flag::Z, result == 0);
+    SetFlag(Flag::V, (result ^ reg_a) & (result ^ m_operand) & 0x80);
+    SetFlag(Flag::N, result & 0x80);
+
+    reg_a = static_cast<uint8_t>(result);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });
@@ -274,7 +286,7 @@ void CPU::BRK()
         });
     m_microInstructionQueue.push([this]()
         {
-            StackPush(reg_pc & 0x00FF);
+            StackPush(static_cast<uint8_t>(reg_pc));
             reg_s--;
         });
     m_microInstructionQueue.push([this]()
@@ -376,7 +388,7 @@ void CPU::JSR()
         });
     m_microInstructionQueue.push([this]()
         {
-            StackPush(reg_pc & 0x00FF);
+            StackPush(static_cast<uint8_t>(reg_pc));
             reg_s--;
         });
     m_microInstructionQueue.push([this]()

@@ -86,7 +86,7 @@ private:
 #pragma endregion
 
 #pragma region Wrapped Instruction Queuing Functions
-
+    void ADC(); // Add with carry
 #pragma endregion
 
 #pragma region Standalone Instruction Queuing Functions
