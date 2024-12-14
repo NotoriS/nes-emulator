@@ -67,7 +67,7 @@ void CPU::AbsoluteReadModifyWrite(std::function<void()> operation, IndexType ind
     }
 
     m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
-    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push(operation);
     m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
 }
 
@@ -100,7 +100,7 @@ void CPU::AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType
             throw std::runtime_error("Unexpected address index type.");
     }
 
-    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push(operation);
 }
 
 void CPU::ZeroPageReadOnly(std::function<void()> operation, IndexType indexType)
@@ -147,7 +147,7 @@ void CPU::ZeroPageReadModifyWrite(std::function<void()> operation, IndexType ind
     }
 
     m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
-    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push(operation);
     m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
 }
 
@@ -170,7 +170,7 @@ void CPU::ZeroPageWriteOnly(std::function<void()> operation, IndexType indexType
             throw std::runtime_error("Unexpected address index type.");
     }
 
-    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push(operation);
 }
 
 void CPU::IndexedIndirectReadOnly(std::function<void()> operation)
@@ -195,7 +195,7 @@ void CPU::IndexedIndirectReadModifyWrite(std::function<void()> operation)
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
     m_microInstructionQueue.push([this]() { m_targetAddress |= Read(m_operand) << 8; });
     m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
-    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push(operation);
     m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
 }
 
@@ -206,7 +206,7 @@ void CPU::IndexedIndirectWriteOnly(std::function<void()> operation)
     m_microInstructionQueue.push([this]() { m_operand += reg_x; });
     m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
     m_microInstructionQueue.push([this]() { m_targetAddress |= Read(m_operand) << 8; });
-    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push(operation);
 }
 
 void CPU::IndirectIndexedReadOnly(std::function<void()> operation)
@@ -246,7 +246,7 @@ void CPU::IndirectIndexedReadModifyWrite(std::function<void()> operation)
             m_skipNextCycle = true;
         });
     m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
-    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push(operation);
     m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
 }
 
@@ -261,7 +261,7 @@ void CPU::IndirectIndexedWriteOnly(std::function<void()> operation)
             m_targetAddress += reg_y;
             m_skipNextCycle = true;
         });
-    m_microInstructionQueue.push([this, operation]() { operation(); });
+    m_microInstructionQueue.push(operation);
 }
 
 void CPU::ADC()
