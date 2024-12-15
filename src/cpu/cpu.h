@@ -68,6 +68,8 @@ private:
 #pragma region Instruction Queuing Function Addressing Mode Wrappers
     void ImmediateReadOnly(std::function<void()> operation);
 
+    void AccumulatorReadModifyWrite(std::function<void()> operation);
+
     void AbsoluteReadOnly(std::function<void()> operation, IndexType indexType);
     void AbsoluteReadModifyWrite(std::function<void()> operation, IndexType indexType);
     void AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType);
