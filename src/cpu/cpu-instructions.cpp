@@ -276,6 +276,14 @@ void CPU::ADC()
     reg_a = static_cast<uint8_t>(result);
 }
 
+void CPU::AND()
+{
+    reg_a &= m_operand;
+
+    SetFlag(Flag::Z, reg_a == 0);
+    SetFlag(Flag::N, reg_a & 0x80);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });

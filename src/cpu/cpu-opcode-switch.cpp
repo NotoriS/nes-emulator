@@ -52,10 +52,12 @@ void CPU::QueueNextInstuction()
             JSR();
             break;
         case 0x21: // AND (Indirect,X)
+            IndexedIndirectReadOnly([this]() { AND(); });
             break;
         case 0x24: // BIT Zero Page
             break;
         case 0x25: // AND Zero Page
+            ZeroPageReadOnly([this]() { AND(); }, IndexType::None);
             break;
         case 0x26: // ROL Zero Page
             break;
@@ -63,12 +65,14 @@ void CPU::QueueNextInstuction()
             PLP();
             break;
         case 0x29: // AND Immediate
+            ImmediateReadOnly([this]() { AND(); });
             break;
         case 0x2A: // ROL Accumulator
             break;
         case 0x2C: // BIT Absolute
             break;
         case 0x2D: // AND Absolute
+            AbsoluteReadOnly([this]() { AND(); }, IndexType::None);
             break;
         case 0x2E: // ROL Absolute
             break;
@@ -77,16 +81,20 @@ void CPU::QueueNextInstuction()
         case 0x30: // BMI
             break;
         case 0x31: // AND (Indirect),Y
+            IndirectIndexedReadOnly([this]() { AND(); });
             break;
         case 0x35: // AND Zero Page,X
+            ZeroPageReadOnly([this]() { AND(); }, IndexType::X);
             break;
         case 0x36: // ROL Zero Page,X
             break;
         case 0x38: // SEC
             break;
         case 0x39: // AND Absolute,Y
+            AbsoluteReadOnly([this]() { AND(); }, IndexType::Y);
             break;
         case 0x3D: // AND Absolute,X
+            AbsoluteReadOnly([this]() { AND(); }, IndexType::X);
             break;
         case 0x3E: // ROL Absolute,X
             break;
