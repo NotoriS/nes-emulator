@@ -16,6 +16,7 @@ void CPU::QueueNextInstuction()
         case 0x05: // ORA Zero Page
             break;
         case 0x06: // ASL Zero Page
+            ZeroPageReadModifyWrite([this]() { ASL(); }, IndexType::None);
             break;
         case 0x08: // PHP
             PHP();
@@ -23,10 +24,12 @@ void CPU::QueueNextInstuction()
         case 0x09: // ORA Immediate
             break;
         case 0x0A: // ASL Accumulator
+            AccumulatorReadModifyWrite([this]() { ASL(); });
             break;
         case 0x0D: // ORA Absolute
             break;
         case 0x0E: // ASL Absolute
+            AbsoluteReadModifyWrite([this]() { ASL(); }, IndexType::None);
             break;
 
         // Opcodes 0x10 to 0x1F
@@ -37,6 +40,7 @@ void CPU::QueueNextInstuction()
         case 0x15: // ORA Zero Page,X
             break;
         case 0x16: // ASL Zero Page,X
+            ZeroPageReadModifyWrite([this]() { ASL(); }, IndexType::X);
             break;
         case 0x18: // CLC
             break;
@@ -45,6 +49,7 @@ void CPU::QueueNextInstuction()
         case 0x1D: // ORA Absolute,X
             break;
         case 0x1E: // ASL Absolute,X
+            AbsoluteReadModifyWrite([this]() { ASL(); }, IndexType::X);
             break;
 
         // Opcodes 0x20 to 0x2F

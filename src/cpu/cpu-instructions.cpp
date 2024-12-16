@@ -294,6 +294,16 @@ void CPU::AND()
     SetFlag(Flag::N, reg_a & 0x80);
 }
 
+void CPU::ASL()
+{
+    SetFlag(Flag::C, m_operand & 0x80);
+
+    m_operand = m_operand << 1;
+
+    SetFlag(Flag::Z, m_operand == 0);
+    SetFlag(Flag::N, m_operand & 0x80);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });

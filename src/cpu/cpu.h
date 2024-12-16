@@ -90,6 +90,7 @@ private:
 #pragma region Wrapped Instruction Queuing Functions
     void ADC(); // Add with carry
     void AND(); // Bitwise AND
+    void ASL(); // Arithmetic shift left
 #pragma endregion
 
 #pragma region Standalone Instruction Queuing Functions
