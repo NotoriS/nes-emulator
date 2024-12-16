@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    NesEmulator emulator = NesEmulator(argv[1]);
+    NesEmulator emulator(argv[1]);
     emulator.Run();
 
     return 0;

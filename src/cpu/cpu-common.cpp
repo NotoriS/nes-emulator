@@ -31,6 +31,7 @@ void CPU::Write(uint16_t address, uint8_t data)
 uint8_t CPU::Read(uint16_t address)
 {
     if (m_bus != nullptr) return m_bus->Read(address);
+    throw std::runtime_error("CPU tried to read from the bus before it was connected.");
 }
 
 uint8_t CPU::GetFlag(Flag flag)

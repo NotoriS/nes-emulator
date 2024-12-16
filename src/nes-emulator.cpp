@@ -15,9 +15,9 @@ NesEmulator::~NesEmulator() {}
 
 void NesEmulator::Run()
 {
-    CPU cpu = CPU();
-    CpuBus cpuBus = CpuBus();
-    Cartridge cartridge = Cartridge();
+    CPU cpu;
+    CpuBus cpuBus;
+    Cartridge cartridge;
 
     cpu.ConnectBus(&cpuBus);
     cpuBus.ConnectCartridge(&cartridge);
