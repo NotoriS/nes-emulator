@@ -4,6 +4,5 @@
 
 TEST(TestTests, Test1) 
 {
-    CPU cpu;
     EXPECT_EQ(1, 1);
 }

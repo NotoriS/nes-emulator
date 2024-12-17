@@ -10,11 +10,10 @@
 class CPU
 {
 public:
-    CPU();
+    CPU(IBus* bus);
     ~CPU();
 
-    void ConnectBus(IBus* bus) { m_bus = bus; }
-
+    void Reset();
     void Clock();
 
 private:
@@ -37,7 +36,7 @@ private:
         Y = 2,
     };
 
-    IBus* m_bus = nullptr;
+    IBus* m_bus;
 
     // Contains "per cycle" instructions that will execute when clock is called.
     std::queue<std::function<void()>> m_microInstructionQueue; 
@@ -45,9 +44,9 @@ private:
     uint8_t  reg_a = 0x00;      // Accumulator Register
     uint8_t  reg_x = 0x00;      // X Register
     uint8_t  reg_y = 0x00;      // Y Register
-    uint16_t reg_pc = 0xFFFC;   // Program Counter
-    uint8_t  reg_s = 0xFD;      // Stack Pointer
-    uint8_t  reg_p = 0x20;      // Status Register
+    uint16_t reg_pc = 0x0000;   // Program Counter
+    uint8_t  reg_s = 0x00;      // Stack Pointer
+    uint8_t  reg_p = 0x00;      // Status Register
 
     uint16_t m_targetAddress = 0x0000;
     uint8_t m_operand = 0x00;

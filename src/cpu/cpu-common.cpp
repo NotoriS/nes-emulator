@@ -1,8 +1,24 @@
 #include "cpu.h"
 
-CPU::CPU() {}
+CPU::CPU(IBus* bus) : m_bus(bus)
+{
+    Reset();
+}
 
 CPU::~CPU() {}
+
+void CPU::Reset()
+{
+    while (!m_microInstructionQueue.empty()) m_microInstructionQueue.pop();
+
+    reg_pc = Read(0xFFFC);
+    reg_pc |= Read(0xFFFD) << 8;
+
+    reg_s -= 3;
+
+    SetFlag(Flag::U, true);
+    SetFlag(Flag::I, true);
+}
 
 void CPU::Clock()
 {

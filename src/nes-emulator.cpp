@@ -15,11 +15,8 @@ NesEmulator::~NesEmulator() {}
 
 void NesEmulator::Run()
 {
-    CPU cpu;
     CpuBus cpuBus;
     Cartridge cartridge;
-
-    cpu.ConnectBus(&cpuBus);
     cpuBus.ConnectCartridge(&cartridge);
 
     try
@@ -31,6 +28,8 @@ void NesEmulator::Run()
         std::cerr << "Fatal Error (" << e.what() << ")" << std::endl;
         return;
     }
+
+    CPU cpu(&cpuBus);
 
     while (true)
     {
