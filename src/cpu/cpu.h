@@ -94,6 +94,7 @@ private:
     void ASL(); // Arithmetic shift left
     void LDA(); // Load A
     void LDX(); // Load X
+    void LDY(); // Load Y
 #pragma endregion
 
 #pragma region Standalone Instruction Queuing Functions

@@ -238,6 +238,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xA0 to 0xAF
         case 0xA0: // LDY Immediate
+            ImmediateReadOnly([this]() { LDY(); });
             break;
         case 0xA1: // LDA (Indirect,X)
             IndexedIndirectReadOnly([this]() { LDA(); });
@@ -246,6 +247,7 @@ void CPU::QueueNextInstuction()
             ImmediateReadOnly([this]() { LDX(); });
             break;
         case 0xA4: // LDY Zero Page
+            ZeroPageReadOnly([this]() { LDY(); }, IndexType::None);
             break;
         case 0xA5: // LDA Zero Page
             ZeroPageReadOnly([this]() { LDA(); }, IndexType::None);
@@ -261,6 +263,7 @@ void CPU::QueueNextInstuction()
         case 0xAA: // TAX
             break;
         case 0xAC: // LDY Absolute
+            AbsoluteReadOnly([this]() { LDY(); }, IndexType::None);
             break;
         case 0xAD: // LDA Absolute
             AbsoluteReadOnly([this]() { LDA(); }, IndexType::None);
@@ -276,6 +279,7 @@ void CPU::QueueNextInstuction()
             IndirectIndexedReadOnly([this]() { LDA(); });
             break;
         case 0xB4: // LDY Zero Page,X
+            ZeroPageReadOnly([this]() { LDY(); }, IndexType::X);
             break;
         case 0xB5: // LDA Zero Page,X
             ZeroPageReadOnly([this]() { LDA(); }, IndexType::X);
@@ -291,6 +295,7 @@ void CPU::QueueNextInstuction()
         case 0xBA: // TSX
             break;
         case 0xBC: // LDY Absolute,X
+            AbsoluteReadOnly([this]() { LDY(); }, IndexType::X);
             break;
         case 0xBD: // LDA Absolute,X
             AbsoluteReadOnly([this]() { LDA(); }, IndexType::X);

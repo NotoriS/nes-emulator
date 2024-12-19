@@ -320,6 +320,14 @@ void CPU::LDX()
     SetFlag(Flag::N, reg_x & 0x80);
 }
 
+void CPU::LDY()
+{
+    reg_y = m_operand;
+
+    SetFlag(Flag::Z, reg_y == 0);
+    SetFlag(Flag::N, reg_y & 0x80);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });
