@@ -93,6 +93,7 @@ private:
     void AND(); // Bitwise AND
     void ASL(); // Arithmetic shift left
     void LDA(); // Load A
+    void LDX(); // Load X
 #pragma endregion
 
 #pragma region Standalone Instruction Queuing Functions
