@@ -206,6 +206,7 @@ void CPU::QueueNextInstuction()
             ZeroPageWriteOnly([this]() { STA(); }, IndexType::None);
             break;
         case 0x86: // STX Zero Page
+            ZeroPageWriteOnly([this]() { STX(); }, IndexType::None);
             break;
         case 0x88: // DEY
             break;
@@ -217,6 +218,7 @@ void CPU::QueueNextInstuction()
             AbsoluteWriteOnly([this]() { STA(); }, IndexType::None);
             break;
         case 0x8E: // STX Absolute
+            AbsoluteWriteOnly([this]() { STX(); }, IndexType::None);
             break;
 
         // Opcodes 0x90 to 0x9F
@@ -231,6 +233,7 @@ void CPU::QueueNextInstuction()
             ZeroPageWriteOnly([this]() { STA(); }, IndexType::X);
             break;
         case 0x96: // STX Zero Page,Y
+            ZeroPageWriteOnly([this]() { STX(); }, IndexType::Y);
             break;
         case 0x98: // TYA
             break;

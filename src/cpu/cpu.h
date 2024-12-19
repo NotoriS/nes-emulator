@@ -96,6 +96,7 @@ private:
     void LDX(); // Load X
     void LDY(); // Load Y
     void STA(); // Store A
+    void STX(); // Store X
 #pragma endregion
 
 #pragma region Standalone Instruction Queuing Functions

@@ -333,6 +333,11 @@ void CPU::STA()
     Write(m_targetAddress, reg_a);
 }
 
+void CPU::STX()
+{
+    Write(m_targetAddress, reg_x);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });
