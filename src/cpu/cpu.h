@@ -9,13 +9,6 @@
 
 class CPU
 {
-public:
-    CPU(IBus* bus);
-    ~CPU();
-
-    void Reset();
-    void Clock();
-
 private:
     enum class Flag : uint8_t
     {
@@ -36,6 +29,16 @@ private:
         Y = 2,
     };
 
+public:
+    CPU(IBus* bus);
+    ~CPU();
+
+    void Reset();
+    void Clock();
+
+    uint8_t GetFlag(Flag flag);
+
+private:
     IBus* m_bus;
 
     // Contains "per cycle" instructions that will execute when clock is called.
@@ -58,7 +61,6 @@ private:
     void Write(uint16_t address, uint8_t data);
     uint8_t Read(uint16_t address);
 
-    uint8_t GetFlag(Flag flag);
     void SetFlag(Flag flag, bool value);
 
     void StackPush(uint8_t value);

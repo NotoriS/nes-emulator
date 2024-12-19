@@ -57,7 +57,7 @@ add_executable(nes-emulator-tests
     "src/cartridge/mappers/mapper-000.h"
     "src/cartridge/mappers/mapper-000.cpp"
     "src/cpu/cpu-instructions.cpp"
-)
+    "tests/fakes/fake-cpu-bus.h")
 
 # Link Google Test and the main project to the test executable
 target_link_libraries(nes-emulator-tests PRIVATE gtest gtest_main)
