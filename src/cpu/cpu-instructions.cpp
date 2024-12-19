@@ -328,6 +328,11 @@ void CPU::LDY()
     SetFlag(Flag::N, reg_y & 0x80);
 }
 
+void CPU::STA()
+{
+    Write(m_targetAddress, reg_a);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });

@@ -198,10 +198,12 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x80 to 0x8F
         case 0x81: // STA (Indirect,X)
+            IndexedIndirectWriteOnly([this]() { STA(); });
             break;
         case 0x84: // STY Zero Page
             break;
         case 0x85: // STA Zero Page
+            ZeroPageWriteOnly([this]() { STA(); }, IndexType::None);
             break;
         case 0x86: // STX Zero Page
             break;
@@ -212,6 +214,7 @@ void CPU::QueueNextInstuction()
         case 0x8C: // STY Absolute
             break;
         case 0x8D: // STA Absolute
+            AbsoluteWriteOnly([this]() { STA(); }, IndexType::None);
             break;
         case 0x8E: // STX Absolute
             break;
@@ -220,20 +223,24 @@ void CPU::QueueNextInstuction()
         case 0x90: // BCC
             break;
         case 0x91: // STA (Indirect),Y
+            IndirectIndexedWriteOnly([this]() { STA(); });
             break;
         case 0x94: // STY Zero Page,X
             break;
         case 0x95: // STA Zero Page,X
+            ZeroPageWriteOnly([this]() { STA(); }, IndexType::X);
             break;
         case 0x96: // STX Zero Page,Y
             break;
         case 0x98: // TYA
             break;
         case 0x99: // STA Absolute,Y
+            AbsoluteWriteOnly([this]() { STA(); }, IndexType::Y);
             break;
         case 0x9A: // TXS
             break;
         case 0x9D: // STA Absolute,X
+            AbsoluteWriteOnly([this]() { STA(); }, IndexType::X);
             break;
 
         // Opcodes 0xA0 to 0xAF
