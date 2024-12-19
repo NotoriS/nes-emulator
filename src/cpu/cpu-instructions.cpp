@@ -338,6 +338,11 @@ void CPU::STX()
     Write(m_targetAddress, reg_x);
 }
 
+void CPU::STY()
+{
+    Write(m_targetAddress, reg_y);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });

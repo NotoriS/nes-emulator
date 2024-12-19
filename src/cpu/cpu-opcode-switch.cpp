@@ -201,6 +201,7 @@ void CPU::QueueNextInstuction()
             IndexedIndirectWriteOnly([this]() { STA(); });
             break;
         case 0x84: // STY Zero Page
+            ZeroPageWriteOnly([this]() { STY(); }, IndexType::None);
             break;
         case 0x85: // STA Zero Page
             ZeroPageWriteOnly([this]() { STA(); }, IndexType::None);
@@ -213,6 +214,7 @@ void CPU::QueueNextInstuction()
         case 0x8A: // TXA
             break;
         case 0x8C: // STY Absolute
+            AbsoluteWriteOnly([this]() { STY(); }, IndexType::None);
             break;
         case 0x8D: // STA Absolute
             AbsoluteWriteOnly([this]() { STA(); }, IndexType::None);
@@ -228,6 +230,7 @@ void CPU::QueueNextInstuction()
             IndirectIndexedWriteOnly([this]() { STA(); });
             break;
         case 0x94: // STY Zero Page,X
+            ZeroPageWriteOnly([this]() { STY(); }, IndexType::X);
             break;
         case 0x95: // STA Zero Page,X
             ZeroPageWriteOnly([this]() { STA(); }, IndexType::X);
