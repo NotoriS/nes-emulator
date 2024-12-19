@@ -240,24 +240,28 @@ void CPU::QueueNextInstuction()
         case 0xA0: // LDY Immediate
             break;
         case 0xA1: // LDA (Indirect,X)
+            IndexedIndirectReadOnly([this]() { LDA(); });
             break;
         case 0xA2: // LDX Immediate
             break;
         case 0xA4: // LDY Zero Page
             break;
         case 0xA5: // LDA Zero Page
+            ZeroPageReadOnly([this]() { LDA(); }, IndexType::None);
             break;
         case 0xA6: // LDX Zero Page
             break;
         case 0xA8: // TAY
             break;
         case 0xA9: // LDA Immediate
+            ImmediateReadOnly([this]() { LDA(); });
             break;
         case 0xAA: // TAX
             break;
         case 0xAC: // LDY Absolute
             break;
         case 0xAD: // LDA Absolute
+            AbsoluteReadOnly([this]() { LDA(); }, IndexType::None);
             break;
         case 0xAE: // LDX Absolute
             break;
@@ -266,22 +270,26 @@ void CPU::QueueNextInstuction()
         case 0xB0: // BCS
             break;
         case 0xB1: // LDA (Indirect),Y
+            IndirectIndexedReadOnly([this]() { LDA(); });
             break;
         case 0xB4: // LDY Zero Page,X
             break;
         case 0xB5: // LDA Zero Page,X
+            ZeroPageReadOnly([this]() { LDA(); }, IndexType::X);
             break;
         case 0xB6: // LDX Zero Page,Y
             break;
         case 0xB8: // CLV
             break;
         case 0xB9: // LDA Absolute,Y
+            AbsoluteReadOnly([this]() { LDA(); }, IndexType::Y);
             break;
         case 0xBA: // TSX
             break;
         case 0xBC: // LDY Absolute,X
             break;
         case 0xBD: // LDA Absolute,X
+            AbsoluteReadOnly([this]() { LDA(); }, IndexType::X);
             break;
         case 0xBE: // LDX Absolute,Y
             break;

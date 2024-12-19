@@ -92,6 +92,7 @@ private:
     void ADC(); // Add with carry
     void AND(); // Bitwise AND
     void ASL(); // Arithmetic shift left
+    void LDA(); // Load A
 #pragma endregion
 
 #pragma region Standalone Instruction Queuing Functions
