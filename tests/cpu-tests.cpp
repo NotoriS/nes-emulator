@@ -41,3 +41,72 @@ TEST(CpuTests, Absolute_ASL)
 
     EXPECT_EQ(4, bus.Read(0x0EF6));
 }
+
+TEST(CpuTests, Absolute_LDA_STA)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Write test data
+    bus.Write(0x1EF6, 5);
+
+    // Add load instruction and address to memory
+    bus.Write(0, 0xAD);
+    bus.Write(1, 0xF6);
+    bus.Write(2, 0x1E);
+
+    // Add store instruction and address to memory
+    bus.Write(3, 0x8D);
+    bus.Write(4, 0x45);
+    bus.Write(5, 0x26);
+
+    for (int i = 0; i < 8; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(5, bus.Read(0x2645));
+}
+
+TEST(CpuTests, Absolute_LDX_STX)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Write test data
+    bus.Write(0x1EF6, 5);
+
+    // Add load instruction and address to memory
+    bus.Write(0, 0xAE);
+    bus.Write(1, 0xF6);
+    bus.Write(2, 0x1E);
+
+    // Add store instruction and address to memory
+    bus.Write(3, 0x8E);
+    bus.Write(4, 0x45);
+    bus.Write(5, 0x26);
+
+    for (int i = 0; i < 8; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(5, bus.Read(0x2645));
+}
+
+TEST(CpuTests, Absolute_LDY_STY)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Write test data
+    bus.Write(0x1EF6, 5);
+
+    // Add load instruction and address to memory
+    bus.Write(0, 0xAC);
+    bus.Write(1, 0xF6);
+    bus.Write(2, 0x1E);
+
+    // Add store instruction and address to memory
+    bus.Write(3, 0x8C);
+    bus.Write(4, 0x45);
+    bus.Write(5, 0x26);
+
+    for (int i = 0; i < 8; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(5, bus.Read(0x2645));
+}
