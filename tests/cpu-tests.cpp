@@ -110,3 +110,147 @@ TEST(CpuTests, Absolute_LDY_STY)
 
     EXPECT_EQ(5, bus.Read(0x2645));
 }
+
+TEST(CpuTests, TAX)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load A instruction and address to memory
+    bus.Write(0, 0xA9);
+    bus.Write(1, 5);
+
+    // Add transfer instruction to memory
+    bus.Write(2, 0xAA);
+
+    // Add store X instruction and address to memory
+    bus.Write(3, 0x8E);
+    bus.Write(4, 0x45);
+    bus.Write(5, 0x26);
+
+    for (int i = 0; i < 8; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(5, bus.Read(0x2645));
+}
+
+TEST(CpuTests, TAY)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load A instruction and address to memory
+    bus.Write(0, 0xA9);
+    bus.Write(1, 5);
+
+    // Add transfer instruction to memory
+    bus.Write(2, 0xA8);
+
+    // Add store Y instruction and address to memory
+    bus.Write(3, 0x8C);
+    bus.Write(4, 0x45);
+    bus.Write(5, 0x26);
+
+    for (int i = 0; i < 8; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(5, bus.Read(0x2645));
+}
+
+TEST(CpuTests, TSX)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add transfer instruction to memory
+    bus.Write(0, 0xBA);
+
+    // Add store X instruction and address to memory
+    bus.Write(1, 0x8E);
+    bus.Write(2, 0x45);
+    bus.Write(3, 0x26);
+
+    for (int i = 0; i < 6; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(0xFD, bus.Read(0x2645));
+}
+
+TEST(CpuTests, TYA)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load Y instruction and address to memory
+    bus.Write(0, 0xA0);
+    bus.Write(1, 5);
+
+    // Add transfer instruction to memory
+    bus.Write(2, 0x98);
+
+    // Add store A instruction and address to memory
+    bus.Write(3, 0x8D);
+    bus.Write(4, 0x45);
+    bus.Write(5, 0x26);
+
+    for (int i = 0; i < 8; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(5, bus.Read(0x2645));
+}
+
+TEST(CpuTests, TXA)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load X instruction and address to memory
+    bus.Write(0, 0xA2);
+    bus.Write(1, 5);
+
+    // Add transfer instruction to memory
+    bus.Write(2, 0x8A);
+
+    // Add store A instruction and address to memory
+    bus.Write(3, 0x8D);
+    bus.Write(4, 0x45);
+    bus.Write(5, 0x26);
+
+    for (int i = 0; i < 8; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(5, bus.Read(0x2645));
+}
+
+TEST(CpuTests, TXS_TSX)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load X instruction to memory
+    bus.Write(0, 0xA2);
+    bus.Write(1, 5);
+
+    // Add TXS instruction to memory
+    bus.Write(2, 0x9A);
+
+    // Set X to something else
+    bus.Write(3, 0xA2);
+    bus.Write(4, 7);
+
+    // Add store X instruction and address to memory
+    bus.Write(5, 0x8E);
+    bus.Write(6, 0x45);
+    bus.Write(7, 0x26);
+
+    // Check that X was set properly
+    for (int i = 0; i < 10; i++) { cpu.Clock(); }
+    EXPECT_EQ(7, bus.Read(0x2645));
+
+    // Add TSX instruction to memory
+    bus.Write(8, 0xBA);
+
+    // Add store X instruction and address to memory
+    bus.Write(9, 0x8E);
+    bus.Write(10, 0x45);
+    bus.Write(11, 0x26);
+
+    // Check that X was changed to the value of SP
+    for (int i = 0; i < 6; i++) { cpu.Clock(); }
+    EXPECT_EQ(5, bus.Read(0x2645));
+}

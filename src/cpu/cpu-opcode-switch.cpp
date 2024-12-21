@@ -212,6 +212,7 @@ void CPU::QueueNextInstuction()
         case 0x88: // DEY
             break;
         case 0x8A: // TXA
+            TXA();
             break;
         case 0x8C: // STY Absolute
             AbsoluteWriteOnly([this]() { STY(); }, IndexType::None);
@@ -239,11 +240,13 @@ void CPU::QueueNextInstuction()
             ZeroPageWriteOnly([this]() { STX(); }, IndexType::Y);
             break;
         case 0x98: // TYA
+            TYA();
             break;
         case 0x99: // STA Absolute,Y
             AbsoluteWriteOnly([this]() { STA(); }, IndexType::Y);
             break;
         case 0x9A: // TXS
+            TXS();
             break;
         case 0x9D: // STA Absolute,X
             AbsoluteWriteOnly([this]() { STA(); }, IndexType::X);
@@ -269,11 +272,13 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly([this]() { LDX(); }, IndexType::None);
             break;
         case 0xA8: // TAY
+            TAY();
             break;
         case 0xA9: // LDA Immediate
             ImmediateReadOnly([this]() { LDA(); });
             break;
         case 0xAA: // TAX
+            TAX();
             break;
         case 0xAC: // LDY Absolute
             AbsoluteReadOnly([this]() { LDY(); }, IndexType::None);
@@ -306,6 +311,7 @@ void CPU::QueueNextInstuction()
             AbsoluteReadOnly([this]() { LDA(); }, IndexType::Y);
             break;
         case 0xBA: // TSX
+            TSX();
             break;
         case 0xBC: // LDY Absolute,X
             AbsoluteReadOnly([this]() { LDY(); }, IndexType::X);

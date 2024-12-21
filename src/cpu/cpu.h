@@ -109,5 +109,11 @@ private:
     void PLA(); // Pull the accumulator register from the stack
     void PLP(); // Pull the status register from the stack
     void JSR(); // Jump to subroutine
+    void TAX(); // Transfer A to X
+    void TXA(); // Transfer X to A
+    void TAY(); // Transfer A to Y
+    void TYA(); // Transfer Y to A
+    void TXS(); // Transfer X to Stack Pointer
+    void TSX(); // Transfer Stack Pointer to X
 #pragma endregion
 };

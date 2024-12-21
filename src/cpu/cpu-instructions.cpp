@@ -464,3 +464,66 @@ void CPU::JSR()
             reg_pc = m_targetAddress;
         });
 }
+
+void CPU::TAX()
+{
+    m_microInstructionQueue.push([this]()
+        {
+            reg_x = reg_a;
+
+            SetFlag(Flag::Z, reg_x == 0);
+            SetFlag(Flag::N, reg_x & 0x80);
+        });
+}
+
+void CPU::TXA()
+{
+    m_microInstructionQueue.push([this]()
+        {
+            reg_a = reg_x;
+
+            SetFlag(Flag::Z, reg_a == 0);
+            SetFlag(Flag::N, reg_a & 0x80);
+        });
+}
+
+void CPU::TAY()
+{
+    m_microInstructionQueue.push([this]()
+        {
+            reg_y = reg_a;
+
+            SetFlag(Flag::Z, reg_y == 0);
+            SetFlag(Flag::N, reg_y & 0x80);
+        });
+}
+
+void CPU::TYA()
+{
+    m_microInstructionQueue.push([this]()
+        {
+            reg_a = reg_y;
+
+            SetFlag(Flag::Z, reg_a == 0);
+            SetFlag(Flag::N, reg_a & 0x80);
+        });
+}
+
+void CPU::TXS()
+{
+    m_microInstructionQueue.push([this]()
+        {
+            reg_s = reg_x;
+        });
+}
+
+void CPU::TSX()
+{
+    m_microInstructionQueue.push([this]()
+        {
+            reg_x = reg_s;
+
+            SetFlag(Flag::Z, reg_x == 0);
+            SetFlag(Flag::N, reg_x & 0x80);
+        });
+}
