@@ -10,6 +10,14 @@
 class CPU
 {
 private:
+    enum class IndexType : uint8_t
+    {
+        None = 0,
+        X = 1,
+        Y = 2,
+    };
+
+public:
     enum class Flag : uint8_t
     {
         C = 1,          // Carry
@@ -22,14 +30,6 @@ private:
         N = (1 << 7),   // Negative
     };
 
-    enum class IndexType : uint8_t
-    {
-        None = 0,
-        X = 1,
-        Y = 2,
-    };
-
-public:
     CPU(IBus* bus);
     ~CPU();
 
@@ -90,6 +90,7 @@ private:
 
 #pragma region Wrapped Instruction Queuing Functions
     void ADC(); // Add with carry
+    void SBC(); // Subtract with carry
     void AND(); // Bitwise AND
     void ASL(); // Arithmetic shift left
     void LDA(); // Load A

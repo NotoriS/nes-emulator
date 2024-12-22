@@ -254,3 +254,48 @@ TEST(CpuTests, TXS_TSX)
     for (int i = 0; i < 6; i++) { cpu.Clock(); }
     EXPECT_EQ(5, bus.Read(0x2645));
 }
+
+TEST(CpuTests, Immediate_SBC)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add SBC instruction to program memory
+    bus.Write(0, 0xE9);
+    bus.Write(1, 1);
+
+    // Add store A instruction to program memory
+    bus.Write(2, 0x8D);
+    bus.Write(3, 0x44);
+    bus.Write(4, 0x44);
+
+    for (int i = 0; i < 6; i++) { cpu.Clock(); }
+
+    // Check state after subtraction with overflow and carry cleared
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::C)) << "Carry flag is set after SBC underflows";
+    EXPECT_EQ(254, bus.Read(0x4444)) << "SBC did not subtract properly with the C flag cleared";
+
+    // Add SBC instruction to program memory
+    bus.Write(5, 0xE9);
+    bus.Write(6, 14);
+
+    for (int i = 0; i < 2; i++) { cpu.Clock(); }
+
+    // Check carry flag after subtraction with no overflow and carry cleared
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::C)) << "Carry flag is cleared after normal SBC";
+
+    // Add SBC instruction to program memory
+    bus.Write(7, 0xE9);
+    bus.Write(8, 9);
+
+    // Add store A instruction to program memory
+    bus.Write(9, 0x8D);
+    bus.Write(10, 0x55);
+    bus.Write(11, 0x55);
+
+    for (int i = 0; i < 6; i++) { cpu.Clock(); }
+
+    // Check state after subtraction with no overflow and carry set
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::C)) << "Carry flag is cleared after normal SBC";
+    EXPECT_EQ(230, bus.Read(0x5555)) << "SBC did not subtract properly with the C flag set";
+}

@@ -369,22 +369,26 @@ void CPU::QueueNextInstuction()
         case 0xE0: // CPX Immediate
             break;
         case 0xE1: // SBC (Indirect,X)
+            IndexedIndirectReadOnly([this]() { SBC(); });
             break;
         case 0xE4: // CPX Zero Page
             break;
         case 0xE5: // SBC Zero Page
+            ZeroPageReadOnly([this]() { SBC(); }, IndexType::None);
             break;
         case 0xE6: // INC Zero Page
             break;
         case 0xE8: // INX
             break;
         case 0xE9: // SBC Immediate
+            ImmediateReadOnly([this]() { SBC(); });
             break;
         case 0xEA: // NOP
             break;
         case 0xEC: // CPX Absolute
             break;
         case 0xED: // SBC Absolute
+            AbsoluteReadOnly([this]() { SBC(); }, IndexType::None);
             break;
         case 0xEE: // INC Absolute
             break;
@@ -393,16 +397,20 @@ void CPU::QueueNextInstuction()
         case 0xF0: // BEQ
             break;
         case 0xF1: // SBC (Indirect),Y
+            IndirectIndexedReadOnly([this]() { SBC(); });
             break;
         case 0xF5: // SBC Zero Page,X
+            ZeroPageReadOnly([this]() { SBC(); }, IndexType::X);
             break;
         case 0xF6: // INC Zero Page,X
             break;
         case 0xF8: // SED
             break;
         case 0xF9: // SBC Absolute,Y
+            AbsoluteReadOnly([this]() { SBC(); }, IndexType::Y);
             break;
         case 0xFD: // SBC Absolute,X
+            AbsoluteReadOnly([this]() { SBC(); }, IndexType::X);
             break;
         case 0xFE: // INC Absolute,X
             break;
