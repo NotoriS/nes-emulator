@@ -356,3 +356,22 @@ TEST(CpuTests, Immediate_SBC)
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::C)) << "Carry flag is cleared after normal SBC";
     EXPECT_EQ(230, bus.Read(0x6666)) << "SBC did not subtract properly with the C flag set";
 }
+
+TEST(CpuTests, ZeroPage_INC)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Write value to increment
+    bus.Write(0x0047, 0xFF);
+
+    // Add INC instruction to program memory
+    bus.Write(0, 0xE6);
+    bus.Write(1, 0x47);
+
+    for (int i = 0; i < 5; i++) { cpu.Clock(); }
+
+    // Check state after overflowing INC
+    EXPECT_EQ(0, bus.Read(0x0047)) << "Memory value does not equal zero after incrementing 0xFF";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag is not set when INC results in 0";
+}

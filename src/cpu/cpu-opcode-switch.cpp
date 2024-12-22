@@ -377,6 +377,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly([this]() { SBC(); }, IndexType::None);
             break;
         case 0xE6: // INC Zero Page
+            ZeroPageReadModifyWrite([this]() { INC(); }, IndexType::None);
             break;
         case 0xE8: // INX
             break;
@@ -391,6 +392,7 @@ void CPU::QueueNextInstuction()
             AbsoluteReadOnly([this]() { SBC(); }, IndexType::None);
             break;
         case 0xEE: // INC Absolute
+            AbsoluteReadModifyWrite([this]() { INC(); }, IndexType::None);
             break;
 
         // Opcodes 0xF0 to 0xFF
@@ -403,6 +405,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly([this]() { SBC(); }, IndexType::X);
             break;
         case 0xF6: // INC Zero Page,X
+            ZeroPageReadModifyWrite([this]() { INC(); }, IndexType::X);
             break;
         case 0xF8: // SED
             break;
@@ -413,6 +416,7 @@ void CPU::QueueNextInstuction()
             AbsoluteReadOnly([this]() { SBC(); }, IndexType::X);
             break;
         case 0xFE: // INC Absolute,X
+            AbsoluteReadModifyWrite([this]() { INC(); }, IndexType::X);
             break;
 
         // Illegal opcodes

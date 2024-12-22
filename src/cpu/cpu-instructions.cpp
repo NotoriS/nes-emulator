@@ -298,6 +298,14 @@ void CPU::SBC()
     reg_a = static_cast<uint8_t>(result);
 }
 
+void CPU::INC()
+{
+    m_operand++;
+
+    SetFlag(Flag::Z, m_operand == 0);
+    SetFlag(Flag::N, m_operand & 0x80);
+}
+
 void CPU::AND()
 {
     reg_a &= m_operand;
