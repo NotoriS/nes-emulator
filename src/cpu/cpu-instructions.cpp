@@ -332,6 +332,16 @@ void CPU::ASL()
     SetFlag(Flag::N, m_operand & 0x80);
 }
 
+void CPU::LSR()
+{
+    SetFlag(Flag::C, m_operand & 0x01);
+
+    m_operand = m_operand >> 1;
+
+    SetFlag(Flag::Z, m_operand == 0);
+    SetFlag(Flag::N, m_operand & 0x80);
+}
+
 void CPU::LDA()
 {
     reg_a = m_operand;

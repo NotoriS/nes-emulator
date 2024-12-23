@@ -42,6 +42,26 @@ TEST(CpuTests, Absolute_ASL)
     EXPECT_EQ(4, bus.Read(0x0EF6));
 }
 
+TEST(CpuTests, ZeroPage_LSR)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Write test data
+    bus.Write(0x0011, 9);
+
+    // Add LSR instruction to program memory
+    bus.Write(0, 0x46);
+    bus.Write(1, 0x11);
+
+    for (int i = 0; i < 5; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(4, bus.Read(0x0011)) << "Value should have been 4 after performing LSR on 9";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::C)) << "Carry flag was cleared after performing LSR on 9";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag was set after performing LSR on 9";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::N)) << "Negative flag was set after performing LSR on 9";
+}
+
 TEST(CpuTests, Absolute_LDA_STA)
 {
     TestCpuBus bus;

@@ -95,6 +95,7 @@ private:
     void DEC(); // Decrement memory
     void AND(); // Bitwise AND
     void ASL(); // Arithmetic shift left
+    void LSR(); // Logical shift right
     void LDA(); // Load A
     void LDX(); // Load X
     void LDY(); // Load Y
