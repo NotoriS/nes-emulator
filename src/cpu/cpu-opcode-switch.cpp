@@ -384,6 +384,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite([this]() { INC(); }, IndexType::None);
             break;
         case 0xE8: // INX
+            INX();
             break;
         case 0xE9: // SBC Immediate
             ImmediateReadOnly([this]() { SBC(); });

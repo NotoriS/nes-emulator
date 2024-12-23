@@ -393,6 +393,26 @@ TEST(CpuTests, ZeroPage_DEC)
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "Negative flag is not set when DEC results in 0xFF";
 }
 
+TEST(CpuTests, INX)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add INX to program memory
+    bus.Write(0, 0xE8);
+
+    // Add store X to program memory
+    bus.Write(1, 0x86);
+    bus.Write(2, 0x11);
+
+    for (int i = 0; i < 5; i++) { cpu.Clock(); }
+
+    // Check state after INX
+    EXPECT_EQ(0x01, bus.Read(0x0011)) << "Memory value does not equal 0x01 after incrementing X = 0x00";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag is set when INX results in 0x01";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::N)) << "Negative flag is set when INX results in 0x01";
+}
+
 TEST(CpuTests, Immediate_AND)
 {
     TestCpuBus bus;

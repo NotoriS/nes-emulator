@@ -118,5 +118,6 @@ private:
     void TYA(); // Transfer Y to A
     void TXS(); // Transfer X to Stack Pointer
     void TSX(); // Transfer Stack Pointer to X
+    void INX(); // Increment X register
 #pragma endregion
 };
