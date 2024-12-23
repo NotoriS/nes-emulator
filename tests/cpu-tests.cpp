@@ -418,7 +418,7 @@ TEST(CpuTests, DEX)
     TestCpuBus bus;
     CPU cpu(&bus);
 
-    // Add INX to program memory
+    // Add DEX to program memory
     bus.Write(0, 0xCA);
 
     // Add store X to program memory
@@ -427,10 +427,30 @@ TEST(CpuTests, DEX)
 
     for (int i = 0; i < 5; i++) { cpu.Clock(); }
 
-    // Check state after INX
+    // Check state after DEX
     EXPECT_EQ(0xFF, bus.Read(0x0011)) << "Memory value does not equal 0xFF after decrementing X = 0x00";
     EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag is set when DEX results in 0xFF";
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "Negative flag is not set when DEX results in 0xFF";
+}
+
+TEST(CpuTests, INY)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add INY to program memory
+    bus.Write(0, 0xC8);
+
+    // Add store Y to program memory
+    bus.Write(1, 0x84);
+    bus.Write(2, 0x11);
+
+    for (int i = 0; i < 5; i++) { cpu.Clock(); }
+
+    // Check state after INY
+    EXPECT_EQ(0x01, bus.Read(0x0011)) << "Memory value does not equal 0x01 after incrementing Y = 0x00";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag is set when INY results in 0x01";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::N)) << "Negative flag is set when INY results in 0x01";
 }
 
 TEST(CpuTests, Immediate_AND)

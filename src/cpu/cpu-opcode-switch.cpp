@@ -336,6 +336,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite([this]() { DEC(); }, IndexType::None);
             break;
         case 0xC8: // INY
+            INY();
             break;
         case 0xC9: // CMP Immediate
             break;
