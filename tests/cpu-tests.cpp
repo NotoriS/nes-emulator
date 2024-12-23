@@ -375,3 +375,27 @@ TEST(CpuTests, ZeroPage_INC)
     EXPECT_EQ(0, bus.Read(0x0047)) << "Memory value does not equal zero after incrementing 0xFF";
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag is not set when INC results in 0";
 }
+
+TEST(CpuTests, Immediate_AND)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load A to program memory
+    bus.Write(0, 0xA9);
+    bus.Write(1, 0b00101100);
+
+    // Add AND to program memory
+    bus.Write(2, 0x29);
+    bus.Write(3, 0b00101011);
+
+    // Add store A instruction to program memory
+    bus.Write(4, 0x85);
+    bus.Write(5, 0x11);
+
+    for (int i = 0; i < 7; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(0b00101000, bus.Read(0x0011)) << "AND results in the wrong value in the accumulator";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after AND";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly set after AND";
+}
