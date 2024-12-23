@@ -92,6 +92,7 @@ private:
     void ADC(); // Add with carry
     void SBC(); // Subtract with carry
     void INC(); // Increment memory
+    void DEC(); // Decrement memory
     void AND(); // Bitwise AND
     void ASL(); // Arithmetic shift left
     void LDA(); // Load A

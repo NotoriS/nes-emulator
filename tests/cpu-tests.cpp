@@ -376,6 +376,23 @@ TEST(CpuTests, ZeroPage_INC)
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag is not set when INC results in 0";
 }
 
+TEST(CpuTests, ZeroPage_DEC)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add DEC instruction to program memory
+    bus.Write(0, 0xC6);
+    bus.Write(1, 0x47);
+
+    for (int i = 0; i < 5; i++) { cpu.Clock(); }
+
+    // Check state after overflowing INC
+    EXPECT_EQ(0xFF, bus.Read(0x0047)) << "Memory value does not equal zero after incrementing 0xFF";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag is set when DEC results in 0xFF";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "Negative flag is not set when DEC results in 0xFF";
+}
+
 TEST(CpuTests, Immediate_AND)
 {
     TestCpuBus bus;

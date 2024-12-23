@@ -306,6 +306,14 @@ void CPU::INC()
     SetFlag(Flag::N, m_operand & 0x80);
 }
 
+void CPU::DEC()
+{
+    m_operand--;
+
+    SetFlag(Flag::Z, m_operand == 0);
+    SetFlag(Flag::N, m_operand & 0x80);
+}
+
 void CPU::AND()
 {
     reg_a &= m_operand;
