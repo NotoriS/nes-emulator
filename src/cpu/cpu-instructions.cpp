@@ -588,3 +588,14 @@ void CPU::INY()
             SetFlag(Flag::N, reg_y & 0x80);
         });
 }
+
+void CPU::DEY()
+{
+    m_microInstructionQueue.push([this]()
+        {
+            reg_y--;
+
+            SetFlag(Flag::Z, reg_y == 0);
+            SetFlag(Flag::N, reg_y & 0x80);
+        });
+}

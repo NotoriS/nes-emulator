@@ -121,5 +121,6 @@ private:
     void INX(); // Increment X register
     void DEX(); // Decrement X register
     void INY(); // Increment Y register
+    void DEY(); // Decrement Y register
 #pragma endregion
 };

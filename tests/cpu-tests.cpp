@@ -453,6 +453,26 @@ TEST(CpuTests, INY)
     EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::N)) << "Negative flag is set when INY results in 0x01";
 }
 
+TEST(CpuTests, DEY)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add DEY to program memory
+    bus.Write(0, 0x88);
+
+    // Add store Y to program memory
+    bus.Write(1, 0x84);
+    bus.Write(2, 0x11);
+
+    for (int i = 0; i < 5; i++) { cpu.Clock(); }
+
+    // Check state after DEY
+    EXPECT_EQ(0xFF, bus.Read(0x0011)) << "Memory value does not equal 0xFF after decrementing Y = 0x00";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Zero flag is set when DEY results in 0xFF";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "Negative flag is not set when DEY results in 0xFF";
+}
+
 TEST(CpuTests, Immediate_AND)
 {
     TestCpuBus bus;

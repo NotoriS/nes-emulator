@@ -210,6 +210,7 @@ void CPU::QueueNextInstuction()
             ZeroPageWriteOnly([this]() { STX(); }, IndexType::None);
             break;
         case 0x88: // DEY
+            DEY();
             break;
         case 0x8A: // TXA
             TXA();
