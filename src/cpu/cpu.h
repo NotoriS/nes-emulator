@@ -119,5 +119,6 @@ private:
     void TXS(); // Transfer X to Stack Pointer
     void TSX(); // Transfer Stack Pointer to X
     void INX(); // Increment X register
+    void DEX(); // Decrement X register
 #pragma endregion
 };

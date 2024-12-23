@@ -340,6 +340,7 @@ void CPU::QueueNextInstuction()
         case 0xC9: // CMP Immediate
             break;
         case 0xCA: // DEX
+            DEX();
             break;
         case 0xCC: // CPY Absolute
             break;

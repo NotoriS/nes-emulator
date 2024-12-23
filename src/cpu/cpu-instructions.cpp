@@ -566,3 +566,14 @@ void CPU::INX()
             SetFlag(Flag::N, reg_x & 0x80);
         });
 }
+
+void CPU::DEX()
+{
+    m_microInstructionQueue.push([this]()
+        {
+            reg_x--;
+
+            SetFlag(Flag::Z, reg_x == 0);
+            SetFlag(Flag::N, reg_x & 0x80);
+        });
+}
