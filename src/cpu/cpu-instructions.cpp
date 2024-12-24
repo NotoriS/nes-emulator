@@ -342,6 +342,17 @@ void CPU::LSR()
     SetFlag(Flag::N, m_operand & 0x80);
 }
 
+void CPU::ROL()
+{
+    uint8_t originalC = GetFlag(Flag::C);
+    SetFlag(Flag::C, m_operand & 0x80);
+
+    m_operand = (m_operand << 1) | originalC;
+
+    SetFlag(Flag::Z, m_operand == 0);
+    SetFlag(Flag::N, m_operand & 0x80);
+}
+
 void CPU::LDA()
 {
     reg_a = m_operand;

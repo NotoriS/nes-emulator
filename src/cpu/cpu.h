@@ -96,6 +96,7 @@ private:
     void AND(); // Bitwise AND
     void ASL(); // Arithmetic shift left
     void LSR(); // Logical shift right
+    void ROL(); // Rotate left
     void LDA(); // Load A
     void LDX(); // Load X
     void LDY(); // Load Y

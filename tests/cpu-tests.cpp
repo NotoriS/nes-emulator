@@ -62,6 +62,28 @@ TEST(CpuTests, ZeroPage_LSR)
     EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::N)) << "Negative flag was set after performing LSR on 9";
 }
 
+TEST(CpuTests, Absolute_ROL)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Write test data
+    bus.Write(0x0045, 0b01101010);
+
+    for (int i = 0; i < 9; i++)
+    {
+        // Add instruction to program memory
+        bus.Write(i * 2, 0x26);
+
+        // Add target address to program memory
+        bus.Write((i * 2) + 1, 0x45);
+    }
+
+    for (int i = 0; i < 45; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(0b01101010, bus.Read(0x0045));
+}
+
 TEST(CpuTests, Absolute_LDA_STA)
 {
     TestCpuBus bus;

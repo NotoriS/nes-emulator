@@ -65,6 +65,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly([this]() { AND(); }, IndexType::None);
             break;
         case 0x26: // ROL Zero Page
+            ZeroPageReadModifyWrite([this]() { ROL(); }, IndexType::None);
             break;
         case 0x28: // PLP
             PLP();
@@ -73,6 +74,7 @@ void CPU::QueueNextInstuction()
             ImmediateReadOnly([this]() { AND(); });
             break;
         case 0x2A: // ROL Accumulator
+            AccumulatorReadModifyWrite([this]() { ROL(); });
             break;
         case 0x2C: // BIT Absolute
             break;
@@ -80,6 +82,7 @@ void CPU::QueueNextInstuction()
             AbsoluteReadOnly([this]() { AND(); }, IndexType::None);
             break;
         case 0x2E: // ROL Absolute
+            AbsoluteReadModifyWrite([this]() { ROL(); }, IndexType::None);
             break;
 
         // Opcodes 0x30 to 0x3F
@@ -92,6 +95,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly([this]() { AND(); }, IndexType::X);
             break;
         case 0x36: // ROL Zero Page,X
+            ZeroPageReadModifyWrite([this]() { ROL(); }, IndexType::X);
             break;
         case 0x38: // SEC
             break;
@@ -102,6 +106,7 @@ void CPU::QueueNextInstuction()
             AbsoluteReadOnly([this]() { AND(); }, IndexType::X);
             break;
         case 0x3E: // ROL Absolute,X
+            AbsoluteReadModifyWrite([this]() { ROL(); }, IndexType::X);
             break;
 
         // Opcodes 0x40 to 0x4F
