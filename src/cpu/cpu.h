@@ -97,6 +97,7 @@ private:
     void ASL(); // Arithmetic shift left
     void LSR(); // Logical shift right
     void ROL(); // Rotate left
+    void ROR(); // Rotate right
     void LDA(); // Load A
     void LDX(); // Load X
     void LDY(); // Load Y

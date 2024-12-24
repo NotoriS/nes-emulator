@@ -79,8 +79,38 @@ TEST(CpuTests, Absolute_ROL)
         bus.Write((i * 2) + 1, 0x45);
     }
 
-    for (int i = 0; i < 45; i++) { cpu.Clock(); }
+    // Check value after 4 rotate left calls
+    for (int i = 0; i < 20; i++) { cpu.Clock(); }
+    EXPECT_EQ(0b10100011, bus.Read(0x0045));
 
+    // Check value after 9 rotate left calls
+    for (int i = 0; i < 25; i++) { cpu.Clock(); }
+    EXPECT_EQ(0b01101010, bus.Read(0x0045));
+}
+
+TEST(CpuTests, Absolute_ROR)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Write test data
+    bus.Write(0x0045, 0b01101010);
+
+    for (int i = 0; i < 9; i++)
+    {
+        // Add instruction to program memory
+        bus.Write(i * 2, 0x66);
+
+        // Add target address to program memory
+        bus.Write((i * 2) + 1, 0x45);
+    }
+
+    // Check value after 4 rotate right calls
+    for (int i = 0; i < 20; i++) { cpu.Clock(); }
+    EXPECT_EQ(0b01000110, bus.Read(0x0045));
+
+    // Check value after 9 rotate right calls
+    for (int i = 0; i < 25; i++) { cpu.Clock(); }
     EXPECT_EQ(0b01101010, bus.Read(0x0045));
 }
 

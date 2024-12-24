@@ -167,6 +167,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly([this]() { ADC(); }, IndexType::None);
             break;
         case 0x66: // ROR Zero Page
+            ZeroPageReadModifyWrite([this]() { ROR(); }, IndexType::None);
             break;
         case 0x68: // PLA
             PLA();
@@ -175,6 +176,7 @@ void CPU::QueueNextInstuction()
             ImmediateReadOnly([this]() { ADC(); });
             break;
         case 0x6A: // ROR Accumulator
+            AccumulatorReadModifyWrite([this]() { ROR(); });
             break;
         case 0x6C: // JMP (Indirect)
             break;
@@ -182,6 +184,7 @@ void CPU::QueueNextInstuction()
             AbsoluteReadOnly([this]() { ADC(); }, IndexType::None);
             break;
         case 0x6E: // ROR Absolute
+            AbsoluteReadModifyWrite([this]() { ROR(); }, IndexType::None);
             break;
 
         // Opcodes 0x70 to 0x7F
@@ -194,6 +197,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly([this]() { ADC(); }, IndexType::X);
             break;
         case 0x76: // ROR Zero Page,X
+            ZeroPageReadModifyWrite([this]() { ROR(); }, IndexType::X);
             break;
         case 0x78: // SEI
             break;
@@ -204,6 +208,7 @@ void CPU::QueueNextInstuction()
             AbsoluteReadOnly([this]() { ADC(); }, IndexType::X);
             break;
         case 0x7E: // ROR Absolute,X
+            AbsoluteReadModifyWrite([this]() { ROR(); }, IndexType::X);
             break;
 
         // Opcodes 0x80 to 0x8F
