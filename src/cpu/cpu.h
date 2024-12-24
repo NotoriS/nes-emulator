@@ -94,6 +94,7 @@ private:
     void INC(); // Increment memory
     void DEC(); // Decrement memory
     void AND(); // Bitwise AND
+    void ORA(); // Bitwise OR
     void ASL(); // Arithmetic shift left
     void LSR(); // Logical shift right
     void ROL(); // Rotate left

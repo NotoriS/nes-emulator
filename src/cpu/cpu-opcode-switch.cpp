@@ -12,8 +12,10 @@ void CPU::QueueNextInstuction()
             BRK();
             break;
         case 0x01: // ORA (Indirect,X)
+            IndexedIndirectReadOnly([this]() { ORA(); });
             break;
         case 0x05: // ORA Zero Page
+            ZeroPageReadOnly([this]() { ORA(); }, IndexType::None);
             break;
         case 0x06: // ASL Zero Page
             ZeroPageReadModifyWrite([this]() { ASL(); }, IndexType::None);
@@ -22,11 +24,13 @@ void CPU::QueueNextInstuction()
             PHP();
             break;
         case 0x09: // ORA Immediate
+            ImmediateReadOnly([this]() { ORA(); });
             break;
         case 0x0A: // ASL Accumulator
             AccumulatorReadModifyWrite([this]() { ASL(); });
             break;
         case 0x0D: // ORA Absolute
+            AbsoluteReadOnly([this]() { ORA(); }, IndexType::None);
             break;
         case 0x0E: // ASL Absolute
             AbsoluteReadModifyWrite([this]() { ASL(); }, IndexType::None);
@@ -36,8 +40,10 @@ void CPU::QueueNextInstuction()
         case 0x10: // BPL
             break;
         case 0x11: // ORA (Indirect),Y
+            IndirectIndexedReadOnly([this]() { ORA(); });
             break;
         case 0x15: // ORA Zero Page,X
+            ZeroPageReadOnly([this]() { ORA(); }, IndexType::X);
             break;
         case 0x16: // ASL Zero Page,X
             ZeroPageReadModifyWrite([this]() { ASL(); }, IndexType::X);
@@ -45,8 +51,10 @@ void CPU::QueueNextInstuction()
         case 0x18: // CLC
             break;
         case 0x19: // ORA Absolute,Y
+            AbsoluteReadOnly([this]() { ORA(); }, IndexType::Y);
             break;
         case 0x1D: // ORA Absolute,X
+            AbsoluteReadOnly([this]() { ORA(); }, IndexType::X);
             break;
         case 0x1E: // ASL Absolute,X
             AbsoluteReadModifyWrite([this]() { ASL(); }, IndexType::X);

@@ -568,3 +568,27 @@ TEST(CpuTests, Immediate_AND)
     EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after AND";
     EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly set after AND";
 }
+
+TEST(CpuTests, Immediate_ORA)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load A to program memory
+    bus.Write(0, 0xA9);
+    bus.Write(1, 0b00101100);
+
+    // Add ORA to program memory
+    bus.Write(2, 0x09);
+    bus.Write(3, 0b10100001);
+
+    // Add store A instruction to program memory
+    bus.Write(4, 0x85);
+    bus.Write(5, 0x55);
+
+    for (int i = 0; i < 7; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(0b10101101, bus.Read(0x0055)) << "ORA results in the wrong value in the accumulator";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after ORA";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after ORA";
+}
