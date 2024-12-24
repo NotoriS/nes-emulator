@@ -122,8 +122,10 @@ void CPU::QueueNextInstuction()
             RTI();
             break;
         case 0x41: // EOR (Indirect,X)
+            IndexedIndirectReadOnly([this]() { EOR(); });
             break;
         case 0x45: // EOR Zero Page
+            ZeroPageReadOnly([this]() { EOR(); }, IndexType::None);
             break;
         case 0x46: // LSR Zero Page
             ZeroPageReadModifyWrite([this]() { LSR(); }, IndexType::None);
@@ -132,6 +134,7 @@ void CPU::QueueNextInstuction()
             PHA();
             break;
         case 0x49: // EOR Immediate
+            ImmediateReadOnly([this]() { EOR(); });
             break;
         case 0x4A: // LSR Accumulator
             AccumulatorReadModifyWrite([this]() { LSR(); });
@@ -139,6 +142,7 @@ void CPU::QueueNextInstuction()
         case 0x4C: // JMP Absolute
             break;
         case 0x4D: // EOR Absolute
+            AbsoluteReadOnly([this]() { EOR(); }, IndexType::None);
             break;
         case 0x4E: // LSR Absolute
             AbsoluteReadModifyWrite([this]() { LSR(); }, IndexType::None);
@@ -148,8 +152,10 @@ void CPU::QueueNextInstuction()
         case 0x50: // BVC
             break;
         case 0x51: // EOR (Indirect),Y
+            IndirectIndexedReadOnly([this]() { EOR(); });
             break;
         case 0x55: // EOR Zero Page,X
+            ZeroPageReadOnly([this]() { EOR(); }, IndexType::X);
             break;
         case 0x56: // LSR Zero Page,X
             ZeroPageReadModifyWrite([this]() { LSR(); }, IndexType::X);
@@ -157,8 +163,10 @@ void CPU::QueueNextInstuction()
         case 0x58: // CLI
             break;
         case 0x59: // EOR Absolute,Y
+            AbsoluteReadOnly([this]() { EOR(); }, IndexType::Y);
             break;
         case 0x5D: // EOR Absolute,X
+            AbsoluteReadOnly([this]() { EOR(); }, IndexType::X);
             break;
         case 0x5E: // LSR Absolute,X
             AbsoluteReadModifyWrite([this]() { LSR(); }, IndexType::X);

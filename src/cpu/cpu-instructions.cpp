@@ -330,6 +330,14 @@ void CPU::ORA()
     SetFlag(Flag::N, reg_a & 0x80);
 }
 
+void CPU::EOR()
+{
+    reg_a ^= m_operand;
+
+    SetFlag(Flag::Z, reg_a == 0);
+    SetFlag(Flag::N, reg_a & 0x80);
+}
+
 void CPU::ASL()
 {
     SetFlag(Flag::C, m_operand & 0x80);

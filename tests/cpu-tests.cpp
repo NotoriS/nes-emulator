@@ -592,3 +592,27 @@ TEST(CpuTests, Immediate_ORA)
     EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after ORA";
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after ORA";
 }
+
+TEST(CpuTests, Immediate_EOR)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load A to program memory
+    bus.Write(0, 0xA9);
+    bus.Write(1, 0b00101100);
+
+    // Add EOR to program memory
+    bus.Write(2, 0x49);
+    bus.Write(3, 0b10001001);
+
+    // Add store A instruction to program memory
+    bus.Write(4, 0x85);
+    bus.Write(5, 0x55);
+
+    for (int i = 0; i < 7; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(0b10100101, bus.Read(0x0055)) << "EOR results in the wrong value in the accumulator";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after EOR";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after EOR";
+}
