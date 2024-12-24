@@ -338,6 +338,13 @@ void CPU::EOR()
     SetFlag(Flag::N, reg_a & 0x80);
 }
 
+void CPU::BIT()
+{
+    SetFlag(Flag::Z, (reg_a & m_operand) == 0);
+    SetFlag(Flag::V, m_operand & 0x40);
+    SetFlag(Flag::N, m_operand & 0x80);
+}
+
 void CPU::ASL()
 {
     SetFlag(Flag::C, m_operand & 0x80);

@@ -68,6 +68,7 @@ void CPU::QueueNextInstuction()
             IndexedIndirectReadOnly([this]() { AND(); });
             break;
         case 0x24: // BIT Zero Page
+            ZeroPageReadOnly([this]() { BIT(); }, IndexType::None);
             break;
         case 0x25: // AND Zero Page
             ZeroPageReadOnly([this]() { AND(); }, IndexType::None);
@@ -85,6 +86,7 @@ void CPU::QueueNextInstuction()
             AccumulatorReadModifyWrite([this]() { ROL(); });
             break;
         case 0x2C: // BIT Absolute
+            AbsoluteReadOnly([this]() { BIT(); }, IndexType::None);
             break;
         case 0x2D: // AND Absolute
             AbsoluteReadOnly([this]() { AND(); }, IndexType::None);

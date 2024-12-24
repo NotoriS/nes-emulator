@@ -96,6 +96,7 @@ private:
     void AND(); // Bitwise AND
     void ORA(); // Bitwise OR
     void EOR(); // Bitwise exclusive OR
+    void BIT(); // Bit test
     void ASL(); // Arithmetic shift left
     void LSR(); // Logical shift right
     void ROL(); // Rotate left

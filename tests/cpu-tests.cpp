@@ -616,3 +616,30 @@ TEST(CpuTests, Immediate_EOR)
     EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after EOR";
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after EOR";
 }
+
+TEST(CpuTests, Immediate_BIT)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load A to program memory
+    bus.Write(0, 0xA9);
+    bus.Write(1, 0b00101100);
+
+    // Write test data
+    bus.Write(0x0044, 0b11000011);
+
+    // Add BIT to program memory
+    bus.Write(2, 0x24);
+    bus.Write(3, 0x44);
+
+    // Add store A instruction to program memory
+    bus.Write(4, 0x85);
+    bus.Write(5, 0x55);
+
+    for (int i = 0; i < 8; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly cleared after BIT";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::V)) << "V flag incorrectly cleared after BIT";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after BIT";
+}
