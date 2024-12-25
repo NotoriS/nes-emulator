@@ -617,7 +617,7 @@ TEST(CpuTests, Immediate_EOR)
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after EOR";
 }
 
-TEST(CpuTests, Immediate_BIT)
+TEST(CpuTests, ZeroPage_BIT)
 {
     TestCpuBus bus;
     CPU cpu(&bus);
