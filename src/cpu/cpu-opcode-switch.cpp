@@ -359,11 +359,13 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xC0 to 0xCF
         case 0xC0: // CPY Immediate
+            ImmediateReadOnly([this]() { CPY(); });
             break;
         case 0xC1: // CMP (Indirect,X)
             IndexedIndirectReadOnly([this]() { CMP(); });
             break;
         case 0xC4: // CPY Zero Page
+            ZeroPageReadOnly([this]() { CPY(); }, IndexType::None);
             break;
         case 0xC5: // CMP Zero Page
             ZeroPageReadOnly([this]() { CMP(); }, IndexType::None);
@@ -381,6 +383,7 @@ void CPU::QueueNextInstuction()
             DEX();
             break;
         case 0xCC: // CPY Absolute
+            AbsoluteReadOnly([this]() { CPY(); }, IndexType::None);
             break;
         case 0xCD: // CMP Absolute
             AbsoluteReadOnly([this]() { CMP(); }, IndexType::None);

@@ -440,6 +440,13 @@ void CPU::CPX()
     SetFlag(Flag::N, (reg_x - m_operand) & 0x80);
 }
 
+void CPU::CPY()
+{
+    SetFlag(Flag::C, reg_y >= m_operand);
+    SetFlag(Flag::Z, reg_y == m_operand);
+    SetFlag(Flag::N, (reg_y - m_operand) & 0x80);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });

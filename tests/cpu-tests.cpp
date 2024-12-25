@@ -683,3 +683,23 @@ TEST(CpuTests, Immediate_CPX)
     EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after CPX";
     EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after CPX";
 }
+
+TEST(CpuTests, Immediate_CPY)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Add load Y to program memory
+    bus.Write(0, 0xA0);
+    bus.Write(1, 0xAF);
+
+    // Add CPY to program memory
+    bus.Write(2, 0xC0);
+    bus.Write(3, 0x23);
+
+    for (int i = 0; i < 4; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::C)) << "C flag incorrectly cleared after CPY";
+    EXPECT_EQ(0, cpu.GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after CPY";
+    EXPECT_EQ(1, cpu.GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after CPY";
+}
