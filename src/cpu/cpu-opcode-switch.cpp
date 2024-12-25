@@ -361,10 +361,12 @@ void CPU::QueueNextInstuction()
         case 0xC0: // CPY Immediate
             break;
         case 0xC1: // CMP (Indirect,X)
+            IndexedIndirectReadOnly([this]() { CMP(); });
             break;
         case 0xC4: // CPY Zero Page
             break;
         case 0xC5: // CMP Zero Page
+            ZeroPageReadOnly([this]() { CMP(); }, IndexType::None);
             break;
         case 0xC6: // DEC Zero Page
             ZeroPageReadModifyWrite([this]() { DEC(); }, IndexType::None);
@@ -373,6 +375,7 @@ void CPU::QueueNextInstuction()
             INY();
             break;
         case 0xC9: // CMP Immediate
+            ImmediateReadOnly([this]() { CMP(); });
             break;
         case 0xCA: // DEX
             DEX();
@@ -380,6 +383,7 @@ void CPU::QueueNextInstuction()
         case 0xCC: // CPY Absolute
             break;
         case 0xCD: // CMP Absolute
+            AbsoluteReadOnly([this]() { CMP(); }, IndexType::None);
             break;
         case 0xCE: // DEC Absolute
             AbsoluteReadModifyWrite([this]() { DEC(); }, IndexType::None);
@@ -389,8 +393,10 @@ void CPU::QueueNextInstuction()
         case 0xD0: // BNE
             break;
         case 0xD1: // CMP (Indirect),Y
+            IndirectIndexedReadOnly([this]() { CMP(); });
             break;
         case 0xD5: // CMP Zero Page,X
+            ZeroPageReadOnly([this]() { CMP(); }, IndexType::X);
             break;
         case 0xD6: // DEC Zero Page,X
             ZeroPageReadModifyWrite([this]() { DEC(); }, IndexType::X);
@@ -398,8 +404,10 @@ void CPU::QueueNextInstuction()
         case 0xD8: // CLD
             break;
         case 0xD9: // CMP Absolute,Y
+            AbsoluteReadOnly([this]() { CMP(); }, IndexType::Y);
             break;
         case 0xDD: // CMP Absolute,X
+            AbsoluteReadOnly([this]() { CMP(); }, IndexType::X);
             break;
         case 0xDE: // DEC Absolute,X
             AbsoluteReadModifyWrite([this]() { DEC(); }, IndexType::X);

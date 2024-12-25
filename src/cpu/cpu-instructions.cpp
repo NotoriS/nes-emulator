@@ -426,6 +426,13 @@ void CPU::STY()
     Write(m_targetAddress, reg_y);
 }
 
+void CPU::CMP()
+{
+    SetFlag(Flag::C, reg_a >= m_operand);
+    SetFlag(Flag::Z, reg_a == m_operand);
+    SetFlag(Flag::N, (reg_a - m_operand) & 0x80);
+}
+
 void CPU::BRK()
 {
     m_microInstructionQueue.push([this]() { reg_pc++; });
