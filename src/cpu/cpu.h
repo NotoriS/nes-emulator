@@ -108,6 +108,7 @@ private:
     void STX(); // Store X
     void STY(); // Store Y
     void CMP(); // Compare A
+    void CPX(); // Compare X
 #pragma endregion
 
 #pragma region Standalone Instruction Queuing Functions

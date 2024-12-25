@@ -415,11 +415,13 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xE0 to 0xEF
         case 0xE0: // CPX Immediate
+            ImmediateReadOnly([this]() { CPX(); });
             break;
         case 0xE1: // SBC (Indirect,X)
             IndexedIndirectReadOnly([this]() { SBC(); });
             break;
         case 0xE4: // CPX Zero Page
+            ZeroPageReadOnly([this]() { CPX(); }, IndexType::None);
             break;
         case 0xE5: // SBC Zero Page
             ZeroPageReadOnly([this]() { SBC(); }, IndexType::None);
@@ -436,6 +438,7 @@ void CPU::QueueNextInstuction()
         case 0xEA: // NOP
             break;
         case 0xEC: // CPX Absolute
+            AbsoluteReadOnly([this]() { CPX(); }, IndexType::None);
             break;
         case 0xED: // SBC Absolute
             AbsoluteReadOnly([this]() { SBC(); }, IndexType::None);
