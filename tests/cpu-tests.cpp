@@ -42,6 +42,30 @@ TEST(CpuTests, Absolute_ASL)
     EXPECT_EQ(4, bus.Read(0x0EF6));
 }
 
+TEST(CpuTests, AbsoluteX_ASL)
+{
+    TestCpuBus bus;
+    CPU cpu(&bus);
+
+    // Write test data
+    bus.Write(0x2F26, 2);
+
+    // Add load X instruction and address to memory
+    bus.Write(0, 0xA2);
+    bus.Write(1, 3);
+
+    // Add instruction to program memory
+    bus.Write(2, 0x1E);
+
+    // Add target address to program memory
+    bus.Write(3, 0x23);
+    bus.Write(4, 0x2F);
+
+    for (int i = 0; i < 9; i++) { cpu.Clock(); }
+
+    EXPECT_EQ(4, bus.Read(0x2F26));
+}
+
 TEST(CpuTests, ZeroPage_LSR)
 {
     TestCpuBus bus;
