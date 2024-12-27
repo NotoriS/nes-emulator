@@ -44,7 +44,8 @@ void CPU::AbsoluteReadOnly(std::function<void()> operation, IndexType indexType)
             uint8_t newPage = m_targetAddress >> 8;
             if (originalPage != newPage)
             {
-                m_skipNextCycle = true;
+                // Force an invalid read cycle
+                m_microInstructionQueue.push_front([this] { Read(m_targetAddress - 0x100); });
             }
         });
     m_microInstructionQueue.push_back([this, operation]()
@@ -66,9 +67,18 @@ void CPU::AbsoluteReadModifyWrite(std::function<void()> operation, IndexType ind
         case IndexType::X:
             m_microInstructionQueue.push_back([this]()
                 {
-                    m_targetAddress |= Read(reg_pc++) << 8;
+                    uint8_t originalPage = Read(reg_pc++);
+                    m_targetAddress |= originalPage << 8;
                     m_targetAddress += reg_x;
-                    m_skipNextCycle = true;
+
+                    // Force a read at a possibly invalid address
+                    m_microInstructionQueue.push_front([this, originalPage]
+                        {
+                            if (originalPage == m_targetAddress >> 8)
+                                Read(m_targetAddress);
+                            else
+                                Read(m_targetAddress - 0x100);
+                        });
                 });
             break;
         case IndexType::Y: // Unexpected
@@ -93,17 +103,35 @@ void CPU::AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType
         case IndexType::X:
             m_microInstructionQueue.push_back([this]()
                 {
-                    m_targetAddress |= Read(reg_pc++) << 8;
+                    uint8_t originalPage = Read(reg_pc++);
+                    m_targetAddress |= originalPage << 8;
                     m_targetAddress += reg_x;
-                    m_skipNextCycle = true;
+
+                    // Force a read at a possibly invalid address
+                    m_microInstructionQueue.push_front([this, originalPage]
+                        {
+                            if (originalPage == m_targetAddress >> 8)
+                                Read(m_targetAddress);
+                            else
+                                Read(m_targetAddress - 0x100);
+                        });
                 });
             break;
         case IndexType::Y:
             m_microInstructionQueue.push_back([this]()
                 {
-                    m_targetAddress |= Read(reg_pc++) << 8;
+                    uint8_t originalPage = Read(reg_pc++);
+                    m_targetAddress |= originalPage << 8;
                     m_targetAddress += reg_y;
-                    m_skipNextCycle = true;
+
+                    // Force a read at a possibly invalid address
+                    m_microInstructionQueue.push_front([this, originalPage]
+                        {
+                            if (originalPage == m_targetAddress >> 8)
+                                Read(m_targetAddress);
+                            else
+                                Read(m_targetAddress - 0x100);
+                        });
                 });
             break;
         default:
@@ -234,7 +262,8 @@ void CPU::IndirectIndexedReadOnly(std::function<void()> operation)
             uint8_t newPage = m_targetAddress >> 8;
             if (originalPage != newPage)
             {
-                m_skipNextCycle = true;
+                // Force an invalid read cycle
+                m_microInstructionQueue.push_front([this] { Read(m_targetAddress - 0x100); });
             }
         });
     m_microInstructionQueue.push_back([this, operation]()
@@ -251,9 +280,18 @@ void CPU::IndirectIndexedReadModifyWrite(std::function<void()> operation)
     m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
     m_microInstructionQueue.push_back([this]()
         {
-            m_targetAddress |= Read(m_operand) << 8;
+            uint8_t originalPage = Read(reg_pc++);
+            m_targetAddress |= originalPage << 8;
             m_targetAddress += reg_y;
-            m_skipNextCycle = true;
+
+            // Force a read at a possibly invalid address
+            m_microInstructionQueue.push_front([this, originalPage]
+                {
+                    if (originalPage == m_targetAddress >> 8)
+                        Read(m_targetAddress);
+                    else
+                        Read(m_targetAddress - 0x100);
+                });
         });
     m_microInstructionQueue.push_back([this]() { m_operand = Read(m_targetAddress); });
     m_microInstructionQueue.push_back(operation);
@@ -267,9 +305,18 @@ void CPU::IndirectIndexedWriteOnly(std::function<void()> operation)
     m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
     m_microInstructionQueue.push_back([this]()
         {
-            m_targetAddress |= Read(m_operand) << 8;
+            uint8_t originalPage = Read(reg_pc++);
+            m_targetAddress |= originalPage << 8;
             m_targetAddress += reg_y;
-            m_skipNextCycle = true;
+
+            // Force a read at a possibly invalid address
+            m_microInstructionQueue.push_front([this, originalPage]
+                {
+                    if (originalPage == m_targetAddress >> 8)
+                        Read(m_targetAddress);
+                    else
+                        Read(m_targetAddress - 0x100);
+                });
         });
     m_microInstructionQueue.push_back(operation);
 }
@@ -475,7 +522,7 @@ void CPU::BRK()
 
 void CPU::RTI()
 {
-    m_skipNextCycle = true;
+    m_microInstructionQueue.push_back([this] { Read(reg_pc); });
     m_microInstructionQueue.push_back([this]() { reg_s++; });
     m_microInstructionQueue.push_back([this]()
         {
@@ -492,7 +539,7 @@ void CPU::RTI()
 
 void CPU::RTS()
 {
-    m_skipNextCycle = true;
+    m_microInstructionQueue.push_back([this] { Read(reg_pc); });
     m_microInstructionQueue.push_back([this]() { reg_s++; });
     m_microInstructionQueue.push_back([this]()
         {
@@ -505,7 +552,7 @@ void CPU::RTS()
 
 void CPU::PHA()
 {
-    m_skipNextCycle = true;
+    m_microInstructionQueue.push_back([this] { Read(reg_pc); });
     m_microInstructionQueue.push_back([this]()
         {
             StackPush(reg_a);
@@ -515,7 +562,7 @@ void CPU::PHA()
 
 void CPU::PHP()
 {
-    m_skipNextCycle = true;
+    m_microInstructionQueue.push_back([this] { Read(reg_pc); });
     m_microInstructionQueue.push_back([this]()
         {
             StackPush(reg_p | static_cast<uint8_t>(Flag::B));
@@ -525,7 +572,7 @@ void CPU::PHP()
 
 void CPU::PLA()
 {
-    m_skipNextCycle = true;
+    m_microInstructionQueue.push_back([this] { Read(reg_pc); });
     m_microInstructionQueue.push_back([this]() { reg_s++; });
     m_microInstructionQueue.push_back([this]()
         {
@@ -537,7 +584,7 @@ void CPU::PLA()
 
 void CPU::PLP()
 {
-    m_skipNextCycle = true;
+    m_microInstructionQueue.push_back([this] { Read(reg_pc); });
     m_microInstructionQueue.push_back([this]() { reg_s++; });
     m_microInstructionQueue.push_back([this]()
         {
@@ -547,11 +594,8 @@ void CPU::PLP()
 
 void CPU::JSR()
 {
-    m_microInstructionQueue.push_back([this]()
-        {
-            m_targetAddress = Read(reg_pc++);
-            m_skipNextCycle = true;
-        });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this] { Read(0x100 + reg_s); });
     m_microInstructionQueue.push_back([this]()
         {
             StackPush(reg_pc >> 8);

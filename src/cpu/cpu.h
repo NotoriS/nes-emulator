@@ -54,8 +54,6 @@ private:
     uint16_t m_targetAddress = 0x0000;
     uint8_t m_operand = 0x00;
 
-    bool m_skipNextCycle = false;
-
     void QueueNextInstuction();
 
     void Write(uint16_t address, uint8_t data);

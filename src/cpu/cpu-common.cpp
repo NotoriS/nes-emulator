@@ -22,20 +22,15 @@ void CPU::Reset()
 
 void CPU::Clock()
 {
-    if (m_skipNextCycle)
-    {
-        m_skipNextCycle = false;
-        return;
-    }
-
     if (m_microInstructionQueue.empty())
     {
         QueueNextInstuction();
     }
     else
     {
-        m_microInstructionQueue.front()();
+        auto instruction = m_microInstructionQueue.front();
         m_microInstructionQueue.pop_front();
+        instruction();
     }
 }
 
