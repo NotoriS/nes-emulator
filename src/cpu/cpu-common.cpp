@@ -9,7 +9,7 @@ CPU::~CPU() {}
 
 void CPU::Reset()
 {
-    while (!m_microInstructionQueue.empty()) m_microInstructionQueue.pop();
+    while (!m_microInstructionQueue.empty()) m_microInstructionQueue.pop_front();
 
     reg_pc = Read(0xFFFC);
     reg_pc |= Read(0xFFFD) << 8;
@@ -35,7 +35,7 @@ void CPU::Clock()
     else
     {
         m_microInstructionQueue.front()();
-        m_microInstructionQueue.pop();
+        m_microInstructionQueue.pop_front();
     }
 }
 

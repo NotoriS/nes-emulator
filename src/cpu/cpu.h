@@ -1,6 +1,6 @@
 #pragma once
 
-#include <queue>
+#include <deque>
 #include <functional>
 #include <cstdint>
 #include <iostream>
@@ -42,7 +42,7 @@ private:
     IBus* m_bus;
 
     // Contains "per cycle" instructions that will execute when clock is called.
-    std::queue<std::function<void()>> m_microInstructionQueue; 
+    std::deque<std::function<void()>> m_microInstructionQueue; 
 
     uint8_t  reg_a = 0x00;      // Accumulator Register
     uint8_t  reg_x = 0x00;      // X Register

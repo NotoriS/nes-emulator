@@ -2,7 +2,7 @@
 
 void CPU::ImmediateReadOnly(std::function<void()> operation)
 {
-    m_microInstructionQueue.push([this, operation]()
+    m_microInstructionQueue.push_back([this, operation]()
         {
             m_operand = Read(reg_pc++);
             operation();
@@ -11,7 +11,7 @@ void CPU::ImmediateReadOnly(std::function<void()> operation)
 
 void CPU::AccumulatorReadModifyWrite(std::function<void()> operation)
 {
-    m_microInstructionQueue.push([this, operation]()
+    m_microInstructionQueue.push_back([this, operation]()
         {
             m_operand = reg_a;
             operation();
@@ -21,8 +21,8 @@ void CPU::AccumulatorReadModifyWrite(std::function<void()> operation)
 
 void CPU::AbsoluteReadOnly(std::function<void()> operation, IndexType indexType)
 {
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
-    m_microInstructionQueue.push([this, indexType]()
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this, indexType]()
         {
             uint8_t originalPage = Read(reg_pc++);
             m_targetAddress |= originalPage << 8;
@@ -47,7 +47,7 @@ void CPU::AbsoluteReadOnly(std::function<void()> operation, IndexType indexType)
                 m_skipNextCycle = true;
             }
         });
-    m_microInstructionQueue.push([this, operation]()
+    m_microInstructionQueue.push_back([this, operation]()
         {
             m_operand = Read(m_targetAddress);
             operation();
@@ -56,15 +56,15 @@ void CPU::AbsoluteReadOnly(std::function<void()> operation, IndexType indexType)
 
 void CPU::AbsoluteReadModifyWrite(std::function<void()> operation, IndexType indexType)
 {
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(reg_pc++); });
 
     switch (indexType)
     {
         case IndexType::None:
-            m_microInstructionQueue.push([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
+            m_microInstructionQueue.push_back([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
             break;
         case IndexType::X:
-            m_microInstructionQueue.push([this]()
+            m_microInstructionQueue.push_back([this]()
                 {
                     m_targetAddress |= Read(reg_pc++) << 8;
                     m_targetAddress += reg_x;
@@ -76,22 +76,22 @@ void CPU::AbsoluteReadModifyWrite(std::function<void()> operation, IndexType ind
             throw std::runtime_error("Unexpected address index type.");
     }
 
-    m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
-    m_microInstructionQueue.push(operation);
-    m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(m_targetAddress); });
+    m_microInstructionQueue.push_back(operation);
+    m_microInstructionQueue.push_back([this]() { Write(m_targetAddress, m_operand); });
 }
 
 void CPU::AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType)
 {
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(reg_pc++); });
     
     switch (indexType)
     {
         case IndexType::None:
-            m_microInstructionQueue.push([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
+            m_microInstructionQueue.push_back([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
             break;
         case IndexType::X:
-            m_microInstructionQueue.push([this]()
+            m_microInstructionQueue.push_back([this]()
                 {
                     m_targetAddress |= Read(reg_pc++) << 8;
                     m_targetAddress += reg_x;
@@ -99,7 +99,7 @@ void CPU::AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType
                 });
             break;
         case IndexType::Y:
-            m_microInstructionQueue.push([this]()
+            m_microInstructionQueue.push_back([this]()
                 {
                     m_targetAddress |= Read(reg_pc++) << 8;
                     m_targetAddress += reg_y;
@@ -110,12 +110,12 @@ void CPU::AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType
             throw std::runtime_error("Unexpected address index type.");
     }
 
-    m_microInstructionQueue.push(operation);
+    m_microInstructionQueue.push_back(operation);
 }
 
 void CPU::ZeroPageReadOnly(std::function<void()> operation, IndexType indexType)
 {
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(reg_pc++); });
 
     switch (indexType)
     {
@@ -123,16 +123,16 @@ void CPU::ZeroPageReadOnly(std::function<void()> operation, IndexType indexType)
             // Do nothing
             break;
         case IndexType::X:
-            m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
+            m_microInstructionQueue.push_back([this]() { m_targetAddress += reg_x; });
             break;
         case IndexType::Y:
-            m_microInstructionQueue.push([this]() { m_targetAddress += reg_y; });
+            m_microInstructionQueue.push_back([this]() { m_targetAddress += reg_y; });
             break;
         default:
             throw std::runtime_error("Unexpected address index type.");
     }
 
-    m_microInstructionQueue.push([this, operation]()
+    m_microInstructionQueue.push_back([this, operation]()
         {
             m_operand = Read(m_targetAddress);
             operation();
@@ -141,7 +141,7 @@ void CPU::ZeroPageReadOnly(std::function<void()> operation, IndexType indexType)
 
 void CPU::ZeroPageReadModifyWrite(std::function<void()> operation, IndexType indexType)
 {
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(reg_pc++); });
 
     switch (indexType)
     {
@@ -149,21 +149,21 @@ void CPU::ZeroPageReadModifyWrite(std::function<void()> operation, IndexType ind
             // Do nothing
             break;
         case IndexType::X:
-            m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
+            m_microInstructionQueue.push_back([this]() { m_targetAddress += reg_x; });
             break;
         case IndexType::Y: // Unexpected
         default:
             throw std::runtime_error("Unexpected address index type.");
     }
 
-    m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
-    m_microInstructionQueue.push(operation);
-    m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(m_targetAddress); });
+    m_microInstructionQueue.push_back(operation);
+    m_microInstructionQueue.push_back([this]() { Write(m_targetAddress, m_operand); });
 }
 
 void CPU::ZeroPageWriteOnly(std::function<void()> operation, IndexType indexType)
 {
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(reg_pc++); });
 
     switch (indexType)
     {
@@ -171,26 +171,26 @@ void CPU::ZeroPageWriteOnly(std::function<void()> operation, IndexType indexType
             // Do nothing
             break;
         case IndexType::X:
-            m_microInstructionQueue.push([this]() { m_targetAddress += reg_x; });
+            m_microInstructionQueue.push_back([this]() { m_targetAddress += reg_x; });
             break;
         case IndexType::Y:
-            m_microInstructionQueue.push([this]() { m_targetAddress += reg_y; });
+            m_microInstructionQueue.push_back([this]() { m_targetAddress += reg_y; });
             break;
         default:
             throw std::runtime_error("Unexpected address index type.");
     }
 
-    m_microInstructionQueue.push(operation);
+    m_microInstructionQueue.push_back(operation);
 }
 
 void CPU::IndexedIndirectReadOnly(std::function<void()> operation)
 {
     // Temporarily uses the operand variable to store a pointer
-    m_microInstructionQueue.push([this]() { m_operand = Read(reg_pc++); });
-    m_microInstructionQueue.push([this]() { m_operand += reg_x; });
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
-    m_microInstructionQueue.push([this]() { m_targetAddress |= Read(m_operand) << 8; });
-    m_microInstructionQueue.push([this, operation]()
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_operand += reg_x; });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress |= Read(m_operand) << 8; });
+    m_microInstructionQueue.push_back([this, operation]()
         {
             m_operand = Read(m_targetAddress);
             operation();
@@ -200,31 +200,31 @@ void CPU::IndexedIndirectReadOnly(std::function<void()> operation)
 void CPU::IndexedIndirectReadModifyWrite(std::function<void()> operation)
 {
     // Temporarily uses the operand variable to store a pointer
-    m_microInstructionQueue.push([this]() { m_operand = Read(reg_pc++); });
-    m_microInstructionQueue.push([this]() { m_operand += reg_x; });
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
-    m_microInstructionQueue.push([this]() { m_targetAddress |= Read(m_operand) << 8; });
-    m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
-    m_microInstructionQueue.push(operation);
-    m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_operand += reg_x; });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress |= Read(m_operand) << 8; });
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(m_targetAddress); });
+    m_microInstructionQueue.push_back(operation);
+    m_microInstructionQueue.push_back([this]() { Write(m_targetAddress, m_operand); });
 }
 
 void CPU::IndexedIndirectWriteOnly(std::function<void()> operation)
 {
     // Temporarily uses the operand variable to store a pointer
-    m_microInstructionQueue.push([this]() { m_operand = Read(reg_pc++); });
-    m_microInstructionQueue.push([this]() { m_operand += reg_x; });
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
-    m_microInstructionQueue.push([this]() { m_targetAddress |= Read(m_operand) << 8; });
-    m_microInstructionQueue.push(operation);
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_operand += reg_x; });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress |= Read(m_operand) << 8; });
+    m_microInstructionQueue.push_back(operation);
 }
 
 void CPU::IndirectIndexedReadOnly(std::function<void()> operation)
 {
     // Temporarily uses the operand variable to store a pointer
-    m_microInstructionQueue.push([this]() { m_operand = Read(reg_pc++); });
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
+    m_microInstructionQueue.push_back([this]()
         {
             uint8_t originalPage = Read(m_operand);
 
@@ -237,7 +237,7 @@ void CPU::IndirectIndexedReadOnly(std::function<void()> operation)
                 m_skipNextCycle = true;
             }
         });
-    m_microInstructionQueue.push([this, operation]()
+    m_microInstructionQueue.push_back([this, operation]()
         {
             m_operand = Read(m_targetAddress);
             operation();
@@ -247,31 +247,31 @@ void CPU::IndirectIndexedReadOnly(std::function<void()> operation)
 void CPU::IndirectIndexedReadModifyWrite(std::function<void()> operation)
 {
     // Temporarily uses the operand variable to store a pointer
-    m_microInstructionQueue.push([this]() { m_operand = Read(reg_pc++); });
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
+    m_microInstructionQueue.push_back([this]()
         {
             m_targetAddress |= Read(m_operand) << 8;
             m_targetAddress += reg_y;
             m_skipNextCycle = true;
         });
-    m_microInstructionQueue.push([this]() { m_operand = Read(m_targetAddress); });
-    m_microInstructionQueue.push(operation);
-    m_microInstructionQueue.push([this]() { Write(m_targetAddress, m_operand); });
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(m_targetAddress); });
+    m_microInstructionQueue.push_back(operation);
+    m_microInstructionQueue.push_back([this]() { Write(m_targetAddress, m_operand); });
 }
 
 void CPU::IndirectIndexedWriteOnly(std::function<void()> operation)
 {
     // Temporarily uses the operand variable to store a pointer
-    m_microInstructionQueue.push([this]() { m_operand = Read(reg_pc++); });
-    m_microInstructionQueue.push([this]() { m_targetAddress = Read(m_operand++); });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
+    m_microInstructionQueue.push_back([this]()
         {
             m_targetAddress |= Read(m_operand) << 8;
             m_targetAddress += reg_y;
             m_skipNextCycle = true;
         });
-    m_microInstructionQueue.push(operation);
+    m_microInstructionQueue.push_back(operation);
 }
 
 void CPU::ADC()
@@ -449,64 +449,64 @@ void CPU::CPY()
 
 void CPU::BRK()
 {
-    m_microInstructionQueue.push([this]() { reg_pc++; });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]() { reg_pc++; });
+    m_microInstructionQueue.push_back([this]()
         {
             StackPush(reg_pc >> 8);
             reg_s--;
         });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             StackPush(static_cast<uint8_t>(reg_pc));
             reg_s--;
         });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             StackPush(reg_p | static_cast<uint8_t>(Flag::B));
             reg_s--;
         });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_pc = Read(0xFFFE);
             SetFlag(Flag::I, true);
         });
-    m_microInstructionQueue.push([this]() { reg_pc |= Read(0xFFFF); });
+    m_microInstructionQueue.push_back([this]() { reg_pc |= Read(0xFFFF); });
 }
 
 void CPU::RTI()
 {
     m_skipNextCycle = true;
-    m_microInstructionQueue.push([this]() { reg_s++; });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]() { reg_s++; });
+    m_microInstructionQueue.push_back([this]()
         {
             reg_p = StackPop();
             reg_s++;
         });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_pc = StackPop();
             reg_s++;
         });
-    m_microInstructionQueue.push([this]() { reg_pc |= StackPop(); });
+    m_microInstructionQueue.push_back([this]() { reg_pc |= StackPop(); });
 }
 
 void CPU::RTS()
 {
     m_skipNextCycle = true;
-    m_microInstructionQueue.push([this]() { reg_s++; });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]() { reg_s++; });
+    m_microInstructionQueue.push_back([this]()
         {
             reg_pc = StackPop();
             reg_s++;
         });
-    m_microInstructionQueue.push([this]() { reg_pc |= StackPop(); });
-    m_microInstructionQueue.push([this]() { reg_pc++; });
+    m_microInstructionQueue.push_back([this]() { reg_pc |= StackPop(); });
+    m_microInstructionQueue.push_back([this]() { reg_pc++; });
 }
 
 void CPU::PHA()
 {
     m_skipNextCycle = true;
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             StackPush(reg_a);
             reg_s--;
@@ -516,7 +516,7 @@ void CPU::PHA()
 void CPU::PHP()
 {
     m_skipNextCycle = true;
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             StackPush(reg_p | static_cast<uint8_t>(Flag::B));
             reg_s--;
@@ -526,8 +526,8 @@ void CPU::PHP()
 void CPU::PLA()
 {
     m_skipNextCycle = true;
-    m_microInstructionQueue.push([this]() { reg_s++; });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]() { reg_s++; });
+    m_microInstructionQueue.push_back([this]()
         {
             reg_a = StackPop();
             SetFlag(Flag::Z, reg_a == 0);
@@ -538,8 +538,8 @@ void CPU::PLA()
 void CPU::PLP()
 {
     m_skipNextCycle = true;
-    m_microInstructionQueue.push([this]() { reg_s++; });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]() { reg_s++; });
+    m_microInstructionQueue.push_back([this]()
         {
             reg_p = StackPop();
         });
@@ -547,22 +547,22 @@ void CPU::PLP()
 
 void CPU::JSR()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             m_targetAddress = Read(reg_pc++);
             m_skipNextCycle = true;
         });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             StackPush(reg_pc >> 8);
             reg_s--;
         });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             StackPush(static_cast<uint8_t>(reg_pc));
             reg_s--;
         });
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             m_targetAddress |= Read(reg_pc) << 8;
             reg_pc = m_targetAddress;
@@ -571,7 +571,7 @@ void CPU::JSR()
 
 void CPU::TAX()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_x = reg_a;
 
@@ -582,7 +582,7 @@ void CPU::TAX()
 
 void CPU::TXA()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_a = reg_x;
 
@@ -593,7 +593,7 @@ void CPU::TXA()
 
 void CPU::TAY()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_y = reg_a;
 
@@ -604,7 +604,7 @@ void CPU::TAY()
 
 void CPU::TYA()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_a = reg_y;
 
@@ -615,7 +615,7 @@ void CPU::TYA()
 
 void CPU::TXS()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_s = reg_x;
         });
@@ -623,7 +623,7 @@ void CPU::TXS()
 
 void CPU::TSX()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_x = reg_s;
 
@@ -634,7 +634,7 @@ void CPU::TSX()
 
 void CPU::INX()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_x++;
 
@@ -645,7 +645,7 @@ void CPU::INX()
 
 void CPU::DEX()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_x--;
 
@@ -656,7 +656,7 @@ void CPU::DEX()
 
 void CPU::INY()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_y++;
 
@@ -667,7 +667,7 @@ void CPU::INY()
 
 void CPU::DEY()
 {
-    m_microInstructionQueue.push([this]()
+    m_microInstructionQueue.push_back([this]()
         {
             reg_y--;
 
