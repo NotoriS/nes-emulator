@@ -4,6 +4,7 @@
 #include <functional>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 
 #include "../interfaces/i-bus.h"
 
@@ -30,7 +31,7 @@ public:
         N = (1 << 7),   // Negative
     };
 
-    CPU(IBus* bus);
+    CPU(std::shared_ptr<IBus> bus);
     ~CPU();
 
     void Reset();
@@ -39,7 +40,7 @@ public:
     uint8_t GetFlag(Flag flag);
 
 private:
-    IBus* m_bus;
+    std::shared_ptr<IBus> m_bus;
 
     // Contains "per cycle" instructions that will execute when clock is called.
     std::deque<std::function<void()>> m_microInstructionQueue; 

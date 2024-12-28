@@ -1,11 +1,8 @@
-#include <iostream>
-
 #include "cpu-bus.h"
 
 CpuBus::CpuBus()
 {
     m_memory.fill(0);
-    m_cartridge = nullptr;
 }
 
 CpuBus::~CpuBus()
@@ -23,7 +20,7 @@ uint8_t CpuBus::Read(uint16_t address)
         return m_cartridge->CpuRead(address);
     }
 
-    std::cerr << "Failed to read from CPU bus at address: " << address << std::endl;
+    std::cerr << "Failed to read from CPU bus at address: 0x" << std::hex << address << std::endl;
     return 0;
 }
 
@@ -40,5 +37,5 @@ void CpuBus::Write(uint16_t address, uint8_t data)
         return;
     }
 
-    std::cerr << "Failed to write to CPU bus at address: " << address << std::endl;
+    std::cerr << "Failed to write to CPU bus at address: 0x" << std::hex << address << std::endl;
 }

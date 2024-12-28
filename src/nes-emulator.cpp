@@ -1,5 +1,6 @@
 ﻿#include <stdexcept>
 #include <iostream>
+#include <memory>
 
 #include "nes-emulator.h"
 #include "cpu/cpu.h"
@@ -15,13 +16,10 @@ NesEmulator::~NesEmulator() {}
 
 void NesEmulator::Run()
 {
-    CpuBus cpuBus;
-    Cartridge cartridge;
-    cpuBus.ConnectCartridge(&cartridge);
-
+    auto cartridge = std::make_shared<Cartridge>();
     try
     {
-        cartridge.LoadROM(m_romFilename);
+        cartridge->LoadROM(m_romFilename);
     }
     catch (const std::runtime_error& e)
     {
@@ -29,11 +27,14 @@ void NesEmulator::Run()
         return;
     }
 
-    CPU cpu(&cpuBus);
+    auto cpuBus = std::make_shared<CpuBus>();
+    cpuBus->ConnectCartridge(cartridge);
+
+    auto cpu = std::make_unique<CPU>(cpuBus);
 
     while (true)
     {
         // TODO: Modify to only clock at the specified clock rate.
-        cpu.Clock();
+        cpu->Clock();
     }
 }

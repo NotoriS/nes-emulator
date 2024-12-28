@@ -1,6 +1,6 @@
 #include "cpu.h"
 
-CPU::CPU(IBus* bus) : m_bus(bus)
+CPU::CPU(std::shared_ptr<IBus> bus) : m_bus(bus)
 {
     Reset();
 }
