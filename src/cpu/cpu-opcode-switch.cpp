@@ -409,6 +409,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite([this]() { DEC(); }, IndexType::X);
             break;
         case 0xD8: // CLD
+            CLD();
             break;
         case 0xD9: // CMP Absolute,Y
             AbsoluteReadOnly([this]() { CMP(); }, IndexType::Y);
@@ -467,6 +468,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite([this]() { INC(); }, IndexType::X);
             break;
         case 0xF8: // SED
+            SED();
             break;
         case 0xF9: // SBC Absolute,Y
             AbsoluteReadOnly([this]() { SBC(); }, IndexType::Y);

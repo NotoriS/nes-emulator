@@ -760,3 +760,19 @@ TEST(CpuTests, SEI_CLI)
     for (int i = 0; i < 2; i++) { cpu->Clock(); }
     EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::I)) << "I flag incorrectly set after CLI";
 }
+
+TEST(CpuTests, SED_CLD)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add set and clear decimal to program memory
+    bus->Write(0, 0xF8);
+    bus->Write(1, 0xD8);
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after SED";
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly set after CLD";
+}

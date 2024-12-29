@@ -134,5 +134,7 @@ private:
     void CLC(); // Clear carry
     void SEI(); // Set interrupt disable
     void CLI(); // Clear interrupt disable
+    void SED(); // Set decimal
+    void CLD(); // Clear decimal
 #pragma endregion
 };

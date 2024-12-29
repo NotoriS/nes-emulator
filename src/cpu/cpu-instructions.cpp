@@ -739,3 +739,13 @@ void CPU::CLI()
 {
     m_microInstructionQueue.push_back([this]() { SetFlag(Flag::I, false); });
 }
+
+void CPU::SED()
+{
+    m_microInstructionQueue.push_back([this]() { SetFlag(Flag::D, true); });
+}
+
+void CPU::CLD()
+{
+    m_microInstructionQueue.push_back([this]() { SetFlag(Flag::D, false); });
+}
