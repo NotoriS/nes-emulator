@@ -136,5 +136,6 @@ private:
     void CLI(); // Clear interrupt disable
     void SED(); // Set decimal
     void CLD(); // Clear decimal
+    void CLV(); // Clear overflow
 #pragma endregion
 };

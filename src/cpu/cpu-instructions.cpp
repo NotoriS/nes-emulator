@@ -749,3 +749,8 @@ void CPU::CLD()
 {
     m_microInstructionQueue.push_back([this]() { SetFlag(Flag::D, false); });
 }
+
+void CPU::CLV()
+{
+    m_microInstructionQueue.push_back([this]() { SetFlag(Flag::V, false); });
+}

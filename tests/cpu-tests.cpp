@@ -776,3 +776,24 @@ TEST(CpuTests, SED_CLD)
     for (int i = 0; i < 2; i++) { cpu->Clock(); }
     EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly set after CLD";
 }
+
+TEST(CpuTests, CLV)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add overflowing ADC instructions to program memory
+    bus->Write(0, 0x69);
+    bus->Write(1, 100);
+    bus->Write(2, 0x69);
+    bus->Write(3, 100);
+
+    for (int i = 0; i < 4; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::V)) << "V flag incorrectly cleared after overflowing ADC";
+
+    // Add clear overflow to program memory
+    bus->Write(4, 0xB8);
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::V)) << "V flag incorrectly set after CLV";
+}

@@ -344,6 +344,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly([this]() { LDX(); }, IndexType::Y);
             break;
         case 0xB8: // CLV
+            CLV();
             break;
         case 0xB9: // LDA Absolute,Y
             AbsoluteReadOnly([this]() { LDA(); }, IndexType::Y);
