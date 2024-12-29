@@ -49,6 +49,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite([this]() { ASL(); }, IndexType::X);
             break;
         case 0x18: // CLC
+            CLC();
             break;
         case 0x19: // ORA Absolute,Y
             AbsoluteReadOnly([this]() { ORA(); }, IndexType::Y);
@@ -108,6 +109,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite([this]() { ROL(); }, IndexType::X);
             break;
         case 0x38: // SEC
+            SEC();
             break;
         case 0x39: // AND Absolute,Y
             AbsoluteReadOnly([this]() { AND(); }, IndexType::Y);

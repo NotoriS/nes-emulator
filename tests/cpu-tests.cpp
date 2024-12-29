@@ -728,3 +728,19 @@ TEST(CpuTests, Immediate_CPY)
     EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::Z)) << "Z flag incorrectly set after CPY";
     EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::N)) << "N flag incorrectly cleared after CPY";
 }
+
+TEST(CpuTests, SEC_CLC)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add set and clear carry to program memory
+    bus->Write(0, 0x38);
+    bus->Write(1, 0x18);
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::C)) << "C flag incorrectly cleared after SEC";
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::C)) << "C flag incorrectly set after CLC";
+}

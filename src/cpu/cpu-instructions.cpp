@@ -719,3 +719,13 @@ void CPU::DEY()
             SetFlag(Flag::N, reg_y & 0x80);
         });
 }
+
+void CPU::SEC()
+{
+    m_microInstructionQueue.push_back([this]() { SetFlag(Flag::C, true); });
+}
+
+void CPU::CLC()
+{
+    m_microInstructionQueue.push_back([this]() { SetFlag(Flag::C, false); });
+}

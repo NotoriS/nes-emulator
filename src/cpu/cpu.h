@@ -130,5 +130,7 @@ private:
     void DEX(); // Decrement X register
     void INY(); // Increment Y register
     void DEY(); // Decrement Y register
+    void SEC(); // Set carry
+    void CLC(); // Clear carry
 #pragma endregion
 };
