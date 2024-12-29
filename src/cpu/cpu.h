@@ -132,5 +132,7 @@ private:
     void DEY(); // Decrement Y register
     void SEC(); // Set carry
     void CLC(); // Clear carry
+    void SEI(); // Set interrupt disable
+    void CLI(); // Clear interrupt disable
 #pragma endregion
 };

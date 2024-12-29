@@ -165,6 +165,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite([this]() { LSR(); }, IndexType::X);
             break;
         case 0x58: // CLI
+            CLI();
             break;
         case 0x59: // EOR Absolute,Y
             AbsoluteReadOnly([this]() { EOR(); }, IndexType::Y);
@@ -220,6 +221,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite([this]() { ROR(); }, IndexType::X);
             break;
         case 0x78: // SEI
+            SEI();
             break;
         case 0x79: // ADC Absolute,Y
             AbsoluteReadOnly([this]() { ADC(); }, IndexType::Y);

@@ -744,3 +744,19 @@ TEST(CpuTests, SEC_CLC)
     for (int i = 0; i < 2; i++) { cpu->Clock(); }
     EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::C)) << "C flag incorrectly set after CLC";
 }
+
+TEST(CpuTests, SEI_CLI)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add set and clear interrupt disable to program memory
+    bus->Write(0, 0x78);
+    bus->Write(1, 0x58);
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::I)) << "I flag incorrectly cleared after SEI";
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::I)) << "I flag incorrectly set after CLI";
+}
