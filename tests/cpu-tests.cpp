@@ -797,3 +797,37 @@ TEST(CpuTests, CLV)
     for (int i = 0; i < 2; i++) { cpu->Clock(); }
     EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::V)) << "V flag incorrectly set after CLV";
 }
+
+TEST(CpuTests, BCC_Positive_Offset)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add a branch to byte 47 into program memory
+    bus->Write(0, 0x90);
+    bus->Write(1, 45);
+
+    // Add a SED instruction at byte 47
+    bus->Write(47, 0xF8);
+
+    for (int i = 0; i < 5; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted branch to SED";
+}
+
+TEST(CpuTests, BCC_Negative_Offset)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add a branch to byte 0 into program memory
+    bus->Write(0, 0x90);
+    bus->Write(1, 0xFE);
+
+    for (int i = 0; i < 3; i++) { cpu->Clock(); }
+
+    // Add a SED instruction at byte 0
+    bus->Write(0, 0xF8);
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted branch to SED";
+}

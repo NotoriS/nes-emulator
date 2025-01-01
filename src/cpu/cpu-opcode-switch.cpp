@@ -264,6 +264,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x90 to 0x9F
         case 0x90: // BCC
+            BranchInstruction([this]() { return GetFlag(Flag::C) == 0; });
             break;
         case 0x91: // STA (Indirect),Y
             IndirectIndexedWriteOnly([this]() { STA(); });

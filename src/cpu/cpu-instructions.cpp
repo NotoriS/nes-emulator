@@ -321,6 +321,26 @@ void CPU::IndirectIndexedWriteOnly(std::function<void()> operation)
     m_microInstructionQueue.push_back(operation);
 }
 
+void CPU::BranchInstruction(std::function<bool()> test)
+{
+    m_microInstructionQueue.push_back([this, test]()
+        {
+            if (!test()) return;
+
+            m_operand = Read(reg_pc++);
+
+            m_microInstructionQueue.push_front([this]()
+                {
+                    uint8_t originalPage = reg_pc >> 8;
+                    reg_pc = reg_pc + static_cast<int8_t>(m_operand);
+
+                    // Add a blank cycle when a page is crossed
+                    if (originalPage != (reg_pc >> 8))
+                        m_microInstructionQueue.push_front([]() {});
+                });
+        });
+}
+
 void CPU::ADC()
 {
     uint16_t result = reg_a + m_operand + GetFlag(Flag::C);
