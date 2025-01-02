@@ -1133,3 +1133,41 @@ TEST(CpuTests, BVS_Negative_Offset)
     for (int i = 0; i < 2; i++) { cpu->Clock(); }
     EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted branch to SED";
 }
+
+TEST(CpuTests, JMP_Absolute)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add jump instruction to program memory
+    bus->Write(0, 0x4C);
+    bus->Write(1, 0x60);
+    bus->Write(2, 0x41);
+
+    // Add SED instruction to byte 0x4160 of memory
+    bus->Write(0x4160, 0xF8);
+
+    for (int i = 0; i < 5; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted jump to SED";
+}
+
+TEST(CpuTests, JMP_Indirect)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add pointer to memory
+    bus->Write(0x4160, 0x67);
+    bus->Write(0x4161, 0xF3);
+    
+    // Add jump instruction to program memory
+    bus->Write(0, 0x6C);
+    bus->Write(1, 0x60);
+    bus->Write(2, 0x41);
+
+    // Add SED instruction to byte 0x4160 of memory
+    bus->Write(0xF367, 0xF8);
+
+    for (int i = 0; i < 7; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted jump to SED";
+}

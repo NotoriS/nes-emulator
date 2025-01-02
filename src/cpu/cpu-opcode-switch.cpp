@@ -146,6 +146,7 @@ void CPU::QueueNextInstuction()
             AccumulatorReadModifyWrite([this]() { LSR(); });
             break;
         case 0x4C: // JMP Absolute
+            JMP_Absolute();
             break;
         case 0x4D: // EOR Absolute
             AbsoluteReadOnly([this]() { EOR(); }, IndexType::None);
@@ -203,6 +204,7 @@ void CPU::QueueNextInstuction()
             AccumulatorReadModifyWrite([this]() { ROR(); });
             break;
         case 0x6C: // JMP (Indirect)
+            JMP_Indirect();
             break;
         case 0x6D: // ADC Absolute
             AbsoluteReadOnly([this]() { ADC(); }, IndexType::None);
@@ -492,6 +494,7 @@ void CPU::QueueNextInstuction()
 
         // Illegal opcodes
         default: 
+            std::cout << "Warning: Unexpected opcode 0x" << std::hex << static_cast<int>(opcode) << std::endl;
             break;
     }
 }

@@ -139,5 +139,8 @@ private:
     void SED(); // Set decimal
     void CLD(); // Clear decimal
     void CLV(); // Clear overflow
+
+    void JMP_Absolute(); // Absolute addressed jump
+    void JMP_Indirect(); // Indirect addressed jump
 #pragma endregion
 };

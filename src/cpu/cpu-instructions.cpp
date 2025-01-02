@@ -774,3 +774,32 @@ void CPU::CLV()
 {
     m_microInstructionQueue.push_back([this]() { SetFlag(Flag::V, false); });
 }
+
+void CPU::JMP_Absolute()
+{
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]()
+        {
+            uint8_t pch = Read(reg_pc);
+            reg_pc = m_operand;
+            reg_pc |= pch << 8;
+        });
+}
+
+void CPU::JMP_Indirect()
+{
+    m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(reg_pc++); });
+    m_microInstructionQueue.push_back([this]() { m_targetAddress |= Read(reg_pc++) << 8; });
+    m_microInstructionQueue.push_back([this]() { m_operand = Read(m_targetAddress); });
+    m_microInstructionQueue.push_back([this]()
+        {
+            uint16_t pchAddress;
+            if (static_cast<uint8_t>(m_targetAddress) == 0xFF)
+                pchAddress = m_targetAddress & 0xFF00;
+            else
+                pchAddress = m_targetAddress + 1;
+
+            reg_pc = m_operand;
+            reg_pc |= Read(pchAddress) << 8;
+        });
+}
