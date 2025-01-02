@@ -831,3 +831,61 @@ TEST(CpuTests, BCC_Negative_Offset)
     for (int i = 0; i < 2; i++) { cpu->Clock(); }
     EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted branch to SED";
 }
+
+TEST(CpuTests, BCS_Positive_Offset)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Set the carry flag
+    bus->Write(0, 0x038);
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+
+    // Add a branch to byte 47 into program memory
+    bus->Write(1, 0xB0);
+    bus->Write(2, 44);
+
+    // Add a SED instruction at byte 47
+    bus->Write(47, 0xF8);
+
+    for (int i = 0; i < 5; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted branch to SED";
+}
+
+TEST(CpuTests, BCS_Negative_Offset)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Set the carry flag
+    bus->Write(0, 0x038);
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+
+    // Add a branch to byte 0 into program memory
+    bus->Write(1, 0xB0);
+    bus->Write(2, 0xFD);
+
+    for (int i = 0; i < 3; i++) { cpu->Clock(); }
+
+    // Add a SED instruction at byte 0
+    bus->Write(0, 0xF8);
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted branch to SED";
+}
+
+TEST(CpuTests, BCS_No_Branch)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add a branch to byte 47 into program memory
+    bus->Write(0, 0xB0);
+    bus->Write(1, 45);
+
+    // Add a SED instruction at byte 47
+    bus->Write(47, 0xF8);
+
+    for (int i = 0; i < 5; i++) { cpu->Clock(); }
+    EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly set after branch to SED should fail";
+}

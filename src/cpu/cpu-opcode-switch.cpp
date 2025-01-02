@@ -331,6 +331,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xB0 to 0xBF
         case 0xB0: // BCS
+            BranchInstruction([this]() { return GetFlag(Flag::C) == 1; });
             break;
         case 0xB1: // LDA (Indirect),Y
             IndirectIndexedReadOnly([this]() { LDA(); });
