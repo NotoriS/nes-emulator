@@ -460,6 +460,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xF0 to 0xFF
         case 0xF0: // BEQ
+            BranchInstruction([this]() { return GetFlag(Flag::Z) == 1; });
             break;
         case 0xF1: // SBC (Indirect),Y
             IndirectIndexedReadOnly([this]() { SBC(); });
