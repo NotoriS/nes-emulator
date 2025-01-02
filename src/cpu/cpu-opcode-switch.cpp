@@ -213,6 +213,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x70 to 0x7F
         case 0x70: // BVS
+            BranchInstruction([this]() { return GetFlag(Flag::V) == 1; });
             break;
         case 0x71: // ADC (Indirect),Y
             IndirectIndexedReadOnly([this]() { ADC(); });
