@@ -452,6 +452,7 @@ void CPU::QueueNextInstuction()
             ImmediateReadOnly([this]() { SBC(); });
             break;
         case 0xEA: // NOP
+            m_microInstructionQueue.push_back([]() {});
             break;
         case 0xEC: // CPX Absolute
             AbsoluteReadOnly([this]() { CPX(); }, IndexType::None);
