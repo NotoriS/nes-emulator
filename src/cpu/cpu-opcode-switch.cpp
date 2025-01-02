@@ -38,6 +38,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x10 to 0x1F
         case 0x10: // BPL
+            BranchInstruction([this]() { return GetFlag(Flag::N) == 0; });
             break;
         case 0x11: // ORA (Indirect),Y
             IndirectIndexedReadOnly([this]() { ORA(); });
