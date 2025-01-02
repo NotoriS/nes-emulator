@@ -156,6 +156,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x50 to 0x5F
         case 0x50: // BVC
+            BranchInstruction([this]() { return GetFlag(Flag::V) == 0; });
             break;
         case 0x51: // EOR (Indirect),Y
             IndirectIndexedReadOnly([this]() { EOR(); });
