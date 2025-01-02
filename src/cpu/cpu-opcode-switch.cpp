@@ -401,6 +401,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xD0 to 0xDF
         case 0xD0: // BNE
+            BranchInstruction([this]() { return GetFlag(Flag::Z) == 0; });
             break;
         case 0xD1: // CMP (Indirect),Y
             IndirectIndexedReadOnly([this]() { CMP(); });
