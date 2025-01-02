@@ -99,6 +99,7 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x30 to 0x3F
         case 0x30: // BMI
+            BranchInstruction([this]() { return GetFlag(Flag::N) == 1; });
             break;
         case 0x31: // AND (Indirect),Y
             IndirectIndexedReadOnly([this]() { AND(); });
