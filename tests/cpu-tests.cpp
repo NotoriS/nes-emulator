@@ -1171,3 +1171,106 @@ TEST(CpuTests, JMP_Indirect)
     for (int i = 0; i < 7; i++) { cpu->Clock(); }
     EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted jump to SED";
 }
+
+TEST(CpuTests, BRK)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    /* BRK opcode starts out in memory */
+
+    // Set BRK destination
+    bus->Write(CPU::IRQ_VECTOR, 0x11);
+    bus->Write(CPU::IRQ_VECTOR + 1, 0x41);
+
+    // Add SED instruction to BRK destination
+    bus->Write(0x4111, 0xF8);
+
+    for (int i = 0; i < 9; i++) { cpu->Clock(); }
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted break to SED";
+}
+
+TEST(CpuTests, IRQ_Interrupt)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add increment memory instruction to program memory
+    bus->Write(0, 0xE6);
+    bus->Write(1, 0xF2);
+
+    // Set IRQ destination
+    bus->Write(CPU::IRQ_VECTOR, 0x11);
+    bus->Write(CPU::IRQ_VECTOR + 1, 0x41);
+
+    // Add SED instruction to BRK destination
+    bus->Write(0x4111, 0xF8);
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    cpu->Interrupt(CPU::InterruptType::IRQ);
+    for (int i = 0; i < 12; i++) { cpu->Clock(); }
+
+    EXPECT_EQ(1, bus->Read(0x00F2)) << "Inital instruction is not completed when an IRQ interrupt occurs";
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted IRQ interrupt to SED";
+}
+
+TEST(CpuTests, NMI_Interrupt)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    // Add increment memory instruction to program memory
+    bus->Write(0, 0xE6);
+    bus->Write(1, 0xF2);
+
+    // Set NMI destination
+    bus->Write(CPU::NMI_VECTOR, 0x11);
+    bus->Write(CPU::NMI_VECTOR + 1, 0x41);
+
+    // Add SED instruction to BRK destination
+    bus->Write(0x4111, 0xF8);
+
+    for (int i = 0; i < 2; i++) { cpu->Clock(); }
+    cpu->Interrupt(CPU::InterruptType::NMI);
+    for (int i = 0; i < 12; i++) { cpu->Clock(); }
+
+    EXPECT_EQ(1, bus->Read(0x00F2)) << "Inital instruction is not completed when an NMI interrupt occurs";
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::D)) << "D flag incorrectly cleared after an attempted NMI interrupt to SED";
+}
+
+TEST(CpuTests, NMI_Hijack)
+{
+    auto bus = std::make_shared<TestCpuBus>();
+    auto cpu = std::make_shared<CPU>(bus);
+
+    /* BRK opcode starts out in memory */
+
+    // Set BRK destination
+    bus->Write(CPU::IRQ_VECTOR, 0x11);
+    bus->Write(CPU::IRQ_VECTOR + 1, 0x41);
+
+    // Set NMI destination
+    bus->Write(CPU::NMI_VECTOR, 0x11);
+    bus->Write(CPU::NMI_VECTOR + 1, 0x81);
+
+    // Add SED instruction to BRK destination
+    bus->Write(0x4111, 0xF8);
+
+    // Add SEC instruction to NMI destination
+    bus->Write(0x8111, 0x38);
+
+    for (int i = 0; i < 3; i++) { cpu->Clock(); }
+    cpu->Interrupt(CPU::InterruptType::NMI);
+    for (int i = 0; i < 6; i++) { cpu->Clock(); }
+
+    EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::D)) << "NMI interrupt failed to hijack the BRK vector";
+    EXPECT_EQ(1, cpu->GetFlag(CPU::Flag::C)) << "Hijack was unsuccessful performing the instruction at the NMI vector";
+    
+    // Add CLC instruction to NMI destination
+    bus->Write(0x8111, 0x18);
+
+    for (int i = 0; i < 9; i++) { cpu->Clock(); }
+
+    EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::D)) << "The instruction at BRK's destination executed when it shouldn't have";
+    EXPECT_EQ(0, cpu->GetFlag(CPU::Flag::C)) << "The CPU failed to perform another NMI interrupt after the first hijack";
+}
