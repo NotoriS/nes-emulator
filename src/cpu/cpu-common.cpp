@@ -11,8 +11,8 @@ void CPU::Reset()
 {
     while (!m_microInstructionQueue.empty()) m_microInstructionQueue.pop_front();
 
-    reg_pc = Read(0xFFFC);
-    reg_pc |= Read(0xFFFD) << 8;
+    reg_pc = Read(RESET_VECTOR);
+    reg_pc |= Read(RESET_VECTOR + 1) << 8;
 
     reg_s -= 3;
 
@@ -87,12 +87,12 @@ void CPU::SetFlag(Flag flag, bool value)
 
 void CPU::StackPush(uint8_t value)
 {
-    Write(0x0100 | reg_s, value);
+    Write(STACK_BASE | reg_s, value);
 }
 
 uint8_t CPU::StackPop()
 {
-    return Read(0x0100 | reg_s);
+    return Read(STACK_BASE | reg_s);
 }
 
 void CPU::InternalInterrupt(InterruptType type)
@@ -123,14 +123,14 @@ void CPU::InternalInterrupt(InterruptType type)
         });
     m_microInstructionQueue.push_back([this, type]()
         {
-            if (type == InterruptType::NMI) reg_pc = Read(0xFFFA);
-            else reg_pc = Read(0xFFFE);
+            if (type == InterruptType::NMI) reg_pc = Read(NMI_VECTOR);
+            else reg_pc = Read(IRQ_VECTOR);
 
             SetFlag(Flag::I, true);
         });
     m_microInstructionQueue.push_back([this, type]()
         {
-            if (type == InterruptType::NMI) reg_pc |= Read(0xFFFB) << 8;
-            else reg_pc |= Read(0xFFFF) << 8;
+            if (type == InterruptType::NMI) reg_pc |= Read(NMI_VECTOR + 1) << 8;
+            else reg_pc |= Read(IRQ_VECTOR + 1) << 8;
         });
 }

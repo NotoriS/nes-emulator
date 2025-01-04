@@ -11,6 +11,12 @@
 class CPU
 {
 private:
+    static constexpr uint16_t NMI_VECTOR = 0xFFFA;
+    static constexpr uint16_t RESET_VECTOR = 0xFFFC;
+    static constexpr uint16_t IRQ_VECTOR = 0xFFFE;
+
+    static constexpr uint16_t STACK_BASE = 0x0100;
+
     enum class IndexType : uint8_t
     {
         None = 0,
