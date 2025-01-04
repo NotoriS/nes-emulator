@@ -24,20 +24,6 @@ void CPU::Clock()
 {
     if (m_microInstructionQueue.empty())
     {
-        if (m_pendingNMI)
-        {
-            InternalInterrupt(InterruptType::NMI);
-            m_pendingNMI = false;
-            m_pendingIRQ = false;
-            return;
-        }
-        else if (m_pendingIRQ && !GetFlag(Flag::I))
-        {
-            InternalInterrupt(InterruptType::IRQ);
-            m_pendingIRQ = false;
-            return;
-        }
-
         QueueNextInstuction();
     }
     else
@@ -46,6 +32,9 @@ void CPU::Clock()
         m_microInstructionQueue.pop_front();
         instruction();
     }
+
+    if (m_microInstructionQueue.size() == 1 && !m_interruptInProgress)
+        PollInterrupts();
 }
 
 void CPU::Interrupt(InterruptType type)
@@ -54,9 +43,11 @@ void CPU::Interrupt(InterruptType type)
     {
         case InterruptType::NMI:
             m_pendingNMI = true;
+            m_mostRecentInterruptVector = NMI_VECTOR;
             break;
         case InterruptType::IRQ:
             m_pendingIRQ = true;
+            m_mostRecentInterruptVector = IRQ_VECTOR;
             break;
         default:
             break;
@@ -95,12 +86,36 @@ uint8_t CPU::StackPop()
     return Read(STACK_BASE | reg_s);
 }
 
+void CPU::PollInterrupts()
+{
+    if (m_pendingNMI)
+    {
+        InternalInterrupt(InterruptType::NMI);
+        m_pendingNMI = false;
+        m_pendingIRQ = false;
+    }
+    else if (m_pendingIRQ && !GetFlag(Flag::I))
+    {
+        InternalInterrupt(InterruptType::IRQ);
+        m_pendingIRQ = false;
+    }
+}
+
 void CPU::InternalInterrupt(InterruptType type)
 {
     if (type != InterruptType::BRK)
-        m_microInstructionQueue.push_back([]() {});
+    {
+        m_microInstructionQueue.push_back([this]() { m_interruptInProgress = true; });
+    }
     else
-        m_microInstructionQueue.push_back([this]() { reg_pc++; });
+    {
+        m_mostRecentInterruptVector = IRQ_VECTOR;
+        m_microInstructionQueue.push_back([this]()
+            {
+                m_interruptInProgress = true;
+                reg_pc++;
+            });
+    }
 
     m_microInstructionQueue.push_back([this]()
         {
@@ -114,6 +129,10 @@ void CPU::InternalInterrupt(InterruptType type)
         });
     m_microInstructionQueue.push_back([this, type]()
         {
+            // Allows NMI interrupts to hijack the BRK/IRQ interrupt vector
+            if (type == InterruptType::NMI) m_targetAddress = NMI_VECTOR;
+            else m_targetAddress = m_mostRecentInterruptVector;
+
             if (type == InterruptType::BRK)
                 StackPush(reg_p | static_cast<uint8_t>(Flag::B));
             else
@@ -121,16 +140,14 @@ void CPU::InternalInterrupt(InterruptType type)
 
             reg_s--;
         });
-    m_microInstructionQueue.push_back([this, type]()
+    m_microInstructionQueue.push_back([this]()
         {
-            if (type == InterruptType::NMI) reg_pc = Read(NMI_VECTOR);
-            else reg_pc = Read(IRQ_VECTOR);
-
+            reg_pc = Read(m_targetAddress);
             SetFlag(Flag::I, true);
         });
-    m_microInstructionQueue.push_back([this, type]()
+    m_microInstructionQueue.push_back([this]()
         {
-            if (type == InterruptType::NMI) reg_pc |= Read(NMI_VECTOR + 1) << 8;
-            else reg_pc |= Read(IRQ_VECTOR + 1) << 8;
+            reg_pc |= Read(m_targetAddress + 1) << 8;
+            m_interruptInProgress = false;
         });
 }

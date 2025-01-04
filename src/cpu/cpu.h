@@ -11,12 +11,6 @@
 class CPU
 {
 private:
-    static constexpr uint16_t NMI_VECTOR = 0xFFFA;
-    static constexpr uint16_t RESET_VECTOR = 0xFFFC;
-    static constexpr uint16_t IRQ_VECTOR = 0xFFFE;
-
-    static constexpr uint16_t STACK_BASE = 0x0100;
-
     enum class IndexType : uint8_t
     {
         None = 0,
@@ -44,6 +38,12 @@ public:
         BRK = 2,
     };
 
+    static constexpr uint16_t NMI_VECTOR = 0xFFFA;
+    static constexpr uint16_t RESET_VECTOR = 0xFFFC;
+    static constexpr uint16_t IRQ_VECTOR = 0xFFFE;
+
+    static constexpr uint16_t STACK_BASE = 0x0100;
+
     CPU(std::shared_ptr<IBus> bus);
     ~CPU();
 
@@ -59,18 +59,20 @@ private:
     // Contains "per cycle" instructions that will execute when clock is called.
     std::deque<std::function<void()>> m_microInstructionQueue; 
 
-    uint8_t  reg_a = 0x00;      // Accumulator Register
-    uint8_t  reg_x = 0x00;      // X Register
-    uint8_t  reg_y = 0x00;      // Y Register
-    uint16_t reg_pc = 0x0000;   // Program Counter
-    uint8_t  reg_s = 0x00;      // Stack Pointer
-    uint8_t  reg_p = 0x00;      // Status Register
+    uint8_t  reg_a = 0;    // Accumulator Register
+    uint8_t  reg_x = 0;    // X Register
+    uint8_t  reg_y = 0;    // Y Register
+    uint16_t reg_pc = 0;   // Program Counter
+    uint8_t  reg_s = 0;    // Stack Pointer
+    uint8_t  reg_p = 0;    // Status Register
 
-    uint16_t m_targetAddress = 0x0000;
-    uint8_t m_operand = 0x00;
+    uint16_t m_targetAddress = 0;
+    uint8_t m_operand = 0;
 
+    bool m_interruptInProgress = false;
     bool m_pendingNMI = false;
     bool m_pendingIRQ = false;
+    uint16_t m_mostRecentInterruptVector = 0;
 
     void QueueNextInstuction();
 
@@ -82,6 +84,7 @@ private:
     void StackPush(uint8_t value);
     uint8_t StackPop();
 
+    void PollInterrupts();
     void InternalInterrupt(InterruptType type);
 
 #pragma region Instruction Queuing Function Addressing Mode Wrappers
