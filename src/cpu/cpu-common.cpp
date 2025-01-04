@@ -24,6 +24,20 @@ void CPU::Clock()
 {
     if (m_microInstructionQueue.empty())
     {
+        if (m_pendingNMI)
+        {
+            InternalInterrupt(InterruptType::NMI);
+            m_pendingNMI = false;
+            m_pendingIRQ = false;
+            return;
+        }
+        else if (m_pendingIRQ && !GetFlag(Flag::I))
+        {
+            InternalInterrupt(InterruptType::IRQ);
+            m_pendingIRQ = false;
+            return;
+        }
+
         QueueNextInstuction();
     }
     else
@@ -31,6 +45,21 @@ void CPU::Clock()
         auto instruction = m_microInstructionQueue.front();
         m_microInstructionQueue.pop_front();
         instruction();
+    }
+}
+
+void CPU::Interrupt(InterruptType type)
+{
+    switch (type)
+    {
+        case InterruptType::NMI:
+            m_pendingNMI = true;
+            break;
+        case InterruptType::IRQ:
+            m_pendingIRQ = true;
+            break;
+        default:
+            break;
     }
 }
 
@@ -64,4 +93,44 @@ void CPU::StackPush(uint8_t value)
 uint8_t CPU::StackPop()
 {
     return Read(0x0100 | reg_s);
+}
+
+void CPU::InternalInterrupt(InterruptType type)
+{
+    if (type != InterruptType::BRK)
+        m_microInstructionQueue.push_back([]() {});
+    else
+        m_microInstructionQueue.push_back([this]() { reg_pc++; });
+
+    m_microInstructionQueue.push_back([this]()
+        {
+            StackPush(reg_pc >> 8);
+            reg_s--;
+        });
+    m_microInstructionQueue.push_back([this]()
+        {
+            StackPush(static_cast<uint8_t>(reg_pc));
+            reg_s--;
+        });
+    m_microInstructionQueue.push_back([this, type]()
+        {
+            if (type == InterruptType::BRK)
+                StackPush(reg_p | static_cast<uint8_t>(Flag::B));
+            else
+                StackPush(reg_p & ~static_cast<uint8_t>(Flag::B));
+
+            reg_s--;
+        });
+    m_microInstructionQueue.push_back([this, type]()
+        {
+            if (type == InterruptType::NMI) reg_pc = Read(0xFFFA);
+            else reg_pc = Read(0xFFFE);
+
+            SetFlag(Flag::I, true);
+        });
+    m_microInstructionQueue.push_back([this, type]()
+        {
+            if (type == InterruptType::NMI) reg_pc |= Read(0xFFFB) << 8;
+            else reg_pc |= Read(0xFFFF) << 8;
+        });
 }

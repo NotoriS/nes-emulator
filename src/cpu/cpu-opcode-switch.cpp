@@ -9,7 +9,7 @@ void CPU::QueueNextInstuction()
     {
         // Opcodes 0x00 to 0x0F
         case 0x00: // BRK
-            BRK();
+            InternalInterrupt(InterruptType::BRK);
             break;
         case 0x01: // ORA (Indirect,X)
             IndexedIndirectReadOnly([this]() { ORA(); });

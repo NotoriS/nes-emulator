@@ -31,11 +31,19 @@ public:
         N = (1 << 7),   // Negative
     };
 
+    enum class InterruptType : uint8_t
+    {
+        NMI = 0,
+        IRQ = 1,
+        BRK = 2,
+    };
+
     CPU(std::shared_ptr<IBus> bus);
     ~CPU();
 
     void Reset();
     void Clock();
+    void Interrupt(InterruptType type);
 
     uint8_t GetFlag(Flag flag);
 
@@ -55,6 +63,9 @@ private:
     uint16_t m_targetAddress = 0x0000;
     uint8_t m_operand = 0x00;
 
+    bool m_pendingNMI = false;
+    bool m_pendingIRQ = false;
+
     void QueueNextInstuction();
 
     void Write(uint16_t address, uint8_t data);
@@ -64,6 +75,8 @@ private:
 
     void StackPush(uint8_t value);
     uint8_t StackPop();
+
+    void InternalInterrupt(InterruptType type);
 
 #pragma region Instruction Queuing Function Addressing Mode Wrappers
     void ImmediateReadOnly(std::function<void()> operation);
@@ -114,7 +127,6 @@ private:
 #pragma endregion
 
 #pragma region Standalone Instruction Queuing Functions
-    void BRK(); // Break
     void RTI(); // Return from interrupt
     void RTS(); // Return from subroutine
     void PHA(); // Push the accumulator register to the stack

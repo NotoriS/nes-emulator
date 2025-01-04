@@ -514,32 +514,6 @@ void CPU::CPY()
     SetFlag(Flag::N, (reg_y - m_operand) & 0x80);
 }
 
-void CPU::BRK()
-{
-    m_microInstructionQueue.push_back([this]() { reg_pc++; });
-    m_microInstructionQueue.push_back([this]()
-        {
-            StackPush(reg_pc >> 8);
-            reg_s--;
-        });
-    m_microInstructionQueue.push_back([this]()
-        {
-            StackPush(static_cast<uint8_t>(reg_pc));
-            reg_s--;
-        });
-    m_microInstructionQueue.push_back([this]()
-        {
-            StackPush(reg_p | static_cast<uint8_t>(Flag::B));
-            reg_s--;
-        });
-    m_microInstructionQueue.push_back([this]()
-        {
-            reg_pc = Read(0xFFFE);
-            SetFlag(Flag::I, true);
-        });
-    m_microInstructionQueue.push_back([this]() { reg_pc |= Read(0xFFFF); });
-}
-
 void CPU::RTI()
 {
     m_microInstructionQueue.push_back([this] { Read(reg_pc); });
