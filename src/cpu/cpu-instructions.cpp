@@ -539,7 +539,7 @@ void CPU::RTS()
             reg_pc = StackPop();
             reg_s++;
         });
-    m_microInstructionQueue.push_back([this]() { reg_pc |= StackPop(); });
+    m_microInstructionQueue.push_back([this]() { reg_pc |= StackPop() << 8; });
     m_microInstructionQueue.push_back([this]() { reg_pc++; });
 }
 
