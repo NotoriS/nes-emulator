@@ -325,9 +325,8 @@ void CPU::BranchInstruction(std::function<bool()> test)
 {
     m_microInstructionQueue.push_back([this, test]()
         {
-            if (!test()) return;
-
             m_operand = Read(reg_pc++);
+            if (!test()) return;
 
             m_microInstructionQueue.push_front([this]()
                 {
