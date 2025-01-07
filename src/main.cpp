@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <SDL2/SDL.h>
 
 #include "cpu/cpu.h"
 #include "cpu/cpu-bus.h"
@@ -33,8 +34,21 @@ int main(int argc, char* argv[])
     cpuBus->ConnectCartridge(cartridge);
     auto cpu = std::make_unique<CPU>(cpuBus);
 
+    // Initialize SDL components
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    SDL_Event event;
+    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_CreateWindowAndRenderer(256*3, 240*3, 0, &window, &renderer);
+    SDL_SetWindowTitle(window, "NES Emulator");
+
     while (true)
     {
+        if (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT) break;
+        }
+
         // TODO: Modify to only clock at the specified clock rate.
         cpu->Clock();
     }
