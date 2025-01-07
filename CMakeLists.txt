@@ -22,8 +22,6 @@ add_subdirectory(external/googletest)
 # Add source to this project's executable.
 add_executable (nes-emulator
     "src/main.cpp"
-    "src/nes-emulator.cpp"
-    "src/nes-emulator.h"
     "src/cpu/cpu-common.cpp"
     "src/cpu/cpu.h"
     "src/interfaces/i-bus.h"
@@ -56,8 +54,6 @@ endif()
 # Add a test executable
 add_executable(nes-emulator-tests
     "tests/cpu-tests.cpp"
-    "src/nes-emulator.cpp"
-    "src/nes-emulator.h"
     "src/cpu/cpu-common.cpp"
     "src/cpu/cpu.h"
     "src/interfaces/i-bus.h"
