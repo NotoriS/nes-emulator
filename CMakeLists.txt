@@ -15,6 +15,10 @@ project ("nes-emulator")
 set(CMAKE_CXX_FLAGS_RELEASE "/MT")
 set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
+# Include external libraries
+add_subdirectory(external/SDL)
+add_subdirectory(external/googletest)
+
 # Add source to this project's executable.
 add_executable (nes-emulator
     "src/main.cpp"
@@ -34,11 +38,20 @@ add_executable (nes-emulator
     "src/cpu/cpu-instructions.cpp"
 )
 
+# Link SDL2
+target_link_libraries(nes-emulator PRIVATE SDL2 SDL2main)
+
+# Copy DLL dependencies to the executable directory
+add_custom_command(TARGET nes-emulator POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:nes-emulator> $<TARGET_FILE_DIR:nes-emulator>
+  COMMAND_EXPAND_LISTS
+)
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET nes-emulator PROPERTY CXX_STANDARD 20)
 endif()
 
-add_subdirectory(external/googletest)
+# ===== TESTS ======
 
 # Add a test executable
 add_executable(nes-emulator-tests
@@ -57,9 +70,10 @@ add_executable(nes-emulator-tests
     "src/cartridge/mappers/mapper-000.h"
     "src/cartridge/mappers/mapper-000.cpp"
     "src/cpu/cpu-instructions.cpp"
-    "tests/fakes/fake-cpu-bus.h")
+    "tests/fakes/fake-cpu-bus.h"
+)
 
-# Link Google Test and the main project to the test executable
+# Link Google Test to the test executable
 target_link_libraries(nes-emulator-tests PRIVATE gtest gtest_main)
 
 enable_testing()
