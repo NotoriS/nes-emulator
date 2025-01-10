@@ -28,14 +28,15 @@ This emulator replicates the functionality of the classic Nintendo Entertainment
 ### Stage 4: CPU Implementation
 - Emulate the 6502 CPU and implemented the key instructions, addressing both logic and arithmetic functions.
 - Break down each instruction into it's individual clock cycles, managing the CPU state using a queue of lambda expressions
+- Provide public methods for performing hardware interrupts
   
-**Progress:** In Progress
+**Progress:** Completed
 
 ### Stage 5: PPU Implementation
 - Start implementing the Picture Processing Unit (PPU) to handle graphics rendering.
 - Focus on replicating the behavior of the NES’s graphics pipeline, including background layers, sprites, and color palettes.
 
-**Progress:** Planned
+**Progress:** In Progress
 
 ### Stage 6: User Input System
 - Add support for user input using the SDL library.
