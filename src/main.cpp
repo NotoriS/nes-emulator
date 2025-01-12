@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     {
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT) break;
+            if (event.type == SDL_QUIT) return 0;
         }
 
         // TODO: Modify to only clock at the specified clock rate.
