@@ -34,6 +34,8 @@ add_executable (nes-emulator
     "src/cartridge/mappers/mapper-000.h"
     "src/cartridge/mappers/mapper-000.cpp"
     "src/cpu/cpu-instructions.cpp"
+    "src/ppu/ppu.h"
+    "src/ppu/ppu.cpp"
 )
 
 # Link SDL2
@@ -58,8 +60,6 @@ add_executable(nes-emulator-tests
     "src/cpu/cpu.h"
     "src/interfaces/i-bus.h"
     "src/cpu/cpu-opcode-switch.cpp"
-    "src/cpu/cpu-bus.h"
-    "src/cpu/cpu-bus.cpp"
     "src/cartridge/cartridge.h"
     "src/cartridge/cartridge.cpp"
     "src/cartridge/mappers/mapper.h"

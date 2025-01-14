@@ -29,9 +29,13 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    //Initialize the PPU
+    auto ppu = std::make_shared<PPU>();
+
     // Initalize the CPU and main bus
     auto cpuBus = std::make_shared<CpuBus>();
     cpuBus->ConnectCartridge(cartridge);
+    cpuBus->ConnectPPU(ppu);
     auto cpu = std::make_unique<CPU>(cpuBus);
 
     // Initialize SDL components
@@ -51,6 +55,7 @@ int main(int argc, char* argv[])
 
         // TODO: Modify to only clock at the specified clock rate.
         cpu->Clock();
+        for (int i = 0; i < 3; i++) ppu->Clock();
     }
 
     return 0;
