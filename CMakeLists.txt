@@ -36,6 +36,8 @@ add_executable (nes-emulator
     "src/cpu/cpu-instructions.cpp"
     "src/ppu/ppu.h"
     "src/ppu/ppu.cpp"
+    "src/ppu/ppu-bus.h"
+    "src/ppu/ppu-bus.cpp"
 )
 
 # Link SDL2

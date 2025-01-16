@@ -1,6 +1,6 @@
 #include "ppu.h"
 
-PPU::PPU()
+PPU::PPU(std::shared_ptr<IBus> bus) : m_bus(bus)
 {
 }
 
@@ -15,6 +15,7 @@ void PPU::Clock()
 
 void PPU::Reset()
 {
+    // TODO
 }
 
 uint8_t PPU::Read(uint16_t address)
@@ -24,17 +25,6 @@ uint8_t PPU::Read(uint16_t address)
 }
 
 void PPU::Write(uint16_t address, uint8_t data)
-{
-    // TODO
-}
-
-uint8_t PPU::ReadFromBus(uint16_t address)
-{
-    // TODO
-    return 0;
-}
-
-void PPU::WriteToBus(uint16_t address, uint8_t data)
 {
     // TODO
 }

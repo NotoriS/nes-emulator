@@ -29,8 +29,10 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    //Initialize the PPU
-    auto ppu = std::make_shared<PPU>();
+    //Initialize the PPU and PPU bus
+    auto ppuBus = std::make_shared<PpuBus>();
+    ppuBus->ConnectCartridge(cartridge);
+    auto ppu = std::make_shared<PPU>(ppuBus);
 
     // Initalize the CPU and main bus
     auto cpuBus = std::make_shared<CpuBus>();
