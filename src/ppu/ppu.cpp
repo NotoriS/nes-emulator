@@ -48,7 +48,7 @@ void PPU::Write(uint16_t address, uint8_t data)
         m_tempVramAddress.nametableY = m_control.nametableY;
         break;
     case 0x2001: // PPUMASK
-        // TODO
+        m_mask.byte = data;
     case 0x2003: // OAMADDR
         // TODO
     case 0x2004: // OAMDATA

@@ -26,6 +26,22 @@ class PPU
         uint8_t byte = 0x00;
     };
 
+    union PPUMASK
+    {
+        struct
+        {
+            uint8_t greyscale : 1;
+            uint8_t showLeftmostBackground : 1;
+            uint8_t showLeftmostSprites : 1;
+            uint8_t enableBackground : 1;
+            uint8_t enableSprites : 1;
+            uint8_t emphasizeRed : 1;
+            uint8_t emphasizeGreen : 1;
+            uint8_t emphasizeBlue : 1;
+        };
+        uint8_t byte = 0x00;
+    };
+
     union AddressRegister
     {
         struct
@@ -56,6 +72,7 @@ private:
 
     // Exposed registers
     PPUCTRL m_control;
+    PPUMASK m_mask;
 
     // Internal registers
     AddressRegister m_currVramAddress;
