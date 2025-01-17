@@ -3,11 +3,43 @@
 #include "../interfaces/i-bus.h"
 #include "ppu-bus.h"
 
+#include <iostream>
+#include <iomanip>
 #include <cstdint>
 #include <memory>
 
 class PPU
 {
+    union PPUCTRL
+    {
+        struct
+        {
+            uint8_t nametableX : 1;
+            uint8_t nametableY : 1;
+            uint8_t vramIncrement : 1;
+            uint8_t spritePatternTable : 1;
+            uint8_t backgroundPatternTable : 1;
+            uint8_t spriteSize : 1;
+            uint8_t slave : 1;
+            uint8_t vblankNmi : 1;
+        };
+        uint8_t byte = 0x00;
+    };
+
+    union AddressRegister
+    {
+        struct
+        {
+            uint8_t coarseXScroll : 5;
+            uint8_t coarseYScroll : 5;
+            uint8_t nametableX : 1;
+            uint8_t nametableY : 1;
+            uint8_t fineYScroll : 3;
+            uint8_t unused : 1;
+        };
+        uint16_t address = 0x0000;
+    };
+
 public:
     PPU(std::shared_ptr<IBus> bus);
     ~PPU();
@@ -21,6 +53,15 @@ public:
 
 private:
     std::shared_ptr<IBus> m_bus;
+
+    // Exposed registers
+    PPUCTRL m_control;
+
+    // Internal registers
+    AddressRegister m_currVramAddress;
+    AddressRegister m_tempVramAddress;
+    uint8_t m_fineYScroll = 0x00;
+    bool m_firstWrite = true;
 
     // Used internally to read and write to the PPU's bus
     uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
