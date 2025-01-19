@@ -42,6 +42,18 @@ class PPU
         uint8_t byte = 0x00;
     };
 
+    union PPUSTATUS
+    {
+        struct
+        {
+            uint8_t ppuOpenBus : 5;
+            uint8_t spriteOverflow : 1;
+            uint8_t spriteZeroHit : 1;
+            uint8_t vblank : 1;
+        };
+        uint8_t byte = 0x00;
+    };
+
     union AddressRegister
     {
         struct
@@ -73,6 +85,7 @@ private:
     // Exposed registers
     PPUCTRL m_control;
     PPUMASK m_mask;
+    PPUSTATUS m_status;
 
     // Internal registers
     AddressRegister m_currVramAddress;

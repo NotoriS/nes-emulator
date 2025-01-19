@@ -20,11 +20,16 @@ void PPU::Reset()
 
 uint8_t PPU::Read(uint16_t address)
 {
+    uint8_t result = 0x00;
+
     switch (address)
     {
         case 0x2002: // PPUSTATUS
-            // TODO
-            return 0;
+            // TODO: pickup data from the open bus in bytes 4-0
+            result = m_status.byte;
+            m_status.vblank = 0;
+            m_firstWrite = true;
+            return result;
         case 0x2004: // OAMDATA
             // TODO
             return 0;
@@ -49,6 +54,7 @@ void PPU::Write(uint16_t address, uint8_t data)
         break;
     case 0x2001: // PPUMASK
         m_mask.byte = data;
+        break;
     case 0x2003: // OAMADDR
         // TODO
     case 0x2004: // OAMDATA
