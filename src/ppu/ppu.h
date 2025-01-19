@@ -93,7 +93,11 @@ private:
     uint8_t m_fineXScroll = 0x00;
     bool m_firstWrite = true;
 
+    uint8_t m_readBuffer = 0x00;
+
     // Used internally to read and write to the PPU's bus
     uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
     void WriteToBus(uint16_t address, uint8_t data) { m_bus->Write(address, data); }
+
+    void IncrementVramAddress();
 };

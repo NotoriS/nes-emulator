@@ -25,7 +25,7 @@ uint8_t PPU::Read(uint16_t address)
     switch (address)
     {
         case 0x2002: // PPUSTATUS
-            // TODO: pickup data from the open bus in bytes 4-0
+            m_status.ppuOpenBus = m_readBuffer & 0x1F;
             result = m_status.byte;
             m_status.vblank = 0;
             m_firstWrite = true;
@@ -34,8 +34,11 @@ uint8_t PPU::Read(uint16_t address)
             // TODO
             return 0;
         case 0x2007: // PPUDATA
-            // TODO
-            return 0;
+            result = m_readBuffer;
+            m_readBuffer = ReadFromBus(m_currVramAddress.address);
+            if (m_currVramAddress.address >= 0x3F00) result = m_readBuffer; // Ignore buffer for palette RAM reads
+            IncrementVramAddress();
+            return result;
         default:
             std::cout << "Warning: The CPU attempted to read from the PPU at an invalid address (0x"
                 << std::hex << static_cast<int>(address) << ")" << std::endl;
@@ -87,10 +90,20 @@ void PPU::Write(uint16_t address, uint8_t data)
         m_firstWrite = !m_firstWrite;
         break;
     case 0x2007: // PPUDATA
-        // TODO
+        WriteToBus(m_currVramAddress.address, data);
+        IncrementVramAddress();
+        break;
     default:
         std::cout << "Warning: The CPU attempted to write to the PPU at an invalid address (0x"
             << std::hex << static_cast<int>(address) << ")" << std::endl;
         break;
     }
+}
+
+void PPU::IncrementVramAddress()
+{
+    if (m_control.vramIncrement)
+        m_currVramAddress.address += 32;
+    else
+        m_currVramAddress.address++;
 }
