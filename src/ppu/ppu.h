@@ -90,7 +90,7 @@ private:
     // Internal registers
     AddressRegister m_currVramAddress;
     AddressRegister m_tempVramAddress;
-    uint8_t m_fineYScroll = 0x00;
+    uint8_t m_fineXScroll = 0x00;
     bool m_firstWrite = true;
 
     // Used internally to read and write to the PPU's bus

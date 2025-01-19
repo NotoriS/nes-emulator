@@ -60,7 +60,18 @@ void PPU::Write(uint16_t address, uint8_t data)
     case 0x2004: // OAMDATA
         // TODO
     case 0x2005: // PPUSCROLL
-        // TODO
+        if (m_firstWrite)
+        {
+            m_fineXScroll = data & 0x07;
+            m_tempVramAddress.coarseXScroll = data >> 3;
+        }
+        else
+        {
+            m_tempVramAddress.fineYScroll = data & 0x07;
+            m_tempVramAddress.coarseYScroll = data >> 3;
+        }
+        m_firstWrite = !m_firstWrite;
+        break;
     case 0x2006: // PPUADDR
         // TODO
     case 0x2007: // PPUDATA
