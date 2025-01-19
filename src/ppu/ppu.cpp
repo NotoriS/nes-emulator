@@ -73,7 +73,19 @@ void PPU::Write(uint16_t address, uint8_t data)
         m_firstWrite = !m_firstWrite;
         break;
     case 0x2006: // PPUADDR
-        // TODO
+        if (m_firstWrite)
+        {
+            m_tempVramAddress.address &= 0x00FF;
+            m_tempVramAddress.address |= (data & 0x3F) << 8;
+        }
+        else
+        {
+            m_tempVramAddress.address &= 0xFF00;
+            m_tempVramAddress.address |= data;
+            m_currVramAddress.address = m_tempVramAddress.address;
+        }
+        m_firstWrite = !m_firstWrite;
+        break;
     case 0x2007: // PPUDATA
         // TODO
     default:
