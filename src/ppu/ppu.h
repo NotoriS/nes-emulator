@@ -2,6 +2,7 @@
 
 #include "../interfaces/i-bus.h"
 #include "ppu-bus.h"
+#include "colour-palette.h"
 
 #include <iostream>
 #include <iomanip>

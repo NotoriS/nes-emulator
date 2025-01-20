@@ -38,6 +38,7 @@ add_executable (nes-emulator
     "src/ppu/ppu.cpp"
     "src/ppu/ppu-bus.h"
     "src/ppu/ppu-bus.cpp"
+    "src/ppu/colour-palette.h"
 )
 
 # Link SDL2
