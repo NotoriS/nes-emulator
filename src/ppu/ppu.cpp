@@ -2,6 +2,8 @@
 
 PPU::PPU(std::shared_ptr<IBus> bus) : m_bus(bus)
 {
+    // Set pixel buffer to black
+    for (int i = 0; i < DISPLAY_HEIGHT * DISPLAY_WIDTH; i++) m_pixelBuffer[i] = 0;
 }
 
 PPU::~PPU()

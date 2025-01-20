@@ -69,11 +69,16 @@ class PPU
     };
 
 public:
+    static const uint16_t DISPLAY_WIDTH = 256;
+    static const uint16_t DISPLAY_HEIGHT = 240;
+
     PPU(std::shared_ptr<IBus> bus);
     ~PPU();
 
     void Clock();
     void Reset();
+
+    uint32_t* GetPixelBuffer() { return m_pixelBuffer; }
 
     // Used externally to read and write to the PPU from the CPU bus
     uint8_t Read(uint16_t address);
@@ -94,6 +99,7 @@ private:
     bool m_firstWrite = true;
 
     uint8_t m_readBuffer = 0x00;
+    uint32_t m_pixelBuffer[DISPLAY_HEIGHT * DISPLAY_WIDTH];
 
     // Used internally to read and write to the PPU's bus
     uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }

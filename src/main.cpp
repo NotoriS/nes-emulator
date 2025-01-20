@@ -45,8 +45,20 @@ int main(int argc, char* argv[])
     SDL_Renderer* renderer = nullptr;
     SDL_Event event;
     SDL_Init(SDL_INIT_EVERYTHING);
-    SDL_CreateWindowAndRenderer(256*3, 240*3, 0, &window, &renderer);
+    SDL_CreateWindowAndRenderer(
+        PPU::DISPLAY_WIDTH*3, PPU::DISPLAY_HEIGHT*3, 
+        SDL_WINDOW_RESIZABLE, 
+        &window, &renderer
+    );
     SDL_SetWindowTitle(window, "NES Emulator");
+
+    // Create an SDL texture to render the frames
+    SDL_Texture* texture = SDL_CreateTexture(
+        renderer,
+        SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        256, 240
+    );
 
     while (true)
     {
@@ -55,9 +67,21 @@ int main(int argc, char* argv[])
             if (event.type == SDL_QUIT) return 0;
         }
 
-        // TODO: Modify to only clock at the specified clock rate.
         cpu->Clock();
         for (int i = 0; i < 3; i++) ppu->Clock();
+
+        uint32_t* pixelBuffer = ppu->GetPixelBuffer();
+
+        // Update the texture with the current frame
+        SDL_UpdateTexture(texture, nullptr, pixelBuffer, PPU::DISPLAY_WIDTH * sizeof(uint32_t));
+
+        // Clear the screen and render the texture
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+        SDL_RenderPresent(renderer);
+
+        // TODO: Replace with a more robust timing restriction
+        SDL_Delay(16);
     }
 
     return 0;
