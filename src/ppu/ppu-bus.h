@@ -17,6 +17,7 @@ public:
 
 	void ConnectCartridge(std::shared_ptr<Cartridge> cartridge) { m_cartridge = cartridge; }
 private:
-	std::array<uint8_t, 0x20> m_paletteMemory;
 	std::shared_ptr<Cartridge> m_cartridge;
+	uint8_t m_nameTables[2][0x400];
+	std::array<uint8_t, 0x20> m_paletteMemory;
 };

@@ -30,6 +30,12 @@ void Cartridge::LoadROM(const std::string& filename)
         throw std::runtime_error("Invalid NES file format: " + filename);
     }
 
+    // Set mirror mode
+    if (m_header.flags6 & 0x01)
+        m_mirrorMode = MirrorModes::Horizontal;
+    else
+        m_mirrorMode = MirrorModes::Vertical;
+
     // Discard trainer if present
     if (m_header.flags6 & 0x04)
         file.seekg(512, std::ios_base::cur);
