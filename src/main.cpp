@@ -67,8 +67,11 @@ int main(int argc, char* argv[])
             if (event.type == SDL_QUIT) return 0;
         }
 
-        cpu->Clock();
-        for (int i = 0; i < 3; i++) ppu->Clock();
+        while (!ppu->FrameIsComplete())
+        {
+            cpu->Clock();
+            for (int i = 0; i < 3; i++) ppu->Clock();
+        }
 
         uint32_t* pixelBuffer = ppu->GetPixelBuffer();
 

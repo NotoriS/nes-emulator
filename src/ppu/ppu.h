@@ -79,7 +79,8 @@ public:
     void Clock();
     void Reset();
 
-    uint32_t* GetPixelBuffer() { return m_pixelBuffer; }
+    uint32_t* GetPixelBuffer() { m_frameCompleted = false; return m_pixelBuffer; }
+    bool FrameIsComplete() const { return m_frameCompleted; }
 
     // Used externally to read and write to the PPU from the CPU bus
     uint8_t Read(uint16_t address);
@@ -93,14 +94,28 @@ private:
     PPUMASK m_mask;
     PPUSTATUS m_status;
 
-    // Internal registers
+    // Internal control registers
     AddressRegister m_currVramAddress;
     AddressRegister m_tempVramAddress;
     uint8_t m_fineXScroll = 0x00;
     bool m_firstWrite = true;
-
     uint8_t m_readBuffer = 0x00;
+
+    // Internal rendering registers
+    uint8_t m_nametableByte = 0x00;
+    uint8_t m_attributeTableByte = 0x00;
+    uint8_t m_patternTableTileLow = 0x00;
+    uint8_t m_patternTableTileHigh = 0x00;
+    uint16_t m_patternLowShifter = 0x0000;
+    uint16_t m_patternHighShifter = 0x0000;
+    uint16_t m_attributeLowShifter = 0x0000;
+    uint16_t m_attributeHighShifter = 0x0000;
+
+    short m_scanline = 0;
+    short m_dot = 0;
+
     uint32_t m_pixelBuffer[DISPLAY_HEIGHT * DISPLAY_WIDTH];
+    bool m_frameCompleted = false;
 
     // Used internally to read and write to the PPU's bus
     uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }

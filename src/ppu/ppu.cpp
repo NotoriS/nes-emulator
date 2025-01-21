@@ -12,7 +12,25 @@ PPU::~PPU()
 
 void PPU::Clock()
 {
-    // TODO
+    // TODO: Implement logic to determine what pixel to draw
+
+    if (m_dot > 0 && m_dot <= DISPLAY_WIDTH && m_scanline >= 0 && m_scanline < DISPLAY_HEIGHT)
+    {
+        // TODO: Draw pixel
+        m_pixelBuffer[m_scanline * DISPLAY_WIDTH + m_dot - 1] += 0x010101FF;
+    }
+
+    m_dot++;
+    if (m_dot > 340)
+    {
+        m_dot = 0;
+        m_scanline++;
+        if (m_scanline > 260)
+        {
+            m_scanline = -1;
+            m_frameCompleted = true;
+        }
+    }
 }
 
 void PPU::Reset()
