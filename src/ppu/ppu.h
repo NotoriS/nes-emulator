@@ -87,6 +87,9 @@ public:
     void Write(uint16_t address, uint8_t data);
 
 private:
+    static const uint16_t NAMETABLE_BASE = 0x2000;
+    static const uint16_t ATTRIBUTE_TABLE_OFFSET = 0x03C0;
+
     std::shared_ptr<IBus> m_bus;
 
     // Exposed registers
@@ -103,7 +106,7 @@ private:
 
     // Internal rendering registers
     uint8_t m_nametableByte = 0x00;
-    uint8_t m_attributeTableByte = 0x00;
+    uint8_t m_tileAttribute = 0x00;
     uint8_t m_patternTableTileLow = 0x00;
     uint8_t m_patternTableTileHigh = 0x00;
     uint16_t m_patternLowShifter = 0x0000;
@@ -122,4 +125,18 @@ private:
     void WriteToBus(uint16_t address, uint8_t data) { m_bus->Write(address, data); }
 
     void IncrementVramAddress();
+
+    // Rendering helpers
+    void PerformTickLogic();
+    uint32_t DeterminePixelColour();
+    void FetchFromNametable();
+    void FetchFromAttributeTable();
+    void FetchPatternLeastSignificantBits();
+    void FetchPatternMostSignificantBits();
+    void IncrementHorizontalPointer();
+    void IncrementVerticalPointer();
+    void TransferHoriontalPointer();
+    void TransferVerticalPointer();
+    void LoadShiftersLowByte();
+    void ShiftShifters();
 };

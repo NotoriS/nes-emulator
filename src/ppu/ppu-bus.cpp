@@ -97,6 +97,7 @@ void PpuBus::Write(uint16_t address, uint8_t data)
         default:
             std::cerr << "Error: Unsupported mirror mode encoutered while reading from the name table." << std::endl;
         }
+        return;
     }
     else if (address < 0x4000) // Write to palette RAM
     {
@@ -106,5 +107,5 @@ void PpuBus::Write(uint16_t address, uint8_t data)
         return;
     }
 
-    std::cerr << "Error: Failed to write to CPU bus at address: 0x" << std::hex << address << std::endl;
+    std::cerr << "Error: Failed to write to PPU bus at address: 0x" << std::hex << address << std::endl;
 }

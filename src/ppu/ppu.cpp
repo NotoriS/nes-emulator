@@ -12,13 +12,13 @@ PPU::~PPU()
 
 void PPU::Clock()
 {
-    // TODO: Implement logic to determine what pixel to draw
+    PerformTickLogic();
+
+    uint8_t backgroundPixel = 0x00;
+    uint8_t backgroundColor = 0x00;
 
     if (m_dot > 0 && m_dot <= DISPLAY_WIDTH && m_scanline >= 0 && m_scanline < DISPLAY_HEIGHT)
-    {
-        // TODO: Draw pixel
-        m_pixelBuffer[m_scanline * DISPLAY_WIDTH + m_dot - 1] += 0x010101FF;
-    }
+        m_pixelBuffer[m_scanline * DISPLAY_WIDTH + m_dot - 1] = DeterminePixelColour();
 
     m_dot++;
     if (m_dot > 340)
@@ -120,10 +120,199 @@ void PPU::Write(uint16_t address, uint8_t data)
     }
 }
 
+void PPU::PerformTickLogic()
+{
+    if (m_scanline >= -1 && m_scanline < DISPLAY_HEIGHT) // Rendering scanlines
+    {
+        if (m_dot > 0 && m_dot <= DISPLAY_WIDTH || m_dot >= 321 && m_dot <= 336) // Rendering Cycles
+        {
+            ShiftShifters();
+            switch (m_dot % 8)
+            {
+            case 1:
+                LoadShiftersLowByte();
+                break;
+            case 2:
+                FetchFromNametable();
+                break;
+            case 4:
+                FetchFromAttributeTable();
+                break;
+            case 6:
+                FetchPatternLeastSignificantBits();
+                break;
+            case 0:
+                FetchPatternMostSignificantBits();
+                IncrementHorizontalPointer();
+                break;
+            }
+        }
+        if (m_dot == 256) IncrementVerticalPointer();
+        if (m_dot == 257)
+        {
+            LoadShiftersLowByte();
+            TransferHoriontalPointer();
+        }
+        if (m_dot == 338 || m_dot == 340) FetchFromNametable();
+    }
+
+    if (m_scanline == -1)
+    {
+        if (m_dot == 1)
+        {
+            m_status.vblank = 0;
+            m_status.spriteZeroHit = 0;
+            m_status.spriteOverflow = 0;
+        }
+        if (m_dot >= 280 && m_dot <= 304) TransferVerticalPointer();
+    }
+
+    if (m_scanline == 241 && m_dot == 1)
+    {
+        m_status.vblank = 1;
+        // TODO: Trigger nmi interrupt
+    }
+}
+
+uint32_t PPU::DeterminePixelColour()
+{
+    if (!m_mask.enableBackground) 
+        return COLOUR_PALETTE[ReadFromBus(0x3F00) & 0x3F];
+
+    uint16_t selectedBit = 0x8000 >> m_fineXScroll;
+
+    uint8_t pixelLow = (m_patternLowShifter & selectedBit) != 0;
+    uint8_t pixelHigh = (m_patternHighShifter & selectedBit) != 0;
+    uint8_t backgroundPixel = (pixelHigh << 1) | pixelLow;
+
+    uint8_t paletteLow = (m_attributeLowShifter & selectedBit) != 0;
+    uint8_t paletteHigh = (m_attributeHighShifter & selectedBit) != 0;
+    uint8_t backgroundPalette = (paletteHigh << 1) | paletteLow;
+
+    uint16_t paletteIndexAddress = 0x3F00 + (backgroundPalette << 2) + backgroundPixel;
+    return COLOUR_PALETTE[ReadFromBus(paletteIndexAddress) & 0x3F];
+}
+
+void PPU::FetchFromNametable()
+{
+    m_nametableByte = ReadFromBus(
+        NAMETABLE_BASE
+        | (m_currVramAddress.address & 0x0FFF)
+    );
+}
+
+void PPU::FetchFromAttributeTable()
+{
+    m_tileAttribute = ReadFromBus(
+        NAMETABLE_BASE | ATTRIBUTE_TABLE_OFFSET
+        | (m_currVramAddress.nametableY << 11)
+        | (m_currVramAddress.nametableX << 10)
+        | ((m_currVramAddress.coarseYScroll >> 2) << 3)
+        | (m_currVramAddress.coarseXScroll >> 2)
+    );
+
+    // Shift the 4 tile attribute byte to isolate the current tile (2 bits)
+    if (m_currVramAddress.coarseYScroll & 2) m_tileAttribute >>= 4;
+    if (m_currVramAddress.coarseXScroll & 2) m_tileAttribute >>= 2;
+    m_tileAttribute &= 0b11;
+}
+
+void PPU::FetchPatternLeastSignificantBits()
+{
+    m_patternTableTileLow = ReadFromBus(
+        (m_control.backgroundPatternTable << 12)
+        | (m_nametableByte << 4)
+        | m_currVramAddress.fineYScroll
+    );
+}
+
+void PPU::FetchPatternMostSignificantBits()
+{
+    m_patternTableTileHigh = ReadFromBus(
+        (m_control.backgroundPatternTable << 12)
+        | (m_nametableByte << 4)
+        | m_currVramAddress.fineYScroll + 8
+    );
+}
+
 void PPU::IncrementVramAddress()
 {
     if (m_control.vramIncrement)
         m_currVramAddress.address += 32;
     else
         m_currVramAddress.address++;
+}
+
+void PPU::IncrementHorizontalPointer()
+{
+    if (!m_mask.enableBackground && !m_mask.enableSprites) return;
+
+    m_currVramAddress.coarseXScroll++;
+
+    // Flip nametable selector when a coarse X scroll overflow is detected
+    if (m_currVramAddress.coarseXScroll == 0)
+        m_currVramAddress.nametableX = ~m_currVramAddress.nametableX;
+}
+
+void PPU::IncrementVerticalPointer()
+{
+    if (!m_mask.enableBackground && !m_mask.enableSprites) return;
+
+    // Only update fine Y scroll when possible (no overflow)
+    m_currVramAddress.fineYScroll++;
+    if (m_currVramAddress.fineYScroll != 0) return;
+
+    if (m_currVramAddress.coarseYScroll == 29)
+    {
+        // Switch to the next nametable before running in to the attribute table
+        m_currVramAddress.coarseYScroll = 0;
+        m_currVramAddress.nametableY = ~m_currVramAddress.nametableY;
+    }
+    else
+    {
+        m_currVramAddress.coarseYScroll++;
+    }
+}
+
+void PPU::TransferHoriontalPointer()
+{
+    if (!m_mask.enableBackground && !m_mask.enableSprites) return;
+
+    m_currVramAddress.nametableX = m_tempVramAddress.nametableX;
+    m_currVramAddress.coarseXScroll = m_tempVramAddress.coarseXScroll;
+}
+
+void PPU::TransferVerticalPointer()
+{
+    if (!m_mask.enableBackground && !m_mask.enableSprites) return;
+
+    m_currVramAddress.nametableY = m_tempVramAddress.nametableY;
+    m_currVramAddress.coarseYScroll = m_tempVramAddress.coarseYScroll;
+    m_currVramAddress.fineYScroll = m_tempVramAddress.fineYScroll;
+}
+
+void PPU::LoadShiftersLowByte()
+{
+    m_patternLowShifter &= 0xFF00;
+    m_patternLowShifter |= m_patternTableTileLow;
+
+    m_patternHighShifter &= 0xFF00;
+    m_patternHighShifter |= m_patternTableTileHigh;
+
+    m_attributeLowShifter &= 0xFF00;
+    m_attributeLowShifter |= (m_tileAttribute & 1) ? 0xFF : 0;
+
+    m_attributeHighShifter &= 0xFF00;
+    m_attributeHighShifter |= (m_tileAttribute & 2) ? 0xFF : 0;
+
+}
+
+void PPU::ShiftShifters()
+{
+    if (!m_mask.enableBackground) return;
+
+    m_patternLowShifter <<= 1;
+    m_patternHighShifter <<= 1;
+    m_attributeLowShifter <<= 1;
+    m_attributeHighShifter <<= 1;
 }
