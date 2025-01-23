@@ -280,7 +280,7 @@ void CPU::IndirectIndexedReadModifyWrite(std::function<void()> operation)
     m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
     m_microInstructionQueue.push_back([this]()
         {
-            uint8_t originalPage = Read(reg_pc++);
+            uint8_t originalPage = Read(m_operand);
             m_targetAddress |= originalPage << 8;
             m_targetAddress += reg_y;
 
@@ -305,7 +305,7 @@ void CPU::IndirectIndexedWriteOnly(std::function<void()> operation)
     m_microInstructionQueue.push_back([this]() { m_targetAddress = Read(m_operand++); });
     m_microInstructionQueue.push_back([this]()
         {
-            uint8_t originalPage = Read(reg_pc++);
+            uint8_t originalPage = Read(m_operand);
             m_targetAddress |= originalPage << 8;
             m_targetAddress += reg_y;
 
