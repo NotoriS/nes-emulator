@@ -38,6 +38,19 @@ void PPU::Reset()
     // TODO
 }
 
+bool PPU::NmiInterruptWasRaised()
+{
+    if (m_nmiInterruptRaised)
+    {
+        m_nmiInterruptRaised = false;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 uint8_t PPU::Read(uint16_t address)
 {
     uint8_t result = 0x00;
@@ -170,7 +183,8 @@ void PPU::PerformTickLogic()
     if (m_scanline == 241 && m_dot == 1)
     {
         m_status.vblank = 1;
-        // TODO: Trigger nmi interrupt
+        if (m_control.vblankNmi)
+            m_nmiInterruptRaised = true;
     }
 }
 

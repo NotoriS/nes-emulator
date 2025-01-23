@@ -69,8 +69,17 @@ int main(int argc, char* argv[])
 
         while (!ppu->FrameIsComplete())
         {
+            bool nmiInterruptRaised = false;
+            for (int i = 0; i < 3; i++)
+            {
+                ppu->Clock();
+                nmiInterruptRaised |= ppu->NmiInterruptWasRaised();
+            }
+
+            if (nmiInterruptRaised) 
+                cpu->Interrupt(CPU::InterruptType::NMI);
+
             cpu->Clock();
-            for (int i = 0; i < 3; i++) ppu->Clock();
         }
 
         uint32_t* pixelBuffer = ppu->GetPixelBuffer();

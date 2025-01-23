@@ -81,6 +81,7 @@ public:
 
     uint32_t* GetPixelBuffer() { m_frameCompleted = false; return m_pixelBuffer; }
     bool FrameIsComplete() const { return m_frameCompleted; }
+    bool NmiInterruptWasRaised();
 
     // Used externally to read and write to the PPU from the CPU bus
     uint8_t Read(uint16_t address);
@@ -119,6 +120,7 @@ private:
 
     uint32_t m_pixelBuffer[DISPLAY_HEIGHT * DISPLAY_WIDTH];
     bool m_frameCompleted = false;
+    bool m_nmiInterruptRaised = false;
 
     // Used internally to read and write to the PPU's bus
     uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
