@@ -59,12 +59,12 @@ class PPU
     {
         struct
         {
-            uint8_t coarseXScroll : 5;
-            uint8_t coarseYScroll : 5;
-            uint8_t nametableX : 1;
-            uint8_t nametableY : 1;
-            uint8_t fineYScroll : 3;
-            uint8_t unused : 1;
+            uint16_t coarseXScroll : 5;
+            uint16_t coarseYScroll : 5;
+            uint16_t nametableX : 1;
+            uint16_t nametableY : 1;
+            uint16_t fineYScroll : 3;
+            uint16_t unused : 1;
         };
         uint16_t address = 0x0000;
     };
