@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <SDL2/SDL.h>
 
+#include "debug/logger.h"
 #include "cpu/cpu.h"
 #include "cpu/cpu-bus.h"
 #include "cartridge/cartridge.h"
@@ -25,7 +26,7 @@ int main(int argc, char* argv[])
     }
     catch (const std::runtime_error& e)
     {
-        std::cerr << "Fatal Error (" << e.what() << ")" << std::endl;
+        Logger::GetInstance().Error(e.what());
         return -1;
     }
 
