@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <vector>
 
 class Logger
 {
@@ -24,31 +25,43 @@ public:
     void SetLoggingMode(LoggingModes loggingMode);
 
     template<typename T>
-    void Log(const T& value)
+    void Log(const T& value) const
     {
         if (m_loggingMode == LoggingModes::Disabled) return;
         std::cout << value << std::endl;
     }
 
     template<typename T>
-    void Warn(const T& value)
+    void Warn(const T& value) const
     {
         if (m_loggingMode == LoggingModes::Disabled) return;
         std::cout << "Warning: " << value << std::endl;
     }
 
     template<typename T>
-    void Error(const T& value)
+    void Error(const T& value) const
     {
         if (m_loggingMode == LoggingModes::Disabled) return;
         std::cerr << "Error: " << value << std::endl;
     }
 
     template<typename T>
-    std::string DecmialToHex(T value)
+    static std::string DecmialToHex(T value)
     {
-        // TODO: Implement function
-        return "";
+        static_assert(std::is_integral_v<T>, "DecimalToHex can only be used with integral types.");
+
+        const std::string hexChars = "0123456789ABCDEF";
+        int hexCharCount = sizeof(value) * 2;
+        std::vector<char> result(hexCharCount + 3);
+        result[0] = '0';
+        result[1] = 'x';
+
+        for (int i = hexCharCount + 1; i > 1; i--, value >>= 4)
+        {
+            result[i] = hexChars[value & 0xF];
+        }
+
+        return std::string(result.begin(), result.end());
     }
 
 private:
