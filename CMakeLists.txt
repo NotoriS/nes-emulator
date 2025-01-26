@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for nes-emulator, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.12)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -52,9 +52,7 @@ add_custom_command(TARGET nes-emulator POST_BUILD
   COMMAND_EXPAND_LISTS
 )
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET nes-emulator PROPERTY CXX_STANDARD 20)
-endif()
+set_property(TARGET nes-emulator PROPERTY CXX_STANDARD 20)
 
 # ===== TESTS ======
 
@@ -81,3 +79,5 @@ target_link_libraries(nes-emulator-tests PRIVATE gtest gtest_main)
 
 enable_testing()
 add_test(NAME NES_Emulator_Tests COMMAND nes-emulator-tests)
+
+set_property(TARGET nes-emulator-tests PROPERTY CXX_STANDARD 20)
