@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 
+#include "../debug/logger.h"
 #include "../interfaces/i-bus.h"
 
 class CPU

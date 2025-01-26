@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     // Fetch the ROM filepath from the program arguments
     if (argc < 2)
     {
-        std::cerr << "No filename provided" << std::endl;
+        Logger::GetInstance().Error("no filename provided");
         return -1;
     }
     const std::string romPath = argv[1];

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "../../debug/logger.h"
 #include "mapper.h"
 
 class Mapper000 : public Mapper

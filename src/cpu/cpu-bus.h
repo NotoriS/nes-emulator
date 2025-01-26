@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../debug/logger.h"
 #include "../interfaces/i-bus.h"
 #include "../cartridge/cartridge.h"
 #include "../ppu/ppu.h"

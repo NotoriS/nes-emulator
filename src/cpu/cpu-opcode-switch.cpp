@@ -494,7 +494,7 @@ void CPU::QueueNextInstuction()
 
         // Illegal opcodes
         default: 
-            std::cout << "Warning: Unexpected opcode 0x" << std::hex << static_cast<int>(opcode) << std::endl;
+            Logger::GetInstance().Warn("unexpected opcode " + Logger::DecmialToHex(opcode));
             break;
     }
 }

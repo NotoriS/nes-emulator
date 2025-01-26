@@ -47,7 +47,7 @@ uint8_t PpuBus::Read(uint16_t address)
             else
                 return m_nameTables[1][address & 0x03FF];
         default:
-            std::cerr << "Error: Unsupported mirror mode encoutered while reading from the name table." << std::endl;
+            Logger::GetInstance().Error("unsupported mirror mode encoutered while reading from the name table");
         }
     }
     else if (address < 0x4000) // Read from palette RAM
@@ -57,7 +57,7 @@ uint8_t PpuBus::Read(uint16_t address)
         return m_paletteMemory[address];
     }
 
-    std::cerr << "Error: Failed to read from PPU bus at address: 0x" << std::hex << address << std::endl;
+    Logger::GetInstance().Warn("failed to read from PPU bus at address " + Logger::DecmialToHex(address));
     return 0;
 }
 
@@ -95,7 +95,7 @@ void PpuBus::Write(uint16_t address, uint8_t data)
                 m_nameTables[1][address & 0x03FF] = data;
             break;
         default:
-            std::cerr << "Error: Unsupported mirror mode encoutered while reading from the name table." << std::endl;
+            Logger::GetInstance().Error("unsupported mirror mode encoutered while reading from the name table");
         }
         return;
     }
@@ -107,5 +107,5 @@ void PpuBus::Write(uint16_t address, uint8_t data)
         return;
     }
 
-    std::cerr << "Error: Failed to write to PPU bus at address: 0x" << std::hex << address << std::endl;
+    Logger::GetInstance().Warn("failed to write to PPU bus at address " + Logger::DecmialToHex(address));
 }

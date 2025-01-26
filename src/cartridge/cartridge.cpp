@@ -56,8 +56,7 @@ void Cartridge::LoadROM(const std::string& filename)
     uint8_t mapperID = (m_header.flags6 & 0xF0) & (m_header.flags7 >> 4);
     CreateMapper(mapperID);
 
-    std::cout << "Loaded " << prgSize << " bytes of PRG ROM and "
-        << chrSize << " bytes of CHR ROM from " << filename << std::endl;
+    Logger::GetInstance().Log(std::format("Loaded {} bytes of PRG ROM and {} bytes of CHR ROM from {}", prgSize, chrSize, filename));
 }
 
 void Cartridge::CreateMapper(uint8_t mapperID)
@@ -68,7 +67,7 @@ void Cartridge::CreateMapper(uint8_t mapperID)
             m_mapper = std::make_unique<Mapper000>(m_prgRom, m_chrRom);
             break;
         default:
-            std::cerr << "The mapper required by this ROM is unsuported." << std::endl;
+            Logger::GetInstance().Error("the mapper required by this ROM is unsuported");
             break;
     }
 }

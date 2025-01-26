@@ -24,7 +24,7 @@ uint8_t CpuBus::Read(uint16_t address)
         return m_cartridge->CpuRead(address);
     }
 
-    std::cerr << "Failed to read from CPU bus at address: 0x" << std::hex << address << std::endl;
+    Logger::GetInstance().Warn("failed to read from CPU bus at address: " + Logger::DecmialToHex(address));
     return 0;
 }
 
@@ -46,5 +46,5 @@ void CpuBus::Write(uint16_t address, uint8_t data)
         return;
     }
 
-    std::cerr << "Failed to write to CPU bus at address: 0x" << std::hex << address << std::endl;
+    Logger::GetInstance().Warn("failed to write to CPU bus at address: " + Logger::DecmialToHex(address));
 }

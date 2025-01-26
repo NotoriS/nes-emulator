@@ -5,7 +5,9 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <format>
 
+#include "../debug/logger.h"
 #include "mappers/mapper.h"
 #include "mappers/mapper-000.h"
 

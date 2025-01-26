@@ -73,8 +73,7 @@ uint8_t PPU::Read(uint16_t address)
             IncrementVramAddress();
             return result;
         default:
-            std::cout << "Warning: The CPU attempted to read from the PPU at an invalid address (0x"
-                << std::hex << static_cast<int>(address) << ")" << std::endl;
+            Logger::GetInstance().Warn("the CPU attempted to read from the PPU at an invalid address (" + Logger::DecmialToHex(address) + ")");
             return 0;
     }
 }
@@ -127,8 +126,7 @@ void PPU::Write(uint16_t address, uint8_t data)
         IncrementVramAddress();
         break;
     default:
-        std::cout << "Warning: The CPU attempted to write to the PPU at an invalid address (0x"
-            << std::hex << static_cast<int>(address) << ")" << std::endl;
+        Logger::GetInstance().Warn("the CPU attempted to write to the PPU at an invalid address (" + Logger::DecmialToHex(address) + ")");
         break;
     }
 }
