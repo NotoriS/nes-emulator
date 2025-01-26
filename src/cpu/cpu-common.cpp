@@ -65,7 +65,7 @@ uint8_t CPU::Read(uint16_t address)
     throw std::runtime_error("CPU tried to read from the bus before it was connected.");
 }
 
-uint8_t CPU::GetFlag(Flag flag)
+uint8_t CPU::GetFlag(Flag flag) const
 {
     return ((reg_p & static_cast<uint8_t>(flag)) > 0) ? 1 : 0;
 }

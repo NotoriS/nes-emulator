@@ -52,7 +52,7 @@ public:
     void Clock();
     void Interrupt(InterruptType type);
 
-    uint8_t GetFlag(Flag flag);
+    uint8_t GetFlag(Flag flag) const;
 
 private:
     std::shared_ptr<IBus> m_bus;
