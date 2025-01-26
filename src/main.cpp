@@ -2,6 +2,8 @@
 #include <memory>
 #include <stdexcept>
 #include <SDL2/SDL.h>
+#include <chrono>
+#include <thread>
 
 #include "debug/logger.h"
 #include "cpu/cpu.h"
@@ -63,6 +65,8 @@ int main(int argc, char* argv[])
 
     while (true)
     {
+        const auto frameStart = std::chrono::high_resolution_clock().now();
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT) return 0;
@@ -93,8 +97,12 @@ int main(int argc, char* argv[])
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
         SDL_RenderPresent(renderer);
 
-        // TODO: Replace with a more robust timing restriction
-        SDL_Delay(16);
+        // Wait for the next frame to keep a consistent framerate
+        const auto frameEnd = std::chrono::high_resolution_clock().now();
+        const auto frameDuration = frameEnd - frameStart;
+        const auto targetFrameDuration = std::chrono::duration<double, std::milli>(16.67);
+        if (frameDuration < targetFrameDuration)
+            std::this_thread::sleep_for(targetFrameDuration - frameDuration);
     }
 
     return 0;
