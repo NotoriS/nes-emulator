@@ -14,9 +14,6 @@ void PPU::Clock()
 {
     PerformTickLogic();
 
-    uint8_t backgroundPixel = 0x00;
-    uint8_t backgroundColor = 0x00;
-
     if (m_dot > 0 && m_dot <= DISPLAY_WIDTH && m_scanline >= 0 && m_scanline < DISPLAY_HEIGHT)
         m_pixelBuffer[m_scanline * DISPLAY_WIDTH + m_dot - 1] = DeterminePixelColour();
 
