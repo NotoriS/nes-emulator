@@ -103,51 +103,20 @@ void CPU::PollInterrupts()
 
 void CPU::InternalInterrupt(InterruptType type)
 {
+    m_inProgressInterruptType = type;
     if (type != InterruptType::BRK)
     {
-        m_OldMicroInstructionQueue.push_back([this]() { m_interruptInProgress = true; });
+        m_microInstructionQueue.push_back(&CPU::SetInterruptInProgress);
     }
     else
     {
         m_mostRecentInterruptVector = IRQ_VECTOR;
-        m_OldMicroInstructionQueue.push_back([this]()
-            {
-                m_interruptInProgress = true;
-                reg_pc++;
-            });
+        m_microInstructionQueue.push_back(&CPU::SetInterruptInProgressAndIncrementPC);
     }
 
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            StackPush(reg_pc >> 8);
-            reg_s--;
-        });
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            StackPush(static_cast<uint8_t>(reg_pc));
-            reg_s--;
-        });
-    m_OldMicroInstructionQueue.push_back([this, type]()
-        {
-            // Allows NMI interrupts to hijack the BRK/IRQ interrupt vector
-            if (type == InterruptType::NMI) m_targetAddress = NMI_VECTOR;
-            else m_targetAddress = m_mostRecentInterruptVector;
-
-            if (type == InterruptType::BRK)
-                StackPush(reg_p | static_cast<uint8_t>(Flag::B));
-            else
-                StackPush(reg_p & ~static_cast<uint8_t>(Flag::B));
-
-            reg_s--;
-        });
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_pc = Read(m_targetAddress);
-            SetFlag(Flag::I, true);
-        });
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_pc |= Read(m_targetAddress + 1) << 8;
-            m_interruptInProgress = false;
-        });
+    m_microInstructionQueue.push_back(&CPU::PushPCHighByteToTheStack);
+    m_microInstructionQueue.push_back(&CPU::PushPCLowByteToTheStack);
+    m_microInstructionQueue.push_back(&CPU::PushStatusAndDecideFinalInterruptVector);
+    m_microInstructionQueue.push_back(&CPU::SetPCLowByteAndSetInterruptFlag);
+    m_microInstructionQueue.push_back(&CPU::SetPCHighByteAndClearInterruptInProgress);
 }

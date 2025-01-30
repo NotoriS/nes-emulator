@@ -76,6 +76,7 @@ private:
     IndexType m_indexType = IndexType::None;
 
     bool m_interruptInProgress = false;
+    InterruptType m_inProgressInterruptType;
     bool m_pendingNMI = false;
     bool m_pendingIRQ = false;
     uint16_t m_mostRecentInterruptVector = 0;
@@ -210,5 +211,10 @@ private:
     void JumpToSubroutineFinal();
     void JumpAbsoluteFinal();
     void JumpIndirectFinal();
+    void PushStatusAndDecideFinalInterruptVector();
+    void SetPCLowByteAndSetInterruptFlag();
+    void SetPCHighByteAndClearInterruptInProgress();
+    void SetInterruptInProgress();
+    void SetInterruptInProgressAndIncrementPC();
 #pragma endregion
 };

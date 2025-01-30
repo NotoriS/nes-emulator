@@ -270,3 +270,40 @@ void CPU::JumpIndirectFinal()
     reg_pc = m_operand;
     reg_pc |= Read(pchAddress) << 8;
 }
+
+void CPU::PushStatusAndDecideFinalInterruptVector()
+{
+    // Allows NMI interrupts to hijack the BRK/IRQ interrupt vector
+    if (m_inProgressInterruptType == InterruptType::NMI) m_targetAddress = NMI_VECTOR;
+    else m_targetAddress = m_mostRecentInterruptVector;
+
+    if (m_inProgressInterruptType == InterruptType::BRK)
+        StackPush(reg_p | static_cast<uint8_t>(Flag::B));
+    else
+        StackPush(reg_p & ~static_cast<uint8_t>(Flag::B));
+
+    reg_s--;
+}
+
+void CPU::SetPCLowByteAndSetInterruptFlag()
+{
+    reg_pc = Read(m_targetAddress);
+    SetFlag(Flag::I, true);
+}
+
+void CPU::SetPCHighByteAndClearInterruptInProgress()
+{
+    reg_pc |= Read(m_targetAddress + 1) << 8;
+    m_interruptInProgress = false;
+}
+
+void CPU::SetInterruptInProgress()
+{
+    m_interruptInProgress = true;
+}
+
+void CPU::SetInterruptInProgressAndIncrementPC()
+{
+    m_interruptInProgress = true;
+    reg_pc++;
+}
