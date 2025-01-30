@@ -421,144 +421,114 @@ void CPU::JSR()
 
 void CPU::TAX()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_x = reg_a;
+    reg_x = reg_a;
 
-            SetFlag(Flag::Z, reg_x == 0);
-            SetFlag(Flag::N, reg_x & 0x80);
-        });
+    SetFlag(Flag::Z, reg_x == 0);
+    SetFlag(Flag::N, reg_x & 0x80);
 }
 
 void CPU::TXA()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_a = reg_x;
+    reg_a = reg_x;
 
-            SetFlag(Flag::Z, reg_a == 0);
-            SetFlag(Flag::N, reg_a & 0x80);
-        });
+    SetFlag(Flag::Z, reg_a == 0);
+    SetFlag(Flag::N, reg_a & 0x80);
 }
 
 void CPU::TAY()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_y = reg_a;
+    reg_y = reg_a;
 
-            SetFlag(Flag::Z, reg_y == 0);
-            SetFlag(Flag::N, reg_y & 0x80);
-        });
+    SetFlag(Flag::Z, reg_y == 0);
+    SetFlag(Flag::N, reg_y & 0x80);
 }
 
 void CPU::TYA()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_a = reg_y;
+    reg_a = reg_y;
 
-            SetFlag(Flag::Z, reg_a == 0);
-            SetFlag(Flag::N, reg_a & 0x80);
-        });
+    SetFlag(Flag::Z, reg_a == 0);
+    SetFlag(Flag::N, reg_a & 0x80);
 }
 
 void CPU::TXS()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_s = reg_x;
-        });
+    reg_s = reg_x;
 }
 
 void CPU::TSX()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_x = reg_s;
+    reg_x = reg_s;
 
-            SetFlag(Flag::Z, reg_x == 0);
-            SetFlag(Flag::N, reg_x & 0x80);
-        });
+    SetFlag(Flag::Z, reg_x == 0);
+    SetFlag(Flag::N, reg_x & 0x80);
 }
 
 void CPU::INX()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_x++;
+    reg_x++;
 
-            SetFlag(Flag::Z, reg_x == 0);
-            SetFlag(Flag::N, reg_x & 0x80);
-        });
+    SetFlag(Flag::Z, reg_x == 0);
+    SetFlag(Flag::N, reg_x & 0x80);
 }
 
 void CPU::DEX()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_x--;
+    reg_x--;
 
-            SetFlag(Flag::Z, reg_x == 0);
-            SetFlag(Flag::N, reg_x & 0x80);
-        });
+    SetFlag(Flag::Z, reg_x == 0);
+    SetFlag(Flag::N, reg_x & 0x80);
 }
 
 void CPU::INY()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_y++;
+    reg_y++;
 
-            SetFlag(Flag::Z, reg_y == 0);
-            SetFlag(Flag::N, reg_y & 0x80);
-        });
+    SetFlag(Flag::Z, reg_y == 0);
+    SetFlag(Flag::N, reg_y & 0x80);
 }
 
 void CPU::DEY()
 {
-    m_OldMicroInstructionQueue.push_back([this]()
-        {
-            reg_y--;
+    reg_y--;
 
-            SetFlag(Flag::Z, reg_y == 0);
-            SetFlag(Flag::N, reg_y & 0x80);
-        });
+    SetFlag(Flag::Z, reg_y == 0);
+    SetFlag(Flag::N, reg_y & 0x80);
 }
 
 void CPU::SEC()
 {
-    m_OldMicroInstructionQueue.push_back([this]() { SetFlag(Flag::C, true); });
+    SetFlag(Flag::C, true);
 }
 
 void CPU::CLC()
 {
-    m_OldMicroInstructionQueue.push_back([this]() { SetFlag(Flag::C, false); });
+    SetFlag(Flag::C, false);
 }
 
 void CPU::SEI()
 {
-    m_OldMicroInstructionQueue.push_back([this]() { SetFlag(Flag::I, true); });
+    SetFlag(Flag::I, true);
 }
 
 void CPU::CLI()
 {
-    m_OldMicroInstructionQueue.push_back([this]() { SetFlag(Flag::I, false); });
+    SetFlag(Flag::I, false);
 }
 
 void CPU::SED()
 {
-    m_OldMicroInstructionQueue.push_back([this]() { SetFlag(Flag::D, true); });
+    SetFlag(Flag::D, true);
 }
 
 void CPU::CLD()
 {
-    m_OldMicroInstructionQueue.push_back([this]() { SetFlag(Flag::D, false); });
+    SetFlag(Flag::D, false);
 }
 
 void CPU::CLV()
 {
-    m_OldMicroInstructionQueue.push_back([this]() { SetFlag(Flag::V, false); });
+    SetFlag(Flag::V, false);
 }
 
 void CPU::JMP_Absolute()

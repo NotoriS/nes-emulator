@@ -67,7 +67,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite();
             break;
         case 0x18: // CLC
-            CLC();
+            m_microInstructionQueue.push_back(&CPU::CLC);
             break;
         case 0x19: // ORA Absolute,Y
             m_operation = &CPU::ORA;
@@ -155,7 +155,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite();
             break;
         case 0x38: // SEC
-            SEC();
+            m_microInstructionQueue.push_back(&CPU::SEC);
             break;
         case 0x39: // AND Absolute,Y
             m_operation = &CPU::AND;
@@ -236,7 +236,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite();
             break;
         case 0x58: // CLI
-            CLI();
+            m_microInstructionQueue.push_back(&CPU::CLI);
             break;
         case 0x59: // EOR Absolute,Y
             m_operation = &CPU::EOR;
@@ -317,7 +317,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite();
             break;
         case 0x78: // SEI
-            SEI();
+            m_microInstructionQueue.push_back(&CPU::SEI);
             break;
         case 0x79: // ADC Absolute,Y
             m_operation = &CPU::ADC;
@@ -356,10 +356,10 @@ void CPU::QueueNextInstuction()
             ZeroPageWriteOnly();
             break;
         case 0x88: // DEY
-            DEY();
+            m_microInstructionQueue.push_back(&CPU::DEY);
             break;
         case 0x8A: // TXA
-            TXA();
+            m_microInstructionQueue.push_back(&CPU::TXA);
             break;
         case 0x8C: // STY Absolute
             m_operation = &CPU::STY;
@@ -402,7 +402,7 @@ void CPU::QueueNextInstuction()
             ZeroPageWriteOnly();
             break;
         case 0x98: // TYA
-            TYA();
+            m_microInstructionQueue.push_back(&CPU::TYA);
             break;
         case 0x99: // STA Absolute,Y
             m_operation = &CPU::STA;
@@ -410,7 +410,7 @@ void CPU::QueueNextInstuction()
             AbsoluteWriteOnly();
             break;
         case 0x9A: // TXS
-            TXS();
+            m_microInstructionQueue.push_back(&CPU::TXS);
             break;
         case 0x9D: // STA Absolute,X
             m_operation = &CPU::STA;
@@ -447,14 +447,14 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly();
             break;
         case 0xA8: // TAY
-            TAY();
+            m_microInstructionQueue.push_back(&CPU::TAY);
             break;
         case 0xA9: // LDA Immediate
             m_operation = &CPU::LDA;
             ImmediateReadOnly();
             break;
         case 0xAA: // TAX
-            TAX();
+            m_microInstructionQueue.push_back(&CPU::TAX);
             break;
         case 0xAC: // LDY Absolute
             m_operation = &CPU::LDY;
@@ -497,7 +497,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadOnly();
             break;
         case 0xB8: // CLV
-            CLV();
+            m_microInstructionQueue.push_back(&CPU::CLV);
             break;
         case 0xB9: // LDA Absolute,Y
             m_operation = &CPU::LDA;
@@ -505,7 +505,7 @@ void CPU::QueueNextInstuction()
             AbsoluteReadOnly();
             break;
         case 0xBA: // TSX
-            TSX();
+            m_microInstructionQueue.push_back(&CPU::TSX);
             break;
         case 0xBC: // LDY Absolute,X
             m_operation = &CPU::LDY;
@@ -548,14 +548,14 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite();
             break;
         case 0xC8: // INY
-            INY();
+            m_microInstructionQueue.push_back(&CPU::INY);
             break;
         case 0xC9: // CMP Immediate
             m_operation = &CPU::CMP;
             ImmediateReadOnly();
             break;
         case 0xCA: // DEX
-            DEX();
+            m_microInstructionQueue.push_back(&CPU::DEX);
             break;
         case 0xCC: // CPY Absolute
             m_operation = &CPU::CPY;
@@ -593,7 +593,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite();
             break;
         case 0xD8: // CLD
-            CLD();
+            m_microInstructionQueue.push_back(&CPU::CLD);
             break;
         case 0xD9: // CMP Absolute,Y
             m_operation = &CPU::CMP;
@@ -636,7 +636,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite();
             break;
         case 0xE8: // INX
-            INX();
+            m_microInstructionQueue.push_back(&CPU::INX);
             break;
         case 0xE9: // SBC Immediate
             m_operation = &CPU::SBC;
@@ -681,7 +681,7 @@ void CPU::QueueNextInstuction()
             ZeroPageReadModifyWrite();
             break;
         case 0xF8: // SED
-            SED();
+            m_microInstructionQueue.push_back(&CPU::SED);
             break;
         case 0xF9: // SBC Absolute,Y
             m_operation = &CPU::SBC;

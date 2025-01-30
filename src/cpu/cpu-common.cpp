@@ -9,7 +9,7 @@ CPU::~CPU() {}
 
 void CPU::Reset()
 {
-    while (!m_OldMicroInstructionQueue.empty()) m_OldMicroInstructionQueue.pop_front();
+    while (!m_microInstructionQueue.empty()) m_microInstructionQueue.pop_front();
 
     reg_pc = Read(RESET_VECTOR);
     reg_pc |= Read(RESET_VECTOR + 1) << 8;

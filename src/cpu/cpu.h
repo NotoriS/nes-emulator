@@ -58,7 +58,6 @@ private:
     std::shared_ptr<IBus> m_bus;
 
     // Contains "per cycle" instructions that will execute when clock is called.
-    std::deque<std::function<void()>> m_OldMicroInstructionQueue; 
     std::deque<void (CPU::*)()> m_microInstructionQueue;
 
     uint8_t  reg_a = 0;    // Accumulator Register
@@ -150,6 +149,8 @@ private:
     void PLA(); // Pull the accumulator register from the stack
     void PLP(); // Pull the status register from the stack
     void JSR(); // Jump to subroutine
+
+    // ==== Two Cycle Instructions ====
     void TAX(); // Transfer A to X
     void TXA(); // Transfer X to A
     void TAY(); // Transfer A to Y
@@ -168,6 +169,7 @@ private:
     void CLD(); // Clear decimal
     void CLV(); // Clear overflow
 
+    // ==== JMP Instructions For All Addressing Modes ====
     void JMP_Absolute(); // Absolute addressed jump
     void JMP_Indirect(); // Indirect addressed jump
 #pragma endregion
