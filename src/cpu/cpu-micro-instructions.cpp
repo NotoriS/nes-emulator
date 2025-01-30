@@ -307,3 +307,43 @@ void CPU::SetInterruptInProgressAndIncrementPC()
     m_interruptInProgress = true;
     reg_pc++;
 }
+
+bool CPU::PlusTest() const
+{
+    return GetFlag(Flag::N) == 0;
+}
+
+bool CPU::MinusTest() const
+{
+    return GetFlag(Flag::N) == 1;
+}
+
+bool CPU::OverflowClearTest() const
+{
+    return GetFlag(Flag::V) == 0;
+}
+
+bool CPU::OverflowSetTest() const
+{
+    return GetFlag(Flag::V) == 1;
+}
+
+bool CPU::CarryClearTest() const
+{
+    return GetFlag(Flag::C) == 0;
+}
+
+bool CPU::CarrySetTest() const
+{
+    return GetFlag(Flag::C) == 1;
+}
+
+bool CPU::NotEqualTest() const
+{
+    return GetFlag(Flag::Z) == 0;
+}
+
+bool CPU::EqualTest() const
+{
+    return GetFlag(Flag::Z) == 1;
+}

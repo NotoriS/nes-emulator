@@ -188,7 +188,7 @@ void CPU::IndirectIndexedWriteOnly()
     m_microInstructionQueue.push_back(m_operation);
 }
 
-void CPU::BranchInstruction(std::function<bool()> test)
+void CPU::BranchInstruction()
 {
     m_microInstructionQueue.push_back(&CPU::CheckBranchCondition);
 }

@@ -49,7 +49,8 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x10 to 0x1F
         case 0x10: // BPL
-            BranchInstruction([this]() { return GetFlag(Flag::N) == 0; });
+            m_branchTest = &CPU::PlusTest;
+            BranchInstruction();
             break;
         case 0x11: // ORA (Indirect),Y
             m_operation = &CPU::ORA;
@@ -136,7 +137,8 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x30 to 0x3F
         case 0x30: // BMI
-            BranchInstruction([this]() { return GetFlag(Flag::N) == 1; });
+            m_branchTest = &CPU::MinusTest;
+            BranchInstruction();
             break;
         case 0x31: // AND (Indirect),Y
             m_operation = &CPU::AND;
@@ -216,7 +218,8 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x50 to 0x5F
         case 0x50: // BVC
-            BranchInstruction([this]() { return GetFlag(Flag::V) == 0; });
+            m_branchTest = &CPU::OverflowClearTest;
+            BranchInstruction();
             break;
         case 0x51: // EOR (Indirect),Y
             m_operation = &CPU::EOR;
@@ -296,7 +299,8 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x70 to 0x7F
         case 0x70: // BVS
-            BranchInstruction([this]() { return GetFlag(Flag::V) == 1; });
+            m_branchTest = &CPU::OverflowSetTest;
+            BranchInstruction();
             break;
         case 0x71: // ADC (Indirect),Y
             m_operation = &CPU::ADC;
@@ -375,7 +379,8 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0x90 to 0x9F
         case 0x90: // BCC
-            BranchInstruction([this]() { return GetFlag(Flag::C) == 0; });
+            m_branchTest = &CPU::CarryClearTest;
+            BranchInstruction();
             break;
         case 0x91: // STA (Indirect),Y
             m_operation = &CPU::STA;
@@ -469,7 +474,8 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xB0 to 0xBF
         case 0xB0: // BCS
-            BranchInstruction([this]() { return GetFlag(Flag::C) == 1; });
+            m_branchTest = &CPU::CarrySetTest;
+            BranchInstruction();
             break;
         case 0xB1: // LDA (Indirect),Y
             m_operation = &CPU::LDA;
@@ -569,7 +575,8 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xD0 to 0xDF
         case 0xD0: // BNE
-            BranchInstruction([this]() { return GetFlag(Flag::Z) == 0; });
+            m_branchTest = &CPU::NotEqualTest;
+            BranchInstruction();
             break;
         case 0xD1: // CMP (Indirect),Y
             m_operation = &CPU::CMP;
@@ -656,7 +663,8 @@ void CPU::QueueNextInstuction()
 
         // Opcodes 0xF0 to 0xFF
         case 0xF0: // BEQ
-            BranchInstruction([this]() { return GetFlag(Flag::Z) == 1; });
+            m_branchTest = &CPU::EqualTest;
+            BranchInstruction();
             break;
         case 0xF1: // SBC (Indirect),Y
             m_operation = &CPU::SBC;

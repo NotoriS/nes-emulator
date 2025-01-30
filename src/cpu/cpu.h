@@ -72,7 +72,7 @@ private:
     uint8_t m_operand = 0;
 
     void (CPU::*m_operation)() = NULL;
-    bool (CPU::* m_branchTest)() = NULL;
+    bool (CPU::* m_branchTest)() const = NULL;
     IndexType m_indexType = IndexType::None;
 
     bool m_interruptInProgress = false;
@@ -115,7 +115,7 @@ private:
     void IndirectIndexedReadModifyWrite(); // (Indirect),Y
     void IndirectIndexedWriteOnly(); // (Indirect),Y
 
-    void BranchInstruction(std::function<bool()> test);
+    void BranchInstruction();
 #pragma endregion
 
 #pragma region Operations Used With Multiple Addressing Modes
@@ -216,5 +216,15 @@ private:
     void SetPCHighByteAndClearInterruptInProgress();
     void SetInterruptInProgress();
     void SetInterruptInProgressAndIncrementPC();
+
+    // ==== Branch Tests ====
+    bool PlusTest() const;
+    bool MinusTest() const;
+    bool OverflowClearTest() const;
+    bool OverflowSetTest() const;
+    bool CarryClearTest() const;
+    bool CarrySetTest() const;
+    bool NotEqualTest() const;
+    bool EqualTest() const;
 #pragma endregion
 };
