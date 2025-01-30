@@ -23,15 +23,15 @@ void CPU::AbsoluteReadModifyWrite()
 
     switch (m_indexType)
     {
-        case IndexType::None:
-            m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingPC);
-            break;
-        case IndexType::X:
-            m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingXIndexedPC);
-            break;
-        case IndexType::Y: // Unexpected
-        default:
-            throw std::runtime_error("Unexpected address index type.");
+    case IndexType::None:
+        m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingPC);
+        break;
+    case IndexType::X:
+        m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingXIndexedPC);
+        break;
+    case IndexType::Y: // Unexpected
+    default:
+        throw std::runtime_error("Unexpected address index type.");
     }
 
     m_microInstructionQueue.push_back(&CPU::ReadOperandFromTargetAddress);
@@ -45,17 +45,17 @@ void CPU::AbsoluteWriteOnly()
     
     switch (m_indexType)
     {
-        case IndexType::None:
-            m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingPC);
-            break;
-        case IndexType::X:
-            m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingXIndexedPC);
-            break;
-        case IndexType::Y:
-            m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingYIndexedPC);
-            break;
-        default:
-            throw std::runtime_error("Unexpected address index type.");
+    case IndexType::None:
+        m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingPC);
+        break;
+    case IndexType::X:
+        m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingXIndexedPC);
+        break;
+    case IndexType::Y:
+        m_microInstructionQueue.push_back(&CPU::SetTargetAddressHighByteUsingYIndexedPC);
+        break;
+    default:
+        throw std::runtime_error("Unexpected address index type.");
     }
 
     m_microInstructionQueue.push_back(m_operation);
@@ -67,17 +67,17 @@ void CPU::ZeroPageReadOnly()
 
     switch (m_indexType)
     {
-        case IndexType::None:
-            // Do nothing
-            break;
-        case IndexType::X:
-            m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
-            break;
-        case IndexType::Y:
-            m_microInstructionQueue.push_back(&CPU::AddRegisterYToTargetAddress);
-            break;
-        default:
-            throw std::runtime_error("Unexpected address index type.");
+    case IndexType::None:
+        // Do nothing
+        break;
+    case IndexType::X:
+        m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
+        break;
+    case IndexType::Y:
+        m_microInstructionQueue.push_back(&CPU::AddRegisterYToTargetAddress);
+        break;
+    default:
+        throw std::runtime_error("Unexpected address index type.");
     }
 
     m_microInstructionQueue.push_back(&CPU::PerformOperationOnTargetAddress);
@@ -89,15 +89,15 @@ void CPU::ZeroPageReadModifyWrite()
 
     switch (m_indexType)
     {
-        case IndexType::None:
-            // Do nothing
-            break;
-        case IndexType::X:
-            m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
-            break;
-        case IndexType::Y: // Unexpected
-        default:
-            throw std::runtime_error("Unexpected address index type.");
+    case IndexType::None:
+        // Do nothing
+        break;
+    case IndexType::X:
+        m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
+        break;
+    case IndexType::Y: // Unexpected
+    default:
+        throw std::runtime_error("Unexpected address index type.");
     }
 
     m_microInstructionQueue.push_back(&CPU::ReadOperandFromTargetAddress);
@@ -111,17 +111,17 @@ void CPU::ZeroPageWriteOnly()
 
     switch (m_indexType)
     {
-        case IndexType::None:
-            // Do nothing
-            break;
-        case IndexType::X:
-            m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
-            break;
-        case IndexType::Y:
-            m_microInstructionQueue.push_back(&CPU::AddRegisterYToTargetAddress);
-            break;
-        default:
-            throw std::runtime_error("Unexpected address index type.");
+    case IndexType::None:
+        // Do nothing
+        break;
+    case IndexType::X:
+        m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
+        break;
+    case IndexType::Y:
+        m_microInstructionQueue.push_back(&CPU::AddRegisterYToTargetAddress);
+        break;
+    default:
+        throw std::runtime_error("Unexpected address index type.");
     }
 
     m_microInstructionQueue.push_back(m_operation);

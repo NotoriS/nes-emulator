@@ -41,16 +41,16 @@ void CPU::Interrupt(InterruptType type)
 {
     switch (type)
     {
-        case InterruptType::NMI:
-            m_pendingNMI = true;
-            m_mostRecentInterruptVector = NMI_VECTOR;
-            break;
-        case InterruptType::IRQ:
-            m_pendingIRQ = true;
-            m_mostRecentInterruptVector = IRQ_VECTOR;
-            break;
-        default:
-            break;
+    case InterruptType::NMI:
+        m_pendingNMI = true;
+        m_mostRecentInterruptVector = NMI_VECTOR;
+        break;
+    case InterruptType::IRQ:
+        m_pendingIRQ = true;
+        m_mostRecentInterruptVector = IRQ_VECTOR;
+        break;
+    default:
+        break;
     }
 }
 

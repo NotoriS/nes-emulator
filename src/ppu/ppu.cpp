@@ -54,24 +54,24 @@ uint8_t PPU::Read(uint16_t address)
 
     switch (address)
     {
-        case 0x2002: // PPUSTATUS
-            m_status.ppuOpenBus = m_readBuffer & 0x1F;
-            result = m_status.byte;
-            m_status.vblank = 0;
-            m_firstWrite = true;
-            return result;
-        case 0x2004: // OAMDATA
-            // TODO
-            return 0;
-        case 0x2007: // PPUDATA
-            result = m_readBuffer;
-            m_readBuffer = ReadFromBus(m_currVramAddress.address);
-            if (m_currVramAddress.address >= 0x3F00) result = m_readBuffer; // Ignore buffer for palette RAM reads
-            IncrementVramAddress();
-            return result;
-        default:
-            Logger::GetInstance().Warn("the CPU attempted to read from the PPU at an invalid address (" + Logger::DecmialToHex(address) + ")");
-            return 0;
+    case 0x2002: // PPUSTATUS
+        m_status.ppuOpenBus = m_readBuffer & 0x1F;
+        result = m_status.byte;
+        m_status.vblank = 0;
+        m_firstWrite = true;
+        return result;
+    case 0x2004: // OAMDATA
+        // TODO
+        return 0;
+    case 0x2007: // PPUDATA
+        result = m_readBuffer;
+        m_readBuffer = ReadFromBus(m_currVramAddress.address);
+        if (m_currVramAddress.address >= 0x3F00) result = m_readBuffer; // Ignore buffer for palette RAM reads
+        IncrementVramAddress();
+        return result;
+    default:
+        Logger::GetInstance().Warn("the CPU attempted to read from the PPU at an invalid address (" + Logger::DecmialToHex(address) + ")");
+        return 0;
     }
 }
 
