@@ -1,13 +1,11 @@
 #pragma once
 
-#include <deque>
-#include <functional>
 #include <cstdint>
-#include <iostream>
 #include <memory>
 
 #include "../debug/logger.h"
 #include "../interfaces/i-bus.h"
+#include "../common/circular-buffer.h"
 
 class CPU
 {
@@ -58,7 +56,7 @@ private:
     std::shared_ptr<IBus> m_bus;
 
     // Contains "per cycle" instructions that will execute when clock is called.
-    std::deque<void (CPU::*)()> m_microInstructionQueue;
+    CircularBuffer<void (CPU::*)(), 20> m_microInstructionQueue;
 
     uint8_t  reg_a = 0;    // Accumulator Register
     uint8_t  reg_x = 0;    // X Register
