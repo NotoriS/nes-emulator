@@ -1,0 +1,272 @@
+#include "cpu.h"
+
+void CPU::ReadProgramCounter()
+{
+    Read(reg_pc);
+}
+
+void CPU::IncrementStackPointer()
+{
+    reg_s++;
+}
+
+void CPU::SetTargetAddressLowByteUsingPC()
+{
+    m_targetAddress = Read(reg_pc++);
+}
+
+void CPU::SetTargetAddressHighByteUsingPC()
+{
+    m_targetAddress |= Read(reg_pc++) << 8;
+}
+
+void CPU::SetTargetAddressHighByteUsingXIndexedPC()
+{
+    uint8_t originalPage = Read(reg_pc++);
+    m_targetAddress |= originalPage << 8;
+    m_targetAddress += reg_x;
+
+    // Force a read at a possibly invalid address
+    if (originalPage == m_targetAddress >> 8)
+        m_microInstructionQueue.push_front(&CPU::ReadOperandFromTargetAddress);
+    else
+        m_microInstructionQueue.push_front(&CPU::PerformInvalidTargetAddressRead);
+}
+
+void CPU::SetTargetAddressHighByteUsingYIndexedPC()
+{
+    uint8_t originalPage = Read(reg_pc++);
+    m_targetAddress |= originalPage << 8;
+    m_targetAddress += reg_y;
+
+    // Force a read at a possibly invalid address
+    if (originalPage == m_targetAddress >> 8)
+        m_microInstructionQueue.push_front(&CPU::ReadOperandFromTargetAddress);
+    else
+        m_microInstructionQueue.push_front(&CPU::PerformInvalidTargetAddressRead);
+}
+
+void CPU::AddRegisterXToTargetAddress()
+{
+    m_targetAddress += reg_x;
+}
+
+void CPU::AddRegisterYToTargetAddress()
+{
+    m_targetAddress += reg_y;
+}
+
+void CPU::ReadOperandAtPCAndPerformOperation()
+{
+    m_operand = Read(reg_pc++);
+    (this->*m_operation)();
+}
+
+void CPU::PerformOperationOnRegA()
+{
+    m_operand = reg_a;
+    (this->*m_operation)();
+    reg_a = m_operand;
+}
+
+void CPU::PerformInvalidTargetAddressRead()
+{
+    Read(m_targetAddress - 0x100);
+}
+
+void CPU::FetchHighByteForAbsoluteReadOnly()
+{
+    uint8_t originalPage = Read(reg_pc++);
+    m_targetAddress |= originalPage << 8;
+
+    switch (m_indexType)
+    {
+    case IndexType::None:
+        return; // No need to continue
+    case IndexType::X:
+        m_targetAddress += reg_x;
+        break;
+    case IndexType::Y:
+        m_targetAddress += reg_y;
+        break;
+    default:
+        throw std::runtime_error("Unexpected address index type.");
+    }
+
+    uint8_t newPage = m_targetAddress >> 8;
+    if (originalPage != newPage)
+    {
+        m_microInstructionQueue.push_front(&CPU::PerformInvalidTargetAddressRead);
+    }
+}
+
+void CPU::PerformOperationOnTargetAddress()
+{
+    m_operand = Read(m_targetAddress);
+    (this->*m_operation)();
+}
+
+void CPU::ReadOperandFromTargetAddress()
+{
+    m_operand = Read(m_targetAddress);
+}
+
+void CPU::WriteOperandToTargetAddress()
+{
+    Write(m_targetAddress, m_operand);
+}
+
+void CPU::ReadOperandAtPCAndIncrementPC()
+{
+    m_operand = Read(reg_pc++);
+}
+
+void CPU::AddRegisterXToOperand()
+{
+    m_operand += reg_x;
+}
+
+void CPU::SetTargetAddressLowByteUsingOperand()
+{
+    m_targetAddress = Read(m_operand++);
+}
+
+void CPU::SetTargetAddressHighByteUsingOperand()
+{
+    m_targetAddress |= Read(m_operand) << 8;
+}
+
+void CPU::FetchHighByteForIndirectIndexedReadOnly()
+{
+    uint8_t originalPage = Read(m_operand);
+
+    m_targetAddress |= originalPage << 8;
+    m_targetAddress += reg_y;
+
+    uint8_t newPage = m_targetAddress >> 8;
+    if (originalPage != newPage)
+    {
+        m_microInstructionQueue.push_front(&CPU::PerformInvalidTargetAddressRead);
+    }
+}
+
+void CPU::SetTargetAddressHighByteUsingYIndexedOperand()
+{
+    uint8_t originalPage = Read(m_operand);
+    m_targetAddress |= originalPage << 8;
+    m_targetAddress += reg_y;
+
+    // Force a read at a possibly invalid address
+    if (originalPage == m_targetAddress >> 8)
+        m_microInstructionQueue.push_front(&CPU::ReadOperandFromTargetAddress);
+    else
+        m_microInstructionQueue.push_front(&CPU::PerformInvalidTargetAddressRead);
+}
+
+void CPU::CheckBranchCondition()
+{
+    m_operand = Read(reg_pc++);
+    if (!(this->*m_branchTest)()) return;
+
+    m_microInstructionQueue.push_front(&CPU::PerformBranch);
+}
+
+void CPU::PerformBranch()
+{
+    uint8_t originalPage = reg_pc >> 8;
+    reg_pc = reg_pc + static_cast<int8_t>(m_operand);
+
+    // Add a blank cycle when a page is crossed
+    if (originalPage != (reg_pc >> 8))
+        m_microInstructionQueue.push_front(&CPU::BlankMicroInstruction);
+}
+
+void CPU::BlankMicroInstruction() {}
+
+void CPU::PopStatusOffTheStackAndIncrementStackPointer()
+{
+    reg_p = StackPop();
+    reg_s++;
+}
+
+void CPU::PopPCLowByteOffTheStackAndIncrementStackPointer()
+{
+    reg_pc = StackPop();
+    reg_s++;
+}
+
+void CPU::PopPCHighByteOffTheStack()
+{
+    reg_pc |= StackPop() << 8;
+}
+
+void CPU::IncrementProgramCounter()
+{
+    reg_pc++;
+}
+
+void CPU::PopStatusOffTheStack()
+{
+    reg_p = StackPop();
+}
+
+void CPU::PushAccumulatorToTheStack()
+{
+    StackPush(reg_a);
+    reg_s--;
+}
+
+void CPU::PushStatusToTheStackWithBSet()
+{
+    StackPush(reg_p | static_cast<uint8_t>(Flag::B));
+    reg_s--;
+}
+
+void CPU::PopAccumulatorFromTheStackAndSetFlags()
+{
+    reg_a = StackPop();
+    SetFlag(Flag::Z, reg_a == 0);
+    SetFlag(Flag::N, reg_a & 0x80);
+}
+
+void CPU::ReadFromTheStackPointer()
+{
+    Read(0x100 + reg_s);
+}
+
+void CPU::PushPCHighByteToTheStack()
+{
+    StackPush(reg_pc >> 8);
+    reg_s--;
+}
+
+void CPU::PushPCLowByteToTheStack()
+{
+    StackPush(static_cast<uint8_t>(reg_pc));
+    reg_s--;
+}
+
+void CPU::JumpToSubroutineFinal()
+{
+    m_targetAddress |= Read(reg_pc) << 8;
+    reg_pc = m_targetAddress;
+}
+
+void CPU::JumpAbsoluteFinal()
+{
+    uint8_t pch = Read(reg_pc);
+    reg_pc = m_operand;
+    reg_pc |= pch << 8;
+}
+
+void CPU::JumpIndirectFinal()
+{
+    uint16_t pchAddress;
+    if (static_cast<uint8_t>(m_targetAddress) == 0xFF)
+        pchAddress = m_targetAddress & 0xFF00;
+    else
+        pchAddress = m_targetAddress + 1;
+
+    reg_pc = m_operand;
+    reg_pc |= Read(pchAddress) << 8;
+}

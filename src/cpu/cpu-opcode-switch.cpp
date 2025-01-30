@@ -12,28 +12,39 @@ void CPU::QueueNextInstuction()
             InternalInterrupt(InterruptType::BRK);
             break;
         case 0x01: // ORA (Indirect,X)
-            IndexedIndirectReadOnly([this]() { ORA(); });
+            m_operation = &CPU::ORA;
+            IndexedIndirectReadOnly();
             break;
         case 0x05: // ORA Zero Page
-            ZeroPageReadOnly([this]() { ORA(); }, IndexType::None);
+            m_operation = &CPU::ORA;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0x06: // ASL Zero Page
-            ZeroPageReadModifyWrite([this]() { ASL(); }, IndexType::None);
+            m_operation = &CPU::ASL;
+            m_indexType = IndexType::None;
+            ZeroPageReadModifyWrite();
             break;
         case 0x08: // PHP
             PHP();
             break;
         case 0x09: // ORA Immediate
-            ImmediateReadOnly([this]() { ORA(); });
+            m_operation = &CPU::ORA;
+            ImmediateReadOnly();
             break;
         case 0x0A: // ASL Accumulator
-            AccumulatorReadModifyWrite([this]() { ASL(); });
+            m_operation = &CPU::ASL;
+            AccumulatorReadModifyWrite();
             break;
         case 0x0D: // ORA Absolute
-            AbsoluteReadOnly([this]() { ORA(); }, IndexType::None);
+            m_operation = &CPU::ORA;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0x0E: // ASL Absolute
-            AbsoluteReadModifyWrite([this]() { ASL(); }, IndexType::None);
+            m_operation = &CPU::ASL;
+            m_indexType = IndexType::None;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0x10 to 0x1F
@@ -41,25 +52,36 @@ void CPU::QueueNextInstuction()
             BranchInstruction([this]() { return GetFlag(Flag::N) == 0; });
             break;
         case 0x11: // ORA (Indirect),Y
-            IndirectIndexedReadOnly([this]() { ORA(); });
+            m_operation = &CPU::ORA;
+            IndirectIndexedReadOnly();
             break;
         case 0x15: // ORA Zero Page,X
-            ZeroPageReadOnly([this]() { ORA(); }, IndexType::X);
+            m_operation = &CPU::ORA;
+            m_indexType = IndexType::X;
+            ZeroPageReadOnly();
             break;
         case 0x16: // ASL Zero Page,X
-            ZeroPageReadModifyWrite([this]() { ASL(); }, IndexType::X);
+            m_operation = &CPU::ASL;
+            m_indexType = IndexType::X;
+            ZeroPageReadModifyWrite();
             break;
         case 0x18: // CLC
             CLC();
             break;
         case 0x19: // ORA Absolute,Y
-            AbsoluteReadOnly([this]() { ORA(); }, IndexType::Y);
+            m_operation = &CPU::ORA;
+            m_indexType = IndexType::Y;
+            AbsoluteReadOnly();
             break;
         case 0x1D: // ORA Absolute,X
-            AbsoluteReadOnly([this]() { ORA(); }, IndexType::X);
+            m_operation = &CPU::ORA;
+            m_indexType = IndexType::X;
+            AbsoluteReadOnly();
             break;
         case 0x1E: // ASL Absolute,X
-            AbsoluteReadModifyWrite([this]() { ASL(); }, IndexType::X);
+            m_operation = &CPU::ASL;
+            m_indexType = IndexType::X;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0x20 to 0x2F
@@ -67,34 +89,49 @@ void CPU::QueueNextInstuction()
             JSR();
             break;
         case 0x21: // AND (Indirect,X)
-            IndexedIndirectReadOnly([this]() { AND(); });
+            m_operation = &CPU::AND;
+            IndexedIndirectReadOnly();
             break;
         case 0x24: // BIT Zero Page
-            ZeroPageReadOnly([this]() { BIT(); }, IndexType::None);
+            m_operation = &CPU::BIT;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0x25: // AND Zero Page
-            ZeroPageReadOnly([this]() { AND(); }, IndexType::None);
+            m_operation = &CPU::AND;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0x26: // ROL Zero Page
-            ZeroPageReadModifyWrite([this]() { ROL(); }, IndexType::None);
+            m_operation = &CPU::ROL;
+            m_indexType = IndexType::None;
+            ZeroPageReadModifyWrite();
             break;
         case 0x28: // PLP
             PLP();
             break;
         case 0x29: // AND Immediate
-            ImmediateReadOnly([this]() { AND(); });
+            m_operation = &CPU::AND;
+            ImmediateReadOnly();
             break;
         case 0x2A: // ROL Accumulator
-            AccumulatorReadModifyWrite([this]() { ROL(); });
+            m_operation = &CPU::ROL;
+            AccumulatorReadModifyWrite();
             break;
         case 0x2C: // BIT Absolute
-            AbsoluteReadOnly([this]() { BIT(); }, IndexType::None);
+            m_operation = &CPU::BIT;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0x2D: // AND Absolute
-            AbsoluteReadOnly([this]() { AND(); }, IndexType::None);
+            m_operation = &CPU::AND;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0x2E: // ROL Absolute
-            AbsoluteReadModifyWrite([this]() { ROL(); }, IndexType::None);
+            m_operation = &CPU::ROL;
+            m_indexType = IndexType::None;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0x30 to 0x3F
@@ -102,25 +139,36 @@ void CPU::QueueNextInstuction()
             BranchInstruction([this]() { return GetFlag(Flag::N) == 1; });
             break;
         case 0x31: // AND (Indirect),Y
-            IndirectIndexedReadOnly([this]() { AND(); });
+            m_operation = &CPU::AND;
+            IndirectIndexedReadOnly();
             break;
         case 0x35: // AND Zero Page,X
-            ZeroPageReadOnly([this]() { AND(); }, IndexType::X);
+            m_operation = &CPU::AND;
+            m_indexType = IndexType::X;
+            ZeroPageReadOnly();
             break;
         case 0x36: // ROL Zero Page,X
-            ZeroPageReadModifyWrite([this]() { ROL(); }, IndexType::X);
+            m_operation = &CPU::ROL;
+            m_indexType = IndexType::X;
+            ZeroPageReadModifyWrite();
             break;
         case 0x38: // SEC
             SEC();
             break;
         case 0x39: // AND Absolute,Y
-            AbsoluteReadOnly([this]() { AND(); }, IndexType::Y);
+            m_operation = &CPU::AND;
+            m_indexType = IndexType::Y;
+            AbsoluteReadOnly();
             break;
         case 0x3D: // AND Absolute,X
-            AbsoluteReadOnly([this]() { AND(); }, IndexType::X);
+            m_operation = &CPU::AND;
+            m_indexType = IndexType::X;
+            AbsoluteReadOnly();
             break;
         case 0x3E: // ROL Absolute,X
-            AbsoluteReadModifyWrite([this]() { ROL(); }, IndexType::X);
+            m_operation = &CPU::ROL;
+            m_indexType = IndexType::X;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0x40 to 0x4F
@@ -128,31 +176,42 @@ void CPU::QueueNextInstuction()
             RTI();
             break;
         case 0x41: // EOR (Indirect,X)
-            IndexedIndirectReadOnly([this]() { EOR(); });
+            m_operation = &CPU::EOR;
+            IndexedIndirectReadOnly();
             break;
         case 0x45: // EOR Zero Page
-            ZeroPageReadOnly([this]() { EOR(); }, IndexType::None);
+            m_operation = &CPU::EOR;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0x46: // LSR Zero Page
-            ZeroPageReadModifyWrite([this]() { LSR(); }, IndexType::None);
+            m_operation = &CPU::LSR;
+            m_indexType = IndexType::None;
+            ZeroPageReadModifyWrite();
             break;
         case 0x48: // PHA
             PHA();
             break;
         case 0x49: // EOR Immediate
-            ImmediateReadOnly([this]() { EOR(); });
+            m_operation = &CPU::EOR;
+            ImmediateReadOnly();
             break;
         case 0x4A: // LSR Accumulator
-            AccumulatorReadModifyWrite([this]() { LSR(); });
+            m_operation = &CPU::LSR;
+            AccumulatorReadModifyWrite();
             break;
         case 0x4C: // JMP Absolute
             JMP_Absolute();
             break;
         case 0x4D: // EOR Absolute
-            AbsoluteReadOnly([this]() { EOR(); }, IndexType::None);
+            m_operation = &CPU::EOR;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0x4E: // LSR Absolute
-            AbsoluteReadModifyWrite([this]() { LSR(); }, IndexType::None);
+            m_operation = &CPU::LSR;
+            m_indexType = IndexType::None;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0x50 to 0x5F
@@ -160,25 +219,36 @@ void CPU::QueueNextInstuction()
             BranchInstruction([this]() { return GetFlag(Flag::V) == 0; });
             break;
         case 0x51: // EOR (Indirect),Y
-            IndirectIndexedReadOnly([this]() { EOR(); });
+            m_operation = &CPU::EOR;
+            IndirectIndexedReadOnly();
             break;
         case 0x55: // EOR Zero Page,X
-            ZeroPageReadOnly([this]() { EOR(); }, IndexType::X);
+            m_operation = &CPU::EOR;
+            m_indexType = IndexType::X;
+            ZeroPageReadOnly();
             break;
         case 0x56: // LSR Zero Page,X
-            ZeroPageReadModifyWrite([this]() { LSR(); }, IndexType::X);
+            m_operation = &CPU::LSR;
+            m_indexType = IndexType::X;
+            ZeroPageReadModifyWrite();
             break;
         case 0x58: // CLI
             CLI();
             break;
         case 0x59: // EOR Absolute,Y
-            AbsoluteReadOnly([this]() { EOR(); }, IndexType::Y);
+            m_operation = &CPU::EOR;
+            m_indexType = IndexType::Y;
+            AbsoluteReadOnly();
             break;
         case 0x5D: // EOR Absolute,X
-            AbsoluteReadOnly([this]() { EOR(); }, IndexType::X);
+            m_operation = &CPU::EOR;
+            m_indexType = IndexType::X;
+            AbsoluteReadOnly();
             break;
         case 0x5E: // LSR Absolute,X
-            AbsoluteReadModifyWrite([this]() { LSR(); }, IndexType::X);
+            m_operation = &CPU::LSR;
+            m_indexType = IndexType::X;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0x60 to 0x6F
@@ -186,31 +256,42 @@ void CPU::QueueNextInstuction()
             RTS();
             break;
         case 0x61: // ADC (Indirect,X)
-            IndexedIndirectReadOnly([this]() { ADC(); });
+            m_operation = &CPU::ADC;
+            IndexedIndirectReadOnly();
             break;
         case 0x65: // ADC Zero Page
-            ZeroPageReadOnly([this]() { ADC(); }, IndexType::None);
+            m_operation = &CPU::ADC;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0x66: // ROR Zero Page
-            ZeroPageReadModifyWrite([this]() { ROR(); }, IndexType::None);
+            m_operation = &CPU::ROR;
+            m_indexType = IndexType::None;
+            ZeroPageReadModifyWrite();
             break;
         case 0x68: // PLA
             PLA();
             break;
         case 0x69: // ADC Immediate
-            ImmediateReadOnly([this]() { ADC(); });
+            m_operation = &CPU::ADC;
+            ImmediateReadOnly();
             break;
         case 0x6A: // ROR Accumulator
-            AccumulatorReadModifyWrite([this]() { ROR(); });
+            m_operation = &CPU::ROR;
+            AccumulatorReadModifyWrite();
             break;
         case 0x6C: // JMP (Indirect)
             JMP_Indirect();
             break;
         case 0x6D: // ADC Absolute
-            AbsoluteReadOnly([this]() { ADC(); }, IndexType::None);
+            m_operation = &CPU::ADC;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0x6E: // ROR Absolute
-            AbsoluteReadModifyWrite([this]() { ROR(); }, IndexType::None);
+            m_operation = &CPU::ROR;
+            m_indexType = IndexType::None;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0x70 to 0x7F
@@ -218,39 +299,57 @@ void CPU::QueueNextInstuction()
             BranchInstruction([this]() { return GetFlag(Flag::V) == 1; });
             break;
         case 0x71: // ADC (Indirect),Y
-            IndirectIndexedReadOnly([this]() { ADC(); });
+            m_operation = &CPU::ADC;
+            IndirectIndexedReadOnly();
             break;
         case 0x75: // ADC Zero Page,X
-            ZeroPageReadOnly([this]() { ADC(); }, IndexType::X);
+            m_operation = &CPU::ADC;
+            m_indexType = IndexType::X;
+            ZeroPageReadOnly();
             break;
         case 0x76: // ROR Zero Page,X
-            ZeroPageReadModifyWrite([this]() { ROR(); }, IndexType::X);
+            m_operation = &CPU::ROR;
+            m_indexType = IndexType::X;
+            ZeroPageReadModifyWrite();
             break;
         case 0x78: // SEI
             SEI();
             break;
         case 0x79: // ADC Absolute,Y
-            AbsoluteReadOnly([this]() { ADC(); }, IndexType::Y);
+            m_operation = &CPU::ADC;
+            m_indexType = IndexType::Y;
+            AbsoluteReadOnly();
             break;
         case 0x7D: // ADC Absolute,X
-            AbsoluteReadOnly([this]() { ADC(); }, IndexType::X);
+            m_operation = &CPU::ADC;
+            m_indexType = IndexType::X;
+            AbsoluteReadOnly();
             break;
         case 0x7E: // ROR Absolute,X
-            AbsoluteReadModifyWrite([this]() { ROR(); }, IndexType::X);
+            m_operation = &CPU::ROR;
+            m_indexType = IndexType::X;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0x80 to 0x8F
         case 0x81: // STA (Indirect,X)
-            IndexedIndirectWriteOnly([this]() { STA(); });
+            m_operation = &CPU::STA;
+            IndexedIndirectWriteOnly();
             break;
         case 0x84: // STY Zero Page
-            ZeroPageWriteOnly([this]() { STY(); }, IndexType::None);
+            m_operation = &CPU::STY;
+            m_indexType = IndexType::None;
+            ZeroPageWriteOnly();
             break;
         case 0x85: // STA Zero Page
-            ZeroPageWriteOnly([this]() { STA(); }, IndexType::None);
+            m_operation = &CPU::STA;
+            m_indexType = IndexType::None;
+            ZeroPageWriteOnly();
             break;
         case 0x86: // STX Zero Page
-            ZeroPageWriteOnly([this]() { STX(); }, IndexType::None);
+            m_operation = &CPU::STX;
+            m_indexType = IndexType::None;
+            ZeroPageWriteOnly();
             break;
         case 0x88: // DEY
             DEY();
@@ -259,13 +358,19 @@ void CPU::QueueNextInstuction()
             TXA();
             break;
         case 0x8C: // STY Absolute
-            AbsoluteWriteOnly([this]() { STY(); }, IndexType::None);
+            m_operation = &CPU::STY;
+            m_indexType = IndexType::None;
+            AbsoluteWriteOnly();
             break;
         case 0x8D: // STA Absolute
-            AbsoluteWriteOnly([this]() { STA(); }, IndexType::None);
+            m_operation = &CPU::STA;
+            m_indexType = IndexType::None;
+            AbsoluteWriteOnly();
             break;
         case 0x8E: // STX Absolute
-            AbsoluteWriteOnly([this]() { STX(); }, IndexType::None);
+            m_operation = &CPU::STX;
+            m_indexType = IndexType::None;
+            AbsoluteWriteOnly();
             break;
 
         // Opcodes 0x90 to 0x9F
@@ -273,66 +378,93 @@ void CPU::QueueNextInstuction()
             BranchInstruction([this]() { return GetFlag(Flag::C) == 0; });
             break;
         case 0x91: // STA (Indirect),Y
-            IndirectIndexedWriteOnly([this]() { STA(); });
+            m_operation = &CPU::STA;
+            IndirectIndexedWriteOnly();
             break;
         case 0x94: // STY Zero Page,X
-            ZeroPageWriteOnly([this]() { STY(); }, IndexType::X);
+            m_operation = &CPU::STY;
+            m_indexType = IndexType::X;
+            ZeroPageWriteOnly();
             break;
         case 0x95: // STA Zero Page,X
-            ZeroPageWriteOnly([this]() { STA(); }, IndexType::X);
+            m_operation = &CPU::STA;
+            m_indexType = IndexType::X;
+            ZeroPageWriteOnly();
             break;
         case 0x96: // STX Zero Page,Y
-            ZeroPageWriteOnly([this]() { STX(); }, IndexType::Y);
+            m_operation = &CPU::STX;
+            m_indexType = IndexType::Y;
+            ZeroPageWriteOnly();
             break;
         case 0x98: // TYA
             TYA();
             break;
         case 0x99: // STA Absolute,Y
-            AbsoluteWriteOnly([this]() { STA(); }, IndexType::Y);
+            m_operation = &CPU::STA;
+            m_indexType = IndexType::Y;
+            AbsoluteWriteOnly();
             break;
         case 0x9A: // TXS
             TXS();
             break;
         case 0x9D: // STA Absolute,X
-            AbsoluteWriteOnly([this]() { STA(); }, IndexType::X);
+            m_operation = &CPU::STA;
+            m_indexType = IndexType::X;
+            AbsoluteWriteOnly();
             break;
 
         // Opcodes 0xA0 to 0xAF
         case 0xA0: // LDY Immediate
-            ImmediateReadOnly([this]() { LDY(); });
+            m_operation = &CPU::LDY;
+            ImmediateReadOnly();
             break;
         case 0xA1: // LDA (Indirect,X)
-            IndexedIndirectReadOnly([this]() { LDA(); });
+            m_operation = &CPU::LDA;
+            IndexedIndirectReadOnly();
             break;
         case 0xA2: // LDX Immediate
-            ImmediateReadOnly([this]() { LDX(); });
+            m_operation = &CPU::LDX;
+            ImmediateReadOnly();
             break;
         case 0xA4: // LDY Zero Page
-            ZeroPageReadOnly([this]() { LDY(); }, IndexType::None);
+            m_operation = &CPU::LDY;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0xA5: // LDA Zero Page
-            ZeroPageReadOnly([this]() { LDA(); }, IndexType::None);
+            m_operation = &CPU::LDA;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0xA6: // LDX Zero Page
-            ZeroPageReadOnly([this]() { LDX(); }, IndexType::None);
+            m_operation = &CPU::LDX;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0xA8: // TAY
             TAY();
             break;
         case 0xA9: // LDA Immediate
-            ImmediateReadOnly([this]() { LDA(); });
+            m_operation = &CPU::LDA;
+            ImmediateReadOnly();
             break;
         case 0xAA: // TAX
             TAX();
             break;
         case 0xAC: // LDY Absolute
-            AbsoluteReadOnly([this]() { LDY(); }, IndexType::None);
+            m_operation = &CPU::LDY;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0xAD: // LDA Absolute
-            AbsoluteReadOnly([this]() { LDA(); }, IndexType::None);
+            m_operation = &CPU::LDA;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0xAE: // LDX Absolute
-            AbsoluteReadOnly([this]() { LDX(); }, IndexType::None);
+            m_operation = &CPU::LDX;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
 
         // Opcodes 0xB0 to 0xBF
@@ -340,69 +472,99 @@ void CPU::QueueNextInstuction()
             BranchInstruction([this]() { return GetFlag(Flag::C) == 1; });
             break;
         case 0xB1: // LDA (Indirect),Y
-            IndirectIndexedReadOnly([this]() { LDA(); });
+            m_operation = &CPU::LDA;
+            IndirectIndexedReadOnly();
             break;
         case 0xB4: // LDY Zero Page,X
-            ZeroPageReadOnly([this]() { LDY(); }, IndexType::X);
+            m_operation = &CPU::LDY;
+            m_indexType = IndexType::X;
+            ZeroPageReadOnly();
             break;
         case 0xB5: // LDA Zero Page,X
-            ZeroPageReadOnly([this]() { LDA(); }, IndexType::X);
+            m_operation = &CPU::LDA;
+            m_indexType = IndexType::X;
+            ZeroPageReadOnly();
             break;
         case 0xB6: // LDX Zero Page,Y
-            ZeroPageReadOnly([this]() { LDX(); }, IndexType::Y);
+            m_operation = &CPU::LDX;
+            m_indexType = IndexType::Y;
+            ZeroPageReadOnly();
             break;
         case 0xB8: // CLV
             CLV();
             break;
         case 0xB9: // LDA Absolute,Y
-            AbsoluteReadOnly([this]() { LDA(); }, IndexType::Y);
+            m_operation = &CPU::LDA;
+            m_indexType = IndexType::Y;
+            AbsoluteReadOnly();
             break;
         case 0xBA: // TSX
             TSX();
             break;
         case 0xBC: // LDY Absolute,X
-            AbsoluteReadOnly([this]() { LDY(); }, IndexType::X);
+            m_operation = &CPU::LDY;
+            m_indexType = IndexType::X;
+            AbsoluteReadOnly();
             break;
         case 0xBD: // LDA Absolute,X
-            AbsoluteReadOnly([this]() { LDA(); }, IndexType::X);
+            m_operation = &CPU::LDA;
+            m_indexType = IndexType::X;
+            AbsoluteReadOnly();
             break;
         case 0xBE: // LDX Absolute,Y
-            AbsoluteReadOnly([this]() { LDX(); }, IndexType::Y);
+            m_operation = &CPU::LDX;
+            m_indexType = IndexType::Y;
+            AbsoluteReadOnly();
             break;
 
         // Opcodes 0xC0 to 0xCF
         case 0xC0: // CPY Immediate
-            ImmediateReadOnly([this]() { CPY(); });
+            m_operation = &CPU::CPY;
+            ImmediateReadOnly();
             break;
         case 0xC1: // CMP (Indirect,X)
-            IndexedIndirectReadOnly([this]() { CMP(); });
+            m_operation = &CPU::CMP;
+            IndexedIndirectReadOnly();
             break;
         case 0xC4: // CPY Zero Page
-            ZeroPageReadOnly([this]() { CPY(); }, IndexType::None);
+            m_operation = &CPU::CPY;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0xC5: // CMP Zero Page
-            ZeroPageReadOnly([this]() { CMP(); }, IndexType::None);
+            m_operation = &CPU::CMP;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0xC6: // DEC Zero Page
-            ZeroPageReadModifyWrite([this]() { DEC(); }, IndexType::None);
+            m_operation = &CPU::DEC;
+            m_indexType = IndexType::None;
+            ZeroPageReadModifyWrite();
             break;
         case 0xC8: // INY
             INY();
             break;
         case 0xC9: // CMP Immediate
-            ImmediateReadOnly([this]() { CMP(); });
+            m_operation = &CPU::CMP;
+            ImmediateReadOnly();
             break;
         case 0xCA: // DEX
             DEX();
             break;
         case 0xCC: // CPY Absolute
-            AbsoluteReadOnly([this]() { CPY(); }, IndexType::None);
+            m_operation = &CPU::CPY;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0xCD: // CMP Absolute
-            AbsoluteReadOnly([this]() { CMP(); }, IndexType::None);
+            m_operation = &CPU::CMP;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0xCE: // DEC Absolute
-            AbsoluteReadModifyWrite([this]() { DEC(); }, IndexType::None);
+            m_operation = &CPU::DEC;
+            m_indexType = IndexType::None;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0xD0 to 0xDF
@@ -410,60 +572,86 @@ void CPU::QueueNextInstuction()
             BranchInstruction([this]() { return GetFlag(Flag::Z) == 0; });
             break;
         case 0xD1: // CMP (Indirect),Y
-            IndirectIndexedReadOnly([this]() { CMP(); });
+            m_operation = &CPU::CMP;
+            IndirectIndexedReadOnly();
             break;
         case 0xD5: // CMP Zero Page,X
-            ZeroPageReadOnly([this]() { CMP(); }, IndexType::X);
+            m_operation = &CPU::CMP;
+            m_indexType = IndexType::X;
+            ZeroPageReadOnly();
             break;
         case 0xD6: // DEC Zero Page,X
-            ZeroPageReadModifyWrite([this]() { DEC(); }, IndexType::X);
+            m_operation = &CPU::DEC;
+            m_indexType = IndexType::X;
+            ZeroPageReadModifyWrite();
             break;
         case 0xD8: // CLD
             CLD();
             break;
         case 0xD9: // CMP Absolute,Y
-            AbsoluteReadOnly([this]() { CMP(); }, IndexType::Y);
+            m_operation = &CPU::CMP;
+            m_indexType = IndexType::Y;
+            AbsoluteReadOnly();
             break;
         case 0xDD: // CMP Absolute,X
-            AbsoluteReadOnly([this]() { CMP(); }, IndexType::X);
+            m_operation = &CPU::CMP;
+            m_indexType = IndexType::X;
+            AbsoluteReadOnly();
             break;
         case 0xDE: // DEC Absolute,X
-            AbsoluteReadModifyWrite([this]() { DEC(); }, IndexType::X);
+            m_operation = &CPU::DEC;
+            m_indexType = IndexType::X;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0xE0 to 0xEF
         case 0xE0: // CPX Immediate
-            ImmediateReadOnly([this]() { CPX(); });
+            m_operation = &CPU::CPX;
+            ImmediateReadOnly();
             break;
         case 0xE1: // SBC (Indirect,X)
-            IndexedIndirectReadOnly([this]() { SBC(); });
+            m_operation = &CPU::SBC;
+            IndexedIndirectReadOnly();
             break;
         case 0xE4: // CPX Zero Page
-            ZeroPageReadOnly([this]() { CPX(); }, IndexType::None);
+            m_operation = &CPU::CPX;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0xE5: // SBC Zero Page
-            ZeroPageReadOnly([this]() { SBC(); }, IndexType::None);
+            m_operation = &CPU::SBC;
+            m_indexType = IndexType::None;
+            ZeroPageReadOnly();
             break;
         case 0xE6: // INC Zero Page
-            ZeroPageReadModifyWrite([this]() { INC(); }, IndexType::None);
+            m_operation = &CPU::INC;
+            m_indexType = IndexType::None;
+            ZeroPageReadModifyWrite();
             break;
         case 0xE8: // INX
             INX();
             break;
         case 0xE9: // SBC Immediate
-            ImmediateReadOnly([this]() { SBC(); });
+            m_operation = &CPU::SBC;
+            ImmediateReadOnly();
             break;
         case 0xEA: // NOP
-            m_microInstructionQueue.push_back([]() {});
+            m_microInstructionQueue.push_back(&CPU::BlankMicroInstruction);
             break;
         case 0xEC: // CPX Absolute
-            AbsoluteReadOnly([this]() { CPX(); }, IndexType::None);
+            m_operation = &CPU::CPX;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0xED: // SBC Absolute
-            AbsoluteReadOnly([this]() { SBC(); }, IndexType::None);
+            m_operation = &CPU::SBC;
+            m_indexType = IndexType::None;
+            AbsoluteReadOnly();
             break;
         case 0xEE: // INC Absolute
-            AbsoluteReadModifyWrite([this]() { INC(); }, IndexType::None);
+            m_operation = &CPU::INC;
+            m_indexType = IndexType::None;
+            AbsoluteReadModifyWrite();
             break;
 
         // Opcodes 0xF0 to 0xFF
@@ -471,25 +659,36 @@ void CPU::QueueNextInstuction()
             BranchInstruction([this]() { return GetFlag(Flag::Z) == 1; });
             break;
         case 0xF1: // SBC (Indirect),Y
-            IndirectIndexedReadOnly([this]() { SBC(); });
+            m_operation = &CPU::SBC;
+            IndirectIndexedReadOnly();
             break;
         case 0xF5: // SBC Zero Page,X
-            ZeroPageReadOnly([this]() { SBC(); }, IndexType::X);
+            m_operation = &CPU::SBC;
+            m_indexType = IndexType::X;
+            ZeroPageReadOnly();
             break;
         case 0xF6: // INC Zero Page,X
-            ZeroPageReadModifyWrite([this]() { INC(); }, IndexType::X);
+            m_operation = &CPU::INC;
+            m_indexType = IndexType::X;
+            ZeroPageReadModifyWrite();
             break;
         case 0xF8: // SED
             SED();
             break;
         case 0xF9: // SBC Absolute,Y
-            AbsoluteReadOnly([this]() { SBC(); }, IndexType::Y);
+            m_operation = &CPU::SBC;
+            m_indexType = IndexType::Y;
+            AbsoluteReadOnly();
             break;
         case 0xFD: // SBC Absolute,X
-            AbsoluteReadOnly([this]() { SBC(); }, IndexType::X);
+            m_operation = &CPU::SBC;
+            m_indexType = IndexType::X;
+            AbsoluteReadOnly();
             break;
         case 0xFE: // INC Absolute,X
-            AbsoluteReadModifyWrite([this]() { INC(); }, IndexType::X);
+            m_operation = &CPU::INC;
+            m_indexType = IndexType::X;
+            AbsoluteReadModifyWrite();
             break;
 
         // Illegal opcodes

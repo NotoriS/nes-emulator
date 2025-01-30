@@ -9,7 +9,7 @@ CPU::~CPU() {}
 
 void CPU::Reset()
 {
-    while (!m_microInstructionQueue.empty()) m_microInstructionQueue.pop_front();
+    while (!m_OldMicroInstructionQueue.empty()) m_OldMicroInstructionQueue.pop_front();
 
     reg_pc = Read(RESET_VECTOR);
     reg_pc |= Read(RESET_VECTOR + 1) << 8;
@@ -30,7 +30,7 @@ void CPU::Clock()
     {
         auto instruction = m_microInstructionQueue.front();
         m_microInstructionQueue.pop_front();
-        instruction();
+        (this->*instruction)();
     }
 
     if (m_microInstructionQueue.size() == 1 && !m_interruptInProgress)
@@ -105,29 +105,29 @@ void CPU::InternalInterrupt(InterruptType type)
 {
     if (type != InterruptType::BRK)
     {
-        m_microInstructionQueue.push_back([this]() { m_interruptInProgress = true; });
+        m_OldMicroInstructionQueue.push_back([this]() { m_interruptInProgress = true; });
     }
     else
     {
         m_mostRecentInterruptVector = IRQ_VECTOR;
-        m_microInstructionQueue.push_back([this]()
+        m_OldMicroInstructionQueue.push_back([this]()
             {
                 m_interruptInProgress = true;
                 reg_pc++;
             });
     }
 
-    m_microInstructionQueue.push_back([this]()
+    m_OldMicroInstructionQueue.push_back([this]()
         {
             StackPush(reg_pc >> 8);
             reg_s--;
         });
-    m_microInstructionQueue.push_back([this]()
+    m_OldMicroInstructionQueue.push_back([this]()
         {
             StackPush(static_cast<uint8_t>(reg_pc));
             reg_s--;
         });
-    m_microInstructionQueue.push_back([this, type]()
+    m_OldMicroInstructionQueue.push_back([this, type]()
         {
             // Allows NMI interrupts to hijack the BRK/IRQ interrupt vector
             if (type == InterruptType::NMI) m_targetAddress = NMI_VECTOR;
@@ -140,12 +140,12 @@ void CPU::InternalInterrupt(InterruptType type)
 
             reg_s--;
         });
-    m_microInstructionQueue.push_back([this]()
+    m_OldMicroInstructionQueue.push_back([this]()
         {
             reg_pc = Read(m_targetAddress);
             SetFlag(Flag::I, true);
         });
-    m_microInstructionQueue.push_back([this]()
+    m_OldMicroInstructionQueue.push_back([this]()
         {
             reg_pc |= Read(m_targetAddress + 1) << 8;
             m_interruptInProgress = false;

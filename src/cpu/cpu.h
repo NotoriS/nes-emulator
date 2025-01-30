@@ -58,7 +58,8 @@ private:
     std::shared_ptr<IBus> m_bus;
 
     // Contains "per cycle" instructions that will execute when clock is called.
-    std::deque<std::function<void()>> m_microInstructionQueue; 
+    std::deque<std::function<void()>> m_OldMicroInstructionQueue; 
+    std::deque<void (CPU::*)()> m_microInstructionQueue;
 
     uint8_t  reg_a = 0;    // Accumulator Register
     uint8_t  reg_x = 0;    // X Register
@@ -69,6 +70,10 @@ private:
 
     uint16_t m_targetAddress = 0;
     uint8_t m_operand = 0;
+
+    void (CPU::*m_operation)() = NULL;
+    bool (CPU::* m_branchTest)() = NULL;
+    IndexType m_indexType = IndexType::None;
 
     bool m_interruptInProgress = false;
     bool m_pendingNMI = false;
@@ -89,30 +94,30 @@ private:
     void InternalInterrupt(InterruptType type);
 
 #pragma region Instruction Queuing Function Addressing Mode Wrappers
-    void ImmediateReadOnly(std::function<void()> operation);
+    void ImmediateReadOnly();
 
-    void AccumulatorReadModifyWrite(std::function<void()> operation);
+    void AccumulatorReadModifyWrite();
 
-    void AbsoluteReadOnly(std::function<void()> operation, IndexType indexType);
-    void AbsoluteReadModifyWrite(std::function<void()> operation, IndexType indexType);
-    void AbsoluteWriteOnly(std::function<void()> operation, IndexType indexType);
+    void AbsoluteReadOnly();
+    void AbsoluteReadModifyWrite();
+    void AbsoluteWriteOnly();
 
-    void ZeroPageReadOnly(std::function<void()> operation, IndexType indexType);
-    void ZeroPageReadModifyWrite(std::function<void()> operation, IndexType indexType);
-    void ZeroPageWriteOnly(std::function<void()> operation, IndexType indexType);
+    void ZeroPageReadOnly();
+    void ZeroPageReadModifyWrite();
+    void ZeroPageWriteOnly();
 
-    void IndexedIndirectReadOnly(std::function<void()> operation); // (Indirect,X)
-    void IndexedIndirectReadModifyWrite(std::function<void()> operation); // (Indirect,X)
-    void IndexedIndirectWriteOnly(std::function<void()> operation); // (Indirect,X)
+    void IndexedIndirectReadOnly(); // (Indirect,X)
+    void IndexedIndirectReadModifyWrite(); // (Indirect,X)
+    void IndexedIndirectWriteOnly(); // (Indirect,X)
 
-    void IndirectIndexedReadOnly(std::function<void()> operation); // (Indirect),Y
-    void IndirectIndexedReadModifyWrite(std::function<void()> operation); // (Indirect),Y
-    void IndirectIndexedWriteOnly(std::function<void()> operation); // (Indirect),Y
+    void IndirectIndexedReadOnly(); // (Indirect),Y
+    void IndirectIndexedReadModifyWrite(); // (Indirect),Y
+    void IndirectIndexedWriteOnly(); // (Indirect),Y
 
     void BranchInstruction(std::function<bool()> test);
 #pragma endregion
 
-#pragma region Wrapped Instruction Queuing Functions
+#pragma region Operations Used With Multiple Addressing Modes
     void ADC(); // Add with carry
     void SBC(); // Subtract with carry
     void INC(); // Increment memory
@@ -164,5 +169,46 @@ private:
 
     void JMP_Absolute(); // Absolute addressed jump
     void JMP_Indirect(); // Indirect addressed jump
+#pragma endregion
+
+#pragma region Micro Instructions
+    void ReadProgramCounter();
+    void IncrementStackPointer();
+    void SetTargetAddressLowByteUsingPC();
+    void SetTargetAddressHighByteUsingPC();
+    void SetTargetAddressHighByteUsingXIndexedPC();
+    void SetTargetAddressHighByteUsingYIndexedPC();
+    void AddRegisterXToTargetAddress();
+    void AddRegisterYToTargetAddress();
+    void ReadOperandAtPCAndPerformOperation();
+    void PerformOperationOnRegA();
+    void PerformInvalidTargetAddressRead();
+    void FetchHighByteForAbsoluteReadOnly();
+    void PerformOperationOnTargetAddress();
+    void ReadOperandFromTargetAddress();
+    void WriteOperandToTargetAddress();
+    void ReadOperandAtPCAndIncrementPC();
+    void AddRegisterXToOperand();
+    void SetTargetAddressLowByteUsingOperand();
+    void SetTargetAddressHighByteUsingOperand();
+    void FetchHighByteForIndirectIndexedReadOnly();
+    void SetTargetAddressHighByteUsingYIndexedOperand();
+    void CheckBranchCondition();
+    void PerformBranch();
+    void BlankMicroInstruction();
+    void PopStatusOffTheStackAndIncrementStackPointer();
+    void PopPCLowByteOffTheStackAndIncrementStackPointer();
+    void PopPCHighByteOffTheStack();
+    void IncrementProgramCounter();
+    void PopStatusOffTheStack();
+    void PushAccumulatorToTheStack();
+    void PushStatusToTheStackWithBSet();
+    void PopAccumulatorFromTheStackAndSetFlags();
+    void ReadFromTheStackPointer();
+    void PushPCHighByteToTheStack();
+    void PushPCLowByteToTheStack();
+    void JumpToSubroutineFinal();
+    void JumpAbsoluteFinal();
+    void JumpIndirectFinal();
 #pragma endregion
 };

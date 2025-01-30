@@ -41,6 +41,7 @@ add_executable (nes-emulator
     "src/ppu/colour-palette.h"
     "src/debug/logger.h"
     "src/debug/logger.cpp"
+    "src/cpu/cpu-micro-instructions.cpp"
 )
 
 # Link SDL2
@@ -72,6 +73,7 @@ add_executable(nes-emulator-tests
     "tests/fakes/fake-cpu-bus.h"
     "src/debug/logger.h"
     "src/debug/logger.cpp"
+    "src/cpu/cpu-micro-instructions.cpp"
 )
 
 # Link Google Test to the test executable
