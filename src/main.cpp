@@ -1,9 +1,10 @@
-#include <iostream>
 #include <memory>
 #include <stdexcept>
-#include <SDL2/SDL.h>
 #include <chrono>
 #include <thread>
+#include <unordered_set>
+
+#include <SDL2/SDL.h>
 
 #include "debug/logger.h"
 #include "cpu/cpu.h"
@@ -12,13 +13,39 @@
 
 int main(int argc, char* argv[])
 {
-    // Fetch the ROM filepath from the program arguments
-    if (argc < 2)
+    std::unordered_set<std::string> flagSet;
+    std::string romPath;
+
+    // Sort all program arguments
+    for (int i = 1; i < argc; i++)
     {
-        Logger::GetInstance().Error("no filename provided");
+        std::string arg = argv[i];
+
+        if (arg.compare(0, 2, "--") == 0)
+        {
+            flagSet.insert(arg);
+        }
+        else
+        {
+            if (!romPath.empty())
+            {
+                Logger::GetInstance().Error("more than one filename provided.");
+                return -1;
+            }
+            romPath = arg;
+        }
+    }
+
+    if (romPath.empty())
+    {
+        Logger::GetInstance().Error("no filename provided.");
         return -1;
     }
-    const std::string romPath = argv[1];
+
+    if (flagSet.count("--console-logging"))
+        Logger::GetInstance().SetLoggingMode(Logger::LoggingModes::Console);
+    else
+        Logger::GetInstance().SetLoggingMode(Logger::LoggingModes::Disabled);
 
     // Initalize the game cartridge
     auto cartridge = std::make_shared<Cartridge>();
