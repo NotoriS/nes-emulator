@@ -70,6 +70,14 @@ class PPU
         uint16_t address = 0x0000;
     };
 
+    struct ObjectAttribute
+    {
+        uint8_t yPosition;
+        uint8_t tileIndex;
+        uint8_t attributes;
+        uint8_t xPosition;
+    };
+
 public:
     static const uint16_t DISPLAY_WIDTH = 256;
     static const uint16_t DISPLAY_HEIGHT = 240;
@@ -122,6 +130,8 @@ private:
     uint32_t m_pixelBuffer[DISPLAY_HEIGHT * DISPLAY_WIDTH];
     bool m_frameCompleted = false;
     bool m_nmiInterruptRaised = false;
+
+    ObjectAttribute m_OAM[64];
 
     // Used internally to read and write to the PPU's bus
     uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
