@@ -80,8 +80,8 @@ private:
 
     void QueueNextInstuction();
 
-    void Write(uint16_t address, uint8_t data);
-    uint8_t Read(uint16_t address);
+    inline void Write(uint16_t address, uint8_t data);
+    inline uint8_t Read(uint16_t address);
 
     void SetFlag(Flag flag, bool value);
 

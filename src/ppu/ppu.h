@@ -134,8 +134,8 @@ private:
     ObjectAttribute m_OAM[64];
 
     // Used internally to read and write to the PPU's bus
-    uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
-    void WriteToBus(uint16_t address, uint8_t data) { m_bus->Write(address, data); }
+    inline uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
+    inline void WriteToBus(uint16_t address, uint8_t data) { m_bus->Write(address, data); }
 
     void IncrementVramAddress();
 
