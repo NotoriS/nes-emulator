@@ -88,7 +88,8 @@ void PPU::Write(uint16_t address, uint8_t data)
         m_mask.byte = data;
         break;
     case 0x2003: // OAMADDR
-        // TODO
+        m_OAMAddress = data;
+        break;
     case 0x2004: // OAMDATA
         // TODO
     case 0x2005: // PPUSCROLL

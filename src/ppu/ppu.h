@@ -132,6 +132,7 @@ private:
     bool m_nmiInterruptRaised = false;
 
     ObjectAttribute m_OAM[64];
+    uint8_t m_OAMAddress = 0x00;
 
     // Used internally to read and write to the PPU's bus
     inline uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
