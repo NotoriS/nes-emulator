@@ -179,8 +179,8 @@ private:
     void SetTargetAddressHighByteUsingPC();
     void SetTargetAddressHighByteUsingXIndexedPC();
     void SetTargetAddressHighByteUsingYIndexedPC();
-    void AddRegisterXToTargetAddress();
-    void AddRegisterYToTargetAddress();
+    void AddRegisterXToZeroPageTargetAddress();
+    void AddRegisterYToZeroPageTargetAddress();
     void ReadOperandAtPCAndPerformOperation();
     void PerformOperationOnRegA();
     void PerformInvalidTargetAddressRead();

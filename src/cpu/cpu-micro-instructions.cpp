@@ -46,14 +46,16 @@ void CPU::SetTargetAddressHighByteUsingYIndexedPC()
         m_microInstructionQueue.push_front(&CPU::PerformInvalidTargetAddressRead);
 }
 
-void CPU::AddRegisterXToTargetAddress()
+void CPU::AddRegisterXToZeroPageTargetAddress()
 {
     m_targetAddress += reg_x;
+    m_targetAddress &= 0x00FF;
 }
 
-void CPU::AddRegisterYToTargetAddress()
+void CPU::AddRegisterYToZeroPageTargetAddress()
 {
     m_targetAddress += reg_y;
+    m_targetAddress &= 0x00FF;
 }
 
 void CPU::ReadOperandAtPCAndPerformOperation()

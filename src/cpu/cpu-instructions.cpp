@@ -71,10 +71,10 @@ void CPU::ZeroPageReadOnly()
         // Do nothing
         break;
     case IndexType::X:
-        m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
+        m_microInstructionQueue.push_back(&CPU::AddRegisterXToZeroPageTargetAddress);
         break;
     case IndexType::Y:
-        m_microInstructionQueue.push_back(&CPU::AddRegisterYToTargetAddress);
+        m_microInstructionQueue.push_back(&CPU::AddRegisterYToZeroPageTargetAddress);
         break;
     default:
         throw std::runtime_error("Unexpected address index type.");
@@ -93,7 +93,7 @@ void CPU::ZeroPageReadModifyWrite()
         // Do nothing
         break;
     case IndexType::X:
-        m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
+        m_microInstructionQueue.push_back(&CPU::AddRegisterXToZeroPageTargetAddress);
         break;
     case IndexType::Y: // Unexpected
     default:
@@ -115,10 +115,10 @@ void CPU::ZeroPageWriteOnly()
         // Do nothing
         break;
     case IndexType::X:
-        m_microInstructionQueue.push_back(&CPU::AddRegisterXToTargetAddress);
+        m_microInstructionQueue.push_back(&CPU::AddRegisterXToZeroPageTargetAddress);
         break;
     case IndexType::Y:
-        m_microInstructionQueue.push_back(&CPU::AddRegisterYToTargetAddress);
+        m_microInstructionQueue.push_back(&CPU::AddRegisterYToZeroPageTargetAddress);
         break;
     default:
         throw std::runtime_error("Unexpected address index type.");
