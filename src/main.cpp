@@ -7,9 +7,7 @@
 #include <SDL2/SDL.h>
 
 #include "debug/logger.h"
-#include "cpu/cpu.h"
-#include "cpu/cpu-bus.h"
-#include "cartridge/cartridge.h"
+#include "nes.h"
 
 int main(int argc, char* argv[])
 {
@@ -36,39 +34,18 @@ int main(int argc, char* argv[])
         }
     }
 
+    // Check if a filename was provided
     if (romPath.empty())
     {
         Logger::GetInstance().Error("no filename provided.");
         return -1;
     }
 
+    // Configure logging mode
     if (flagSet.count("--console-logging"))
         Logger::GetInstance().SetLoggingMode(Logger::LoggingModes::Console);
     else
         Logger::GetInstance().SetLoggingMode(Logger::LoggingModes::Disabled);
-
-    // Initalize the game cartridge
-    auto cartridge = std::make_shared<Cartridge>();
-    try
-    {
-        cartridge->LoadROM(romPath);
-    }
-    catch (const std::runtime_error& e)
-    {
-        Logger::GetInstance().Error(e.what());
-        return -1;
-    }
-
-    //Initialize the PPU and PPU bus
-    auto ppuBus = std::make_shared<PpuBus>();
-    ppuBus->ConnectCartridge(cartridge);
-    auto ppu = std::make_shared<PPU>(ppuBus);
-
-    // Initalize the CPU and main bus
-    auto cpuBus = std::make_shared<CpuBus>();
-    cpuBus->ConnectCartridge(cartridge);
-    cpuBus->ConnectPPU(ppu);
-    auto cpu = std::make_unique<CPU>(cpuBus);
 
     // Initialize SDL components
     SDL_Window* window = nullptr;
@@ -90,46 +67,35 @@ int main(int argc, char* argv[])
         256, 240
     );
 
-    while (true)
+    // Run the emulation
+    try
     {
-        const auto frameStart = std::chrono::high_resolution_clock().now();
+        auto nes = std::make_unique<NES>(romPath);
+        bool running = true;
 
-        while (SDL_PollEvent(&event))
+        while (running)
         {
-            if (event.type == SDL_QUIT) return 0;
-        }
+            const auto frameStart = std::chrono::high_resolution_clock().now();
 
-        while (!ppu->FrameIsComplete())
-        {
-            bool nmiInterruptRaised = false;
-            for (int i = 0; i < 3; i++)
+            while (SDL_PollEvent(&event))
             {
-                ppu->Clock();
-                nmiInterruptRaised |= ppu->NmiInterruptWasRaised();
+                if (event.type == SDL_QUIT) running = false;
             }
 
-            if (nmiInterruptRaised) 
-                cpu->Interrupt(CPU::InterruptType::NMI);
+            nes->DrawFrame(renderer, texture);
 
-            cpu->Clock();
+            // Wait for the next frame to keep a consistent framerate
+            const auto frameEnd = std::chrono::high_resolution_clock().now();
+            const auto frameDuration = frameEnd - frameStart;
+            const auto targetFrameDuration = std::chrono::duration<double, std::milli>(16.67);
+            if (frameDuration < targetFrameDuration)
+                std::this_thread::sleep_for(targetFrameDuration - frameDuration);
         }
-
-        uint32_t* pixelBuffer = ppu->GetPixelBuffer();
-
-        // Update the texture with the current frame
-        SDL_UpdateTexture(texture, nullptr, pixelBuffer, PPU::DISPLAY_WIDTH * sizeof(uint32_t));
-
-        // Clear the screen and render the texture
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, texture, nullptr, nullptr);
-        SDL_RenderPresent(renderer);
-
-        // Wait for the next frame to keep a consistent framerate
-        const auto frameEnd = std::chrono::high_resolution_clock().now();
-        const auto frameDuration = frameEnd - frameStart;
-        const auto targetFrameDuration = std::chrono::duration<double, std::milli>(16.67);
-        if (frameDuration < targetFrameDuration)
-            std::this_thread::sleep_for(targetFrameDuration - frameDuration);
+    }
+    catch (const std::runtime_error& e)
+    {
+        Logger::GetInstance().Error(e.what());
+        return -1;
     }
 
     return 0;

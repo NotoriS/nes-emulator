@@ -42,6 +42,8 @@ add_executable (nes-emulator
     "src/debug/logger.h"
     "src/debug/logger.cpp"
     "src/cpu/cpu-micro-instructions.cpp"
+    "src/nes.h"
+    "src/nes.cpp"
 )
 
 # Link SDL2
