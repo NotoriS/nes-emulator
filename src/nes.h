@@ -1,7 +1,6 @@
 #include <string>
 #include <memory>
-#include <chrono>
-#include <thread>
+#include <cstdint>
 
 #include <SDL2/SDL.h>
 
@@ -17,6 +16,7 @@ public:
     ~NES();
 
     void DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture);
+    void CheckControllerInput(const SDL_Event& event);
 
 private:
     std::string m_romPath;
@@ -26,6 +26,9 @@ private:
     std::shared_ptr<PpuBus> m_ppuBus;
     std::unique_ptr<CPU> m_cpu;
     std::shared_ptr<CpuBus> m_cpuBus;
+
+    std::shared_ptr<uint8_t> m_controllerOneState;
+    std::shared_ptr<uint8_t> m_controllerTwoState;
 
     void InitializeCartridge();
     void InitializePPU();

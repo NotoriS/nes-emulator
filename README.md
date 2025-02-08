@@ -41,7 +41,7 @@ This emulator replicates the functionality of the classic Nintendo Entertainment
 ### Stage 6: User Input System
 - Add support for user input using the SDL library.
 
-**Progress:** Planned
+**Progress:** Completed
 
 ### Stage 7: APU Implementation
 - Set up the Audio Processing Unit (APU) for sound generation, aiming to support the basic channels for sound effects and music.

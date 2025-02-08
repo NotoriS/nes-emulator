@@ -80,6 +80,7 @@ int main(int argc, char* argv[])
             while (SDL_PollEvent(&event))
             {
                 if (event.type == SDL_QUIT) running = false;
+                else nes->CheckControllerInput(event);
             }
 
             nes->DrawFrame(renderer, texture);
