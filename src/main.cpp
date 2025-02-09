@@ -43,9 +43,9 @@ int main(int argc, char* argv[])
 
     // Configure logging mode
     if (flagSet.count("--console-logging"))
-        Logger::GetInstance().SetLoggingMode(Logger::LoggingModes::Console);
+        Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Console);
     else
-        Logger::GetInstance().SetLoggingMode(Logger::LoggingModes::Disabled);
+        Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Disabled);
 
     // Initialize SDL components
     SDL_Window* window = nullptr;

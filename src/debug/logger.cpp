@@ -2,7 +2,7 @@
 
 Logger::Logger()
 {
-    m_loggingMode = LoggingModes::Console;
+    m_loggingMode = LoggingMode::Console;
 }
 
 Logger::~Logger()
@@ -15,7 +15,7 @@ Logger& Logger::GetInstance()
     return instance;
 }
 
-void Logger::SetLoggingMode(LoggingModes loggingMode)
+void Logger::SetLoggingMode(LoggingMode loggingMode)
 {
     m_loggingMode = loggingMode;
 }

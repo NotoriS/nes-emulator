@@ -32,9 +32,9 @@ void Cartridge::LoadROM(const std::string& filename)
 
     // Set mirror mode
     if (m_header.flags6 & 0x01)
-        m_mirrorMode = MirrorModes::Horizontal;
+        m_mirrorMode = MirrorMode::Horizontal;
     else
-        m_mirrorMode = MirrorModes::Vertical;
+        m_mirrorMode = MirrorMode::Vertical;
 
     // Discard trainer if present
     if (m_header.flags6 & 0x04)

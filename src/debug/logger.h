@@ -14,7 +14,7 @@ public:
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
 
-    enum class LoggingModes
+    enum class LoggingMode
     {
         Disabled,
         Console
@@ -22,26 +22,26 @@ public:
 
     static Logger& GetInstance();
 
-    void SetLoggingMode(LoggingModes loggingMode);
+    void SetLoggingMode(LoggingMode loggingMode);
 
     template<typename T>
     void Log(const T& value) const
     {
-        if (m_loggingMode == LoggingModes::Disabled) return;
+        if (m_loggingMode == LoggingMode::Disabled) return;
         std::cout << value << std::endl;
     }
 
     template<typename T>
     void Warn(const T& value) const
     {
-        if (m_loggingMode == LoggingModes::Disabled) return;
+        if (m_loggingMode == LoggingMode::Disabled) return;
         std::cout << "Warning: " << value << std::endl;
     }
 
     template<typename T>
     void Error(const T& value) const
     {
-        if (m_loggingMode == LoggingModes::Disabled) return;
+        if (m_loggingMode == LoggingMode::Disabled) return;
         std::cerr << "Error: " << value << std::endl;
     }
 
@@ -65,5 +65,5 @@ public:
     }
 
 private:
-    LoggingModes m_loggingMode;
+    LoggingMode m_loggingMode;
 };

@@ -28,7 +28,7 @@ uint8_t PpuBus::Read(uint16_t address)
 
         switch (m_cartridge->GetMirrorMode())
         {
-        case Cartridge::MirrorModes::Vertical:
+        case Cartridge::MirrorMode::Vertical:
             if (address < 0x2400)
                 return m_nameTables[0][address & 0x03FF];
             else if (address < 0x2800)
@@ -37,7 +37,7 @@ uint8_t PpuBus::Read(uint16_t address)
                 return m_nameTables[0][address & 0x03FF];
             else
                 return m_nameTables[1][address & 0x03FF];
-        case Cartridge::MirrorModes::Horizontal:
+        case Cartridge::MirrorMode::Horizontal:
             if (address < 0x2400)
                 return m_nameTables[0][address & 0x03FF];
             else if (address < 0x2800)
@@ -74,7 +74,7 @@ void PpuBus::Write(uint16_t address, uint8_t data)
 
         switch (m_cartridge->GetMirrorMode())
         {
-        case Cartridge::MirrorModes::Vertical:
+        case Cartridge::MirrorMode::Vertical:
             if (address < 0x2400)
                 m_nameTables[0][address & 0x03FF] = data;
             else if (address < 0x2800)
@@ -84,7 +84,7 @@ void PpuBus::Write(uint16_t address, uint8_t data)
             else
                 m_nameTables[1][address & 0x03FF] = data;
             break;
-        case Cartridge::MirrorModes::Horizontal:
+        case Cartridge::MirrorMode::Horizontal:
             if (address < 0x2400)
                 m_nameTables[0][address & 0x03FF] = data;
             else if (address < 0x2800)

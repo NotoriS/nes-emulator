@@ -27,7 +27,7 @@ class Cartridge
 
 public:
     // TODO: Add other mirror modes
-    enum class MirrorModes : uint8_t
+    enum class MirrorMode : uint8_t
     {
         Horizontal = 0,
         Vertical = 1
@@ -44,7 +44,7 @@ public:
     uint8_t PpuRead(uint16_t address) { return m_mapper->PpuRead(address); }
     void PpuWrite(uint16_t address, uint8_t data) { m_mapper->PpuWrite(address, data); }
 
-    MirrorModes GetMirrorMode() { return m_mirrorMode; }
+    MirrorMode GetMirrorMode() { return m_mirrorMode; }
 
 private:
     RomHeader m_header{};
@@ -54,7 +54,7 @@ private:
     std::vector<uint8_t> m_prgRom;  // PRG ROM data
     std::vector<uint8_t> m_chrRom;  // CHR ROM data
 
-    MirrorModes m_mirrorMode = MirrorModes::Horizontal;
+    MirrorMode m_mirrorMode = MirrorMode::Horizontal;
 
     void CreateMapper(uint8_t mapperID);
 };
