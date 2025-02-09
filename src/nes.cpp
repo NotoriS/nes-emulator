@@ -40,69 +40,69 @@ void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
-
-    // Reset controller state
-    *m_controllerOneState = 0;
-    *m_controllerTwoState = 0;
 }
 
 void NES::CheckControllerInput(const SDL_Event& event)
 {
-    if (event.type != SDL_EventType::SDL_KEYDOWN) return;
+    if (event.type != SDL_EventType::SDL_KEYDOWN
+        && event.type != SDL_EventType::SDL_KEYUP)
+        return;
 
     auto key = event.key.keysym.sym;
+    bool keyPressed = event.type == SDL_EventType::SDL_KEYDOWN;
+
     switch (key)
     {
     // Controller 1
-    case SDLK_l: // A Button
-        *m_controllerOneState |= 0x80;
+    case SDLK_l:
+        SetControllerButtonState(1, ControllerButton::A, keyPressed);
         break;
-    case SDLK_k: // B Button
-        *m_controllerOneState |= 0x40;
+    case SDLK_k:
+        SetControllerButtonState(1, ControllerButton::B, keyPressed);
         break;
-    case SDLK_g: // Select Button
-        *m_controllerOneState |= 0x20;
+    case SDLK_g:
+        SetControllerButtonState(1, ControllerButton::Select, keyPressed);
         break;
-    case SDLK_h: // Start Button
-        *m_controllerOneState |= 0x10;
+    case SDLK_h:
+        SetControllerButtonState(1, ControllerButton::Start, keyPressed);
         break;
-    case SDLK_w: // D-Pad Up
-        *m_controllerOneState |= 0x08;
+    case SDLK_w:
+        SetControllerButtonState(1, ControllerButton::Up, keyPressed);
         break;
-    case SDLK_s: // D-Pad Down
-        *m_controllerOneState |= 0x04;
+    case SDLK_s:
+        SetControllerButtonState(1, ControllerButton::Down, keyPressed);
         break;
-    case SDLK_a: // D-Pad Left
-        *m_controllerOneState |= 0x02;
+    case SDLK_a:
+        SetControllerButtonState(1, ControllerButton::Left, keyPressed);
         break;
-    case SDLK_d: // D-Pad Right
-        *m_controllerOneState |= 0x01;
+    case SDLK_d:
+        SetControllerButtonState(1, ControllerButton::Right, keyPressed);
         break;
 
     // Controller 2
-    case SDLK_KP_3: // A Button
-        *m_controllerTwoState |= 0x80;
+    case SDLK_KP_3:
+        SetControllerButtonState(2, ControllerButton::A, keyPressed);
         break;
-    case SDLK_KP_2: // B Button
-        *m_controllerTwoState |= 0x40;
+    case SDLK_KP_2:
+        SetControllerButtonState(2, ControllerButton::B, keyPressed);
         break;
-    case SDLK_KP_4: // Select Button
-        *m_controllerTwoState |= 0x20;
+    case SDLK_KP_4:
+        SetControllerButtonState(2, ControllerButton::Select, keyPressed);
         break;
-    case SDLK_KP_5: // Start Button
-        *m_controllerTwoState |= 0x10;
+    case SDLK_KP_5:
+        SetControllerButtonState(2, ControllerButton::Start, keyPressed);
         break;
-    case SDLK_UP: // D-Pad Up
-        *m_controllerTwoState |= 0x08;
+    case SDLK_UP:
+        SetControllerButtonState(2, ControllerButton::Up, keyPressed);
         break;
-    case SDLK_DOWN: // D-Pad Down
-        *m_controllerTwoState |= 0x04;
+    case SDLK_DOWN:
+        SetControllerButtonState(2, ControllerButton::Down, keyPressed);
         break;
-    case SDLK_LEFT: // D-Pad Left
-        *m_controllerTwoState |= 0x02;
+    case SDLK_LEFT:
+        SetControllerButtonState(2, ControllerButton::Left, keyPressed);
         break;
-    case SDLK_RIGHT: // D-Pad Right
-        *m_controllerTwoState |= 0x01;
+    case SDLK_RIGHT:
+        SetControllerButtonState(2, ControllerButton::Right, keyPressed);
         break;
     }
 }
@@ -127,4 +127,15 @@ void NES::InitializeCPU()
     m_cpuBus->ConnectCartridge(m_cartridge);
     m_cpuBus->ConnectPPU(m_ppu);
     m_cpu = std::make_unique<CPU>(m_cpuBus);
+}
+
+void NES::SetControllerButtonState(uint8_t controllerNumber, ControllerButton button, bool newState) const
+{
+    std::shared_ptr<uint8_t> controller;
+    if (controllerNumber == 1) controller = m_controllerOneState;
+    else if (controllerNumber == 2) controller = m_controllerTwoState;
+    else return;
+
+    if (newState) *controller |= static_cast<uint8_t>(button);
+    else *controller &= ~static_cast<uint8_t>(button);
 }

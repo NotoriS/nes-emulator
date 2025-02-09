@@ -11,6 +11,18 @@
 
 class NES
 {
+    enum class ControllerButton : uint8_t
+    {
+        Right = 0x01,
+        Left = 0x02,
+        Down = 0x04,
+        Up = 0x08,
+        Start = 0x10,
+        Select = 0x20,
+        B = 0x40,
+        A = 0x80
+    };
+
 public:
     NES(const std::string& romPath);
     ~NES();
@@ -33,4 +45,6 @@ private:
     void InitializeCartridge();
     void InitializePPU();
     void InitializeCPU();
+
+    void SetControllerButtonState(uint8_t controllerNumber, ControllerButton button, bool newState) const;
 };
