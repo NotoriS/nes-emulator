@@ -34,4 +34,8 @@ private:
 
 	uint8_t m_controllerOneShifter = 0x00;
 	uint8_t m_controllerTwoShifter = 0x00;
+
+	bool m_controllerPollingEnabled = false;
+
+	void PollControllerState();
 };
