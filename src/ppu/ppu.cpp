@@ -61,8 +61,7 @@ uint8_t PPU::Read(uint16_t address)
         m_firstWrite = true;
         return result;
     case 0x2004: // OAMDATA
-        // TODO
-        return 0;
+        return ReadByteFromOAM(m_OAMAddress);
     case 0x2007: // PPUDATA
         result = m_readBuffer;
         m_readBuffer = ReadFromBus(m_currVramAddress.address);
@@ -91,7 +90,8 @@ void PPU::Write(uint16_t address, uint8_t data)
         m_OAMAddress = data;
         break;
     case 0x2004: // OAMDATA
-        // TODO
+        WriteByteToOAM(m_OAMAddress++, data);
+        break;
     case 0x2005: // PPUSCROLL
         if (m_firstWrite)
         {
@@ -126,6 +126,49 @@ void PPU::Write(uint16_t address, uint8_t data)
     default:
         Logger::GetInstance().Warn("the CPU attempted to write to the PPU at an invalid address (" + Logger::DecmialToHex(address) + ")");
         break;
+    }
+}
+
+void PPU::WriteByteToOAM(uint8_t address, uint8_t data)
+{
+    uint8_t translatedAddress = address / 4;
+    uint8_t property = address % 4;
+
+    switch (property)
+    {
+    case 0:
+        m_OAM[translatedAddress].yPosition = data;
+        return;
+    case 1:
+        m_OAM[translatedAddress].tileIndex = data;
+        return;
+    case 2:
+        m_OAM[translatedAddress].attributes = data;
+        return;
+    case 3:
+        m_OAM[translatedAddress].xPosition = data;
+        return;
+    }
+}
+
+uint8_t PPU::ReadByteFromOAM(uint8_t address) const
+{
+    uint8_t translatedAddress = address / 4;
+    uint8_t property = address % 4;
+
+    switch (property)
+    {
+    case 0:
+        return m_OAM[translatedAddress].yPosition;
+    case 1:
+        return m_OAM[translatedAddress].tileIndex;
+    case 2:
+        return m_OAM[translatedAddress].attributes;
+    case 3:
+        return m_OAM[translatedAddress].xPosition;
+    default:
+        Logger::GetInstance().Error("unexpected path reached in PPU::ReadByteFromOAM(uint8_t address).");
+        return 0;
     }
 }
 

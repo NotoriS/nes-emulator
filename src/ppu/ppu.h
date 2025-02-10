@@ -96,6 +96,8 @@ public:
     uint8_t Read(uint16_t address);
     void Write(uint16_t address, uint8_t data);
 
+    void WriteByteToOAM(uint8_t address, uint8_t data);
+
 private:
     static const uint16_t NAMETABLE_BASE = 0x2000;
     static const uint16_t ATTRIBUTE_TABLE_OFFSET = 0x03C0;
@@ -133,6 +135,8 @@ private:
 
     ObjectAttribute m_OAM[64];
     uint8_t m_OAMAddress = 0x00;
+
+    uint8_t ReadByteFromOAM(uint8_t address) const;
 
     // Used internally to read and write to the PPU's bus
     inline uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
