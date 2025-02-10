@@ -24,6 +24,8 @@ public:
 	void ConnectCartridge(std::shared_ptr<Cartridge> cartridge) { m_cartridge = cartridge; }
 	void ConnectPPU(std::shared_ptr<PPU> ppu) { m_ppu = ppu; }
 
+	bool TryDirectMemoryAccess(bool cycleIsOdd);
+
 private:
 	std::array<uint8_t, 2048> m_memory;
 
@@ -34,6 +36,12 @@ private:
 
 	uint8_t m_controllerOneShifter = 0x00;
 	uint8_t m_controllerTwoShifter = 0x00;
+
+	uint8_t m_dmaPage = 0x00;
+	uint8_t m_dmaAddress = 0x00;
+	uint8_t m_dmaDataBuffer = 0x00;
+	bool m_dmaReady = false;
+	bool m_dmaInProgress = false;
 
 	bool m_controllerPollingEnabled = false;
 

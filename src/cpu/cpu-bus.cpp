@@ -56,6 +56,12 @@ void CpuBus::Write(uint16_t address, uint8_t data)
         m_ppu->Write(address & 0x2007, data);
         return;
     }
+    else if (address == 0x4014) // Trigger DMA
+    {
+        m_dmaPage = data;
+        m_dmaReady = true;
+        return;
+    }
     else if (address == 0x4016) // Set controller polling mode
     {
         m_controllerPollingEnabled = data & 0x01;
@@ -75,6 +81,36 @@ void CpuBus::ConnectControllers(std::shared_ptr<uint8_t> controllerOneState, std
 {
     m_controllerOneState = controllerOneState;
     m_controllerTwoState = controllerTwoState;
+}
+
+bool CpuBus::TryDirectMemoryAccess(bool cycleIsOdd)
+{
+    if (!m_dmaReady) return false;
+
+    if (m_dmaInProgress)
+    {
+        if (cycleIsOdd)
+        {
+            m_ppu->WriteByteToOAM(m_dmaAddress, m_dmaDataBuffer);
+            m_dmaAddress++;
+
+            if (m_dmaAddress == 0)
+            {
+                m_dmaReady = false;
+                m_dmaInProgress = false;
+            }
+        }
+        else
+        {
+            m_dmaDataBuffer = Read((m_dmaPage << 8) | m_dmaAddress);
+        }
+    }
+    else
+    {
+        if (cycleIsOdd) m_dmaInProgress = true;
+    }
+
+    return true;
 }
 
 void CpuBus::PollControllerState()

@@ -42,6 +42,8 @@ private:
     std::shared_ptr<uint8_t> m_controllerOneState;
     std::shared_ptr<uint8_t> m_controllerTwoState;
 
+    bool m_oddCpuCycle = false;
+
     void InitializeCartridge();
     void InitializePPU();
     void InitializeCPU();
