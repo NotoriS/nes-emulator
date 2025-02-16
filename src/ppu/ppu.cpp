@@ -254,11 +254,21 @@ void PPU::PerformTickLogic()
                 break;
             }
         }
+
         if (m_dot == 256) IncrementVerticalPointer();
         if (m_dot == 257)
         {
             LoadShiftersLowByte();
             TransferHoriontalPointer();
+        }
+
+        // Garbage Nametable Reads
+        if (m_dot > DISPLAY_WIDTH && m_dot <= 320)
+        {
+            if (m_dot % 8 == 2 || m_dot % 8 == 4)
+            {
+                FetchFromNametable();
+            }
         }
         if (m_dot == 338 || m_dot == 340) FetchFromNametable();
     }
