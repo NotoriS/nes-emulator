@@ -151,6 +151,34 @@ void PPU::WriteByteToOAM(uint8_t address, uint8_t data)
     }
 }
 
+void PPU::WriteByteToSecondaryOAM(uint8_t address, uint8_t data)
+{
+    if (address >= 32)
+    {
+        Logger::GetInstance().Error("address out of bounds for PPU::WriteByteToSecondaryOAM(uint8_t address, uint8_t data)");
+        return;
+    }
+
+    uint8_t translatedAddress = address / 4;
+    uint8_t property = address % 4;
+
+    switch (property)
+    {
+    case 0:
+        m_secondaryOAM[translatedAddress].yPosition = data;
+        return;
+    case 1:
+        m_secondaryOAM[translatedAddress].tileIndex = data;
+        return;
+    case 2:
+        m_secondaryOAM[translatedAddress].attributes = data;
+        return;
+    case 3:
+        m_secondaryOAM[translatedAddress].xPosition = data;
+        return;
+    }
+}
+
 uint8_t PPU::ReadByteFromOAM(uint8_t address) const
 {
     uint8_t translatedAddress = address / 4;
@@ -168,6 +196,33 @@ uint8_t PPU::ReadByteFromOAM(uint8_t address) const
         return m_OAM[translatedAddress].xPosition;
     default:
         Logger::GetInstance().Error("unexpected path reached in PPU::ReadByteFromOAM(uint8_t address).");
+        return 0;
+    }
+}
+
+uint8_t PPU::ReadByteFromSecondaryOAM(uint8_t address) const
+{
+    if (address >= 32)
+    {
+        Logger::GetInstance().Error("address out of bounds for PPU::ReadByteFromSecondaryOAM(uint8_t address)");
+        return 0;
+    }
+
+    uint8_t translatedAddress = address / 4;
+    uint8_t property = address % 4;
+
+    switch (property)
+    {
+    case 0:
+        return m_secondaryOAM[translatedAddress].yPosition;
+    case 1:
+        return m_secondaryOAM[translatedAddress].tileIndex;
+    case 2:
+        return m_secondaryOAM[translatedAddress].attributes;
+    case 3:
+        return m_secondaryOAM[translatedAddress].xPosition;
+    default:
+        Logger::GetInstance().Error("unexpected path reached in PPU::ReadByteFromSecondaryOAM(uint8_t address).");
         return 0;
     }
 }

@@ -97,6 +97,7 @@ public:
     void Write(uint16_t address, uint8_t data);
 
     void WriteByteToOAM(uint8_t address, uint8_t data);
+    void WriteByteToSecondaryOAM(uint8_t address, uint8_t data);
 
 private:
     static const uint16_t NAMETABLE_BASE = 0x2000;
@@ -134,9 +135,11 @@ private:
     bool m_nmiInterruptRaised = false;
 
     ObjectAttribute m_OAM[64];
+    ObjectAttribute m_secondaryOAM[8];
     uint8_t m_OAMAddress = 0x00;
 
     uint8_t ReadByteFromOAM(uint8_t address) const;
+    uint8_t ReadByteFromSecondaryOAM(uint8_t address) const;
 
     // Used internally to read and write to the PPU's bus
     inline uint8_t ReadFromBus(uint16_t address) { return m_bus->Read(address); }
