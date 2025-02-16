@@ -61,6 +61,7 @@ uint8_t PPU::Read(uint16_t address)
         m_firstWrite = true;
         return result;
     case 0x2004: // OAMDATA
+        if (m_scanline < DISPLAY_HEIGHT && m_dot > 0 && m_dot <= 64) return 0xFF;
         return ReadByteFromOAM(m_OAMAddress);
     case 0x2007: // PPUDATA
         result = m_readBuffer;
@@ -289,6 +290,16 @@ void PPU::PerformTickLogic()
         m_status.vblank = 1;
         if (m_control.vblankNmi)
             m_nmiInterruptRaised = true;
+    }
+
+    // Sprite Preparation
+    if (m_scanline < DISPLAY_HEIGHT)
+    {
+        // Secondary OAM Clear
+        if (m_dot > 0 && m_dot <= 64 && (m_dot % 2 == 1))
+        {
+            WriteByteToSecondaryOAM(m_dot / 2, 0xFF);
+        }
     }
 }
 
