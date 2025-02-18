@@ -78,6 +78,20 @@ class PPU
         uint8_t xPosition;
     };
 
+    enum class SpriteEvaluationState
+    {
+        ReadY,
+        WriteY,
+        ReadTileIndex,
+        WriteTileIndex,
+        ReadAttributes,
+        WriteAttributes,
+        ReadX,
+        WriteX,
+        IncrementOAMIndex,
+        CheckForSpriteOverflow
+    };
+
 public:
     static const uint16_t DISPLAY_WIDTH = 256;
     static const uint16_t DISPLAY_HEIGHT = 240;
@@ -138,6 +152,11 @@ private:
     ObjectAttribute m_secondaryOAM[8];
     uint8_t m_OAMAddress = 0x00;
 
+    SpriteEvaluationState m_spriteEvalState = SpriteEvaluationState::ReadY;
+    uint8_t m_spritesFound = 0;
+    uint8_t m_spriteEvalOAMIndex = 0;
+    uint8_t m_spriteEvalByteBuffer = 0;
+
     uint8_t ReadByteFromOAM(uint8_t address) const;
     uint8_t ReadByteFromSecondaryOAM(uint8_t address) const;
 
@@ -160,4 +179,5 @@ private:
     void TransferVerticalPointer();
     void LoadShiftersLowByte();
     void ShiftShifters();
+    void TickSpriteEvaluation();
 };

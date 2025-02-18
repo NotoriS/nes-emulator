@@ -301,6 +301,11 @@ void PPU::PerformTickLogic()
             WriteByteToSecondaryOAM(m_dot / 2, 0xFF);
         }
     }
+
+    if (m_dot > 64 && m_dot <= DISPLAY_WIDTH)
+    {
+        TickSpriteEvaluation();
+    }
 }
 
 uint32_t PPU::DeterminePixelColour()
@@ -444,4 +449,80 @@ void PPU::ShiftShifters()
     m_patternHighShifter <<= 1;
     m_attributeLowShifter <<= 1;
     m_attributeHighShifter <<= 1;
+}
+
+void PPU::TickSpriteEvaluation()
+{
+    if (m_dot == 65)
+    {
+        m_spriteEvalState = SpriteEvaluationState::ReadY;
+        m_spritesFound = 0;
+        m_spriteEvalOAMIndex = 0;
+    }
+
+    short diff;
+    switch (m_spriteEvalState)
+    {
+    case SpriteEvaluationState::ReadY:
+        m_spriteEvalByteBuffer = m_OAM[m_spriteEvalOAMIndex].yPosition;
+        m_spriteEvalState = SpriteEvaluationState::WriteY;
+        break;
+    case SpriteEvaluationState::WriteY:
+        if (m_spritesFound >= 8)
+        {
+            m_spriteEvalState = SpriteEvaluationState::IncrementOAMIndex;
+            break;
+        }
+        m_secondaryOAM[m_spritesFound].yPosition = m_spriteEvalByteBuffer;
+        diff = m_scanline - static_cast<short>(m_spriteEvalByteBuffer);
+        if (diff >= 0 && diff < (m_control.spriteSize ? 16 : 8))
+            m_spriteEvalState = SpriteEvaluationState::ReadTileIndex;
+        else
+            m_spriteEvalState = SpriteEvaluationState::IncrementOAMIndex;
+        break;
+    case SpriteEvaluationState::ReadTileIndex:
+        m_spriteEvalByteBuffer = m_OAM[m_spriteEvalOAMIndex].tileIndex;
+        m_spriteEvalState = SpriteEvaluationState::WriteTileIndex;
+        break;
+    case SpriteEvaluationState::WriteTileIndex:
+        m_secondaryOAM[m_spritesFound].tileIndex = m_spriteEvalByteBuffer;
+        m_spriteEvalState = SpriteEvaluationState::ReadAttributes;
+        break;
+    case SpriteEvaluationState::ReadAttributes:
+        m_spriteEvalByteBuffer = m_OAM[m_spriteEvalOAMIndex].attributes;
+        m_spriteEvalState = SpriteEvaluationState::WriteAttributes;
+        break;
+    case SpriteEvaluationState::WriteAttributes:
+        m_secondaryOAM[m_spritesFound].attributes = m_spriteEvalByteBuffer;
+        m_spriteEvalState = SpriteEvaluationState::ReadX;
+        break;
+    case SpriteEvaluationState::ReadX:
+        m_spriteEvalByteBuffer = m_OAM[m_spriteEvalOAMIndex].xPosition;
+        m_spriteEvalState = SpriteEvaluationState::WriteX;
+        break;
+    case SpriteEvaluationState::WriteX:
+        m_secondaryOAM[m_spritesFound].xPosition = m_spriteEvalByteBuffer;
+        m_spritesFound++;
+        m_spriteEvalState = SpriteEvaluationState::IncrementOAMIndex;
+        break;
+    case SpriteEvaluationState::IncrementOAMIndex:
+        m_spriteEvalOAMIndex++;
+        if (m_spriteEvalOAMIndex == 64)
+        {
+            m_spriteEvalOAMIndex = 0;
+            m_spriteEvalState = SpriteEvaluationState::ReadY;
+        }
+        else if (m_spritesFound < 8)
+        {
+            m_spriteEvalState = SpriteEvaluationState::ReadY;
+        }
+        else
+        {
+            m_spriteEvalState = SpriteEvaluationState::CheckForSpriteOverflow;
+        }
+        break;
+    case SpriteEvaluationState::CheckForSpriteOverflow:
+        // TODO
+        break;
+    }
 }
