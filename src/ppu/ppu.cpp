@@ -300,11 +300,11 @@ void PPU::PerformTickLogic()
         {
             WriteByteToSecondaryOAM(m_dot / 2, 0xFF);
         }
-    }
 
-    if (m_dot > 64 && m_dot <= DISPLAY_WIDTH)
-    {
-        TickSpriteEvaluation();
+        if (m_dot > 64 && m_dot <= DISPLAY_WIDTH)
+        {
+            TickSpriteEvaluation();
+        }
     }
 }
 
