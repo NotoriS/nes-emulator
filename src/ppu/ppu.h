@@ -89,6 +89,7 @@ class PPU
         ReadX,
         WriteX,
         IncrementOAMIndex,
+        StartCheckForSpriteOverflow,
         CheckForSpriteOverflow
     };
 
@@ -156,6 +157,7 @@ private:
     uint8_t m_spritesFound = 0;
     uint8_t m_spriteEvalOAMIndex = 0;
     uint8_t m_spriteEvalByteBuffer = 0;
+    uint8_t m_spriteOverflowPointer = 0;
 
     uint8_t ReadByteFromOAM(uint8_t address) const;
     uint8_t ReadByteFromSecondaryOAM(uint8_t address) const;
@@ -180,4 +182,5 @@ private:
     void LoadShiftersLowByte();
     void ShiftShifters();
     void TickSpriteEvaluation();
+    bool SpriteInRangeOfNextScanline(uint8_t yPosition);
 };

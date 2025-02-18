@@ -293,7 +293,7 @@ void PPU::PerformTickLogic()
     }
 
     // Sprite Preparation
-    if (m_scanline < DISPLAY_HEIGHT)
+    if (m_scanline >= 0 && m_scanline < DISPLAY_HEIGHT)
     {
         // Secondary OAM Clear
         if (m_dot > 0 && m_dot <= 64 && (m_dot % 2 == 1))
@@ -460,7 +460,6 @@ void PPU::TickSpriteEvaluation()
         m_spriteEvalOAMIndex = 0;
     }
 
-    short diff;
     switch (m_spriteEvalState)
     {
     case SpriteEvaluationState::ReadY:
@@ -474,8 +473,7 @@ void PPU::TickSpriteEvaluation()
             break;
         }
         m_secondaryOAM[m_spritesFound].yPosition = m_spriteEvalByteBuffer;
-        diff = m_scanline - static_cast<short>(m_spriteEvalByteBuffer);
-        if (diff >= 0 && diff < (m_control.spriteSize ? 16 : 8))
+        if (SpriteInRangeOfNextScanline(m_spriteEvalByteBuffer))
             m_spriteEvalState = SpriteEvaluationState::ReadTileIndex;
         else
             m_spriteEvalState = SpriteEvaluationState::IncrementOAMIndex;
@@ -518,11 +516,32 @@ void PPU::TickSpriteEvaluation()
         }
         else
         {
-            m_spriteEvalState = SpriteEvaluationState::CheckForSpriteOverflow;
+            m_spriteEvalState = SpriteEvaluationState::StartCheckForSpriteOverflow;
         }
         break;
+    case SpriteEvaluationState::StartCheckForSpriteOverflow:
+        m_spriteOverflowPointer = m_spriteEvalOAMIndex * 4;
+        m_spriteEvalState = SpriteEvaluationState::CheckForSpriteOverflow;
+        [[fallthrough]];
     case SpriteEvaluationState::CheckForSpriteOverflow:
-        // TODO
+        // This is intentionally incorrect to match the buggy behaviour of the NES
+        if (SpriteInRangeOfNextScanline(ReadByteFromOAM(m_spriteOverflowPointer)))
+        {
+            m_status.spriteOverflow = 1;
+            m_spriteOverflowPointer += 4;
+            if (m_spriteOverflowPointer < 4) m_spriteEvalState = SpriteEvaluationState::ReadY;
+        }
+        else
+        {
+            m_spriteOverflowPointer += 5;
+            if (m_spriteOverflowPointer < 5) m_spriteEvalState = SpriteEvaluationState::ReadY;
+        }
         break;
     }
+}
+
+bool PPU::SpriteInRangeOfNextScanline(uint8_t yPosition)
+{
+    short diff = m_scanline - static_cast<short>(m_spriteEvalByteBuffer);
+    return diff >= 0 && diff < (m_control.spriteSize ? 16 : 8);
 }
