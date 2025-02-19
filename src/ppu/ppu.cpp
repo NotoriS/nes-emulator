@@ -382,7 +382,7 @@ uint32_t PPU::DeterminePixelColour()
 
         if (spriteZeroHit) m_status.spriteZeroHit = 1;
 
-        if (foregroundPriority) backgroundPixel == 0;
+        if (foregroundPriority) backgroundPixel = 0;
         else foregroundPixel = 0;
     }
     
