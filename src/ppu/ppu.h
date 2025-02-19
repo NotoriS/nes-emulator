@@ -162,12 +162,13 @@ private:
     uint8_t m_OAMAddress = 0x00;
 
     SpriteEvaluationState m_spriteEvalState = SpriteEvaluationState::ReadY;
-    uint8_t m_spritesFound = 0;
+    uint8_t m_spritesFoundDuringEval = 0;
     uint8_t m_spriteEvalOAMIndex = 0;
     uint8_t m_spriteEvalByteBuffer = 0;
     uint8_t m_spriteOverflowPointer = 0;
 
     uint16_t m_spritePatternAddressBuffer = 0;
+    uint8_t m_spritesOnCurrentScanline = 0;
     SpriteFragment m_spriteFragments[8];
 
     uint8_t ReadByteFromOAM(uint8_t address) const;

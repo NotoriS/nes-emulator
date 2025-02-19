@@ -293,6 +293,7 @@ void PPU::PerformTickLogic()
     }
 
     // Sprite Preparation
+    if (m_dot == 0) m_spritesOnCurrentScanline = m_spritesFoundDuringEval;
     if (m_scanline >= 0 && m_scanline < DISPLAY_HEIGHT)
     {
         // Secondary OAM Clear
@@ -343,7 +344,7 @@ uint32_t PPU::DeterminePixelColour()
 
     if (m_mask.enableSprites)
     {
-        for (char i = 0; i < m_spritesFound; i++)
+        for (char i = 0; i < m_spritesOnCurrentScanline; i++)
         {
             if (m_spriteFragments[i].xPosition != 0) continue;
 
@@ -515,7 +516,7 @@ void PPU::ShiftShifters()
     }
     if (m_mask.enableSprites && m_dot > 0 && m_dot <= DISPLAY_WIDTH)
     {
-        for (char i = 0; i < m_spritesFound; i++)
+        for (char i = 0; i < m_spritesOnCurrentScanline; i++)
         {
             if (m_spriteFragments[i].xPosition > 0)
             {
@@ -535,7 +536,7 @@ void PPU::TickSpriteEvaluation()
     if (m_dot == 65)
     {
         m_spriteEvalState = SpriteEvaluationState::ReadY;
-        m_spritesFound = 0;
+        m_spritesFoundDuringEval = 0;
         m_spriteEvalOAMIndex = 0;
     }
 
@@ -546,12 +547,12 @@ void PPU::TickSpriteEvaluation()
         m_spriteEvalState = SpriteEvaluationState::WriteY;
         break;
     case SpriteEvaluationState::WriteY:
-        if (m_spritesFound >= 8)
+        if (m_spritesFoundDuringEval >= 8)
         {
             m_spriteEvalState = SpriteEvaluationState::IncrementOAMIndex;
             break;
         }
-        m_secondaryOAM[m_spritesFound].yPosition = m_spriteEvalByteBuffer;
+        m_secondaryOAM[m_spritesFoundDuringEval].yPosition = m_spriteEvalByteBuffer;
         if (SpriteInRangeOfNextScanline(m_spriteEvalByteBuffer))
             m_spriteEvalState = SpriteEvaluationState::ReadTileIndex;
         else
@@ -562,7 +563,7 @@ void PPU::TickSpriteEvaluation()
         m_spriteEvalState = SpriteEvaluationState::WriteTileIndex;
         break;
     case SpriteEvaluationState::WriteTileIndex:
-        m_secondaryOAM[m_spritesFound].tileIndex = m_spriteEvalByteBuffer;
+        m_secondaryOAM[m_spritesFoundDuringEval].tileIndex = m_spriteEvalByteBuffer;
         m_spriteEvalState = SpriteEvaluationState::ReadAttributes;
         break;
     case SpriteEvaluationState::ReadAttributes:
@@ -570,7 +571,7 @@ void PPU::TickSpriteEvaluation()
         m_spriteEvalState = SpriteEvaluationState::WriteAttributes;
         break;
     case SpriteEvaluationState::WriteAttributes:
-        m_secondaryOAM[m_spritesFound].attributes = m_spriteEvalByteBuffer;
+        m_secondaryOAM[m_spritesFoundDuringEval].attributes = m_spriteEvalByteBuffer;
         m_spriteEvalState = SpriteEvaluationState::ReadX;
         break;
     case SpriteEvaluationState::ReadX:
@@ -578,8 +579,8 @@ void PPU::TickSpriteEvaluation()
         m_spriteEvalState = SpriteEvaluationState::WriteX;
         break;
     case SpriteEvaluationState::WriteX:
-        m_secondaryOAM[m_spritesFound].xPosition = m_spriteEvalByteBuffer;
-        m_spritesFound++;
+        m_secondaryOAM[m_spritesFoundDuringEval].xPosition = m_spriteEvalByteBuffer;
+        m_spritesFoundDuringEval++;
         m_spriteEvalState = SpriteEvaluationState::IncrementOAMIndex;
         break;
     case SpriteEvaluationState::IncrementOAMIndex:
@@ -589,7 +590,7 @@ void PPU::TickSpriteEvaluation()
             m_spriteEvalOAMIndex = 0;
             m_spriteEvalState = SpriteEvaluationState::ReadY;
         }
-        else if (m_spritesFound < 8)
+        else if (m_spritesFoundDuringEval < 8)
         {
             m_spriteEvalState = SpriteEvaluationState::ReadY;
         }
@@ -630,7 +631,7 @@ void PPU::TickSpriteFetches()
     char spriteIndex = (m_dot - DISPLAY_WIDTH) / 8;
     char fetchCycle = (m_dot - DISPLAY_WIDTH) % 8;
 
-    if (spriteIndex >= m_spritesFound) return;
+    if (spriteIndex >= m_spritesFoundDuringEval) return;
 
     uint16_t spritePatternAddress;
     if (fetchCycle == 5) // Fetch least significant bits
