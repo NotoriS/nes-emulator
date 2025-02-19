@@ -159,6 +159,10 @@ private:
     uint8_t m_spriteEvalByteBuffer = 0;
     uint8_t m_spriteOverflowPointer = 0;
 
+    uint8_t m_spritePatternLowShifters[8];
+    uint8_t m_spritePatternHighShifters[8];
+    uint16_t m_spritePatternAddressBuffer = 0;
+
     uint8_t ReadByteFromOAM(uint8_t address) const;
     uint8_t ReadByteFromSecondaryOAM(uint8_t address) const;
 
@@ -183,4 +187,6 @@ private:
     void ShiftShifters();
     void TickSpriteEvaluation();
     bool SpriteInRangeOfNextScanline(uint8_t yPosition);
+    void TickSpriteFetches();
+    static void HorizontallyFlipByte(uint8_t& byte);
 };

@@ -306,6 +306,10 @@ void PPU::PerformTickLogic()
             TickSpriteEvaluation();
         }
     }
+    if (m_scanline < DISPLAY_HEIGHT && m_dot > DISPLAY_WIDTH && m_dot <= 320)
+    {
+        TickSpriteFetches();
+    }
 }
 
 uint32_t PPU::DeterminePixelColour()
@@ -443,12 +447,28 @@ void PPU::LoadShiftersLowByte()
 
 void PPU::ShiftShifters()
 {
-    if (!m_mask.enableBackground) return;
-
-    m_patternLowShifter <<= 1;
-    m_patternHighShifter <<= 1;
-    m_attributeLowShifter <<= 1;
-    m_attributeHighShifter <<= 1;
+    if (m_mask.enableBackground)
+    {
+        m_patternLowShifter <<= 1;
+        m_patternHighShifter <<= 1;
+        m_attributeLowShifter <<= 1;
+        m_attributeHighShifter <<= 1;
+    }
+    if (m_mask.enableSprites && m_dot > 0 && m_dot <= DISPLAY_WIDTH)
+    {
+        for (char i = 0; i < 8; i++)
+        {
+            if (m_secondaryOAM[i].xPosition > 0)
+            {
+                m_secondaryOAM[i].xPosition--;
+            }
+            else
+            {
+                m_spritePatternLowShifters[i] <<= 1;
+                m_spritePatternHighShifters[i] <<= 1;
+            }
+        }
+    }
 }
 
 void PPU::TickSpriteEvaluation()
@@ -544,4 +564,42 @@ bool PPU::SpriteInRangeOfNextScanline(uint8_t yPosition)
 {
     short diff = m_scanline - static_cast<short>(m_spriteEvalByteBuffer);
     return diff >= 0 && diff < (m_control.spriteSize ? 16 : 8);
+}
+
+void PPU::TickSpriteFetches()
+{
+    char spriteIndex = (m_dot - DISPLAY_WIDTH) / 8;
+    char fetchCycle = (m_dot - DISPLAY_WIDTH) % 8;
+
+    if (spriteIndex >= m_spritesFound) return;
+
+    uint16_t spritePatternAddress;
+    if (fetchCycle == 5) // Fetch least significant bits
+    {
+        spritePatternAddress =
+            (m_control.spritePatternTable << 12)
+            | (m_secondaryOAM[spriteIndex].tileIndex << 4)
+            | (m_scanline - m_secondaryOAM[spriteIndex].yPosition);
+        // TODO: Implement vertical flipping and 8x16 sprites
+
+        m_spritePatternAddressBuffer = spritePatternAddress;
+
+        m_spritePatternLowShifters[spriteIndex] = ReadFromBus(spritePatternAddress);
+        if (m_secondaryOAM[spriteIndex].attributes & 0x40) 
+            HorizontallyFlipByte(m_spritePatternLowShifters[spriteIndex]);
+
+    }
+    else if (fetchCycle == 7) // Fetch most significant bits
+    {
+        spritePatternAddress = m_spritePatternAddressBuffer + 8;
+
+        m_spritePatternHighShifters[spriteIndex] = ReadFromBus(spritePatternAddress);
+        if (m_secondaryOAM[spriteIndex].attributes & 0x40)
+            HorizontallyFlipByte(m_spritePatternHighShifters[spriteIndex]);
+    }
+}
+
+void PPU::HorizontallyFlipByte(uint8_t& byte)
+{
+    byte = ((byte * 0x0802LU & 0x22110LU) | (byte * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16;
 }
