@@ -319,9 +319,6 @@ void PPU::PerformTickLogic()
 
 uint32_t PPU::DeterminePixelColour()
 {
-    if (!m_mask.enableBackground && !m_mask.enableSprites) 
-        return COLOUR_PALETTE[ReadFromBus(0x3F00) & 0x3F];
-
     // Determine the background pixel in this position
 
     uint8_t backgroundPixel = 0;
@@ -363,7 +360,7 @@ uint32_t PPU::DeterminePixelColour()
             if (foregroundPixel != 0)
             {
                 if (m_spriteZeroIsInSpriteFragments && i == 0) spriteZeroIsRendering = true;
-                //break;
+                break;
             }
         }
     }
