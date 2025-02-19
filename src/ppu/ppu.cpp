@@ -557,6 +557,7 @@ void PPU::TickSpriteEvaluation()
     switch (m_spriteEvalState)
     {
     case SpriteEvaluationState::ReadY:
+        if (m_dot % 2 == 0) break;
         m_spriteEvalByteBuffer = m_OAM[m_spriteEvalOAMIndex].yPosition;
         m_spriteEvalState = SpriteEvaluationState::WriteY;
         break;
@@ -603,7 +604,8 @@ void PPU::TickSpriteEvaluation()
         m_spriteEvalState = SpriteEvaluationState::CheckForSpriteOverflow;
         [[fallthrough]];
     case SpriteEvaluationState::CheckForSpriteOverflow:
-        // This is intentionally incorrect to match the buggy behaviour of the NES
+        // This section is intentionally incorrect to match the buggy behaviour of the NES
+        if (m_dot % 2 == 0) break;
         if (SpriteInRangeOfNextScanline(ReadByteFromOAM(m_spriteOverflowPointer)))
         {
             m_status.spriteOverflow = 1;
