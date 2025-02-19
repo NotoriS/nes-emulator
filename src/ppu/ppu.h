@@ -5,7 +5,6 @@
 #include "ppu-bus.h"
 #include "colour-palette.h"
 
-#include <iostream>
 #include <iomanip>
 #include <cstdint>
 #include <memory>
@@ -167,6 +166,7 @@ private:
     uint8_t m_spriteEvalByteBuffer = 0;
     uint8_t m_spriteOverflowPointer = 0;
     bool m_spriteZeroIsInSecondaryOAM = false;
+    bool m_spriteEvalCompleted = true;
 
     uint16_t m_spritePatternAddressBuffer = 0;
     uint8_t m_spritesOnCurrentScanline = 0;

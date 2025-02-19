@@ -542,6 +542,12 @@ void PPU::TickSpriteEvaluation()
 {
     if (m_dot == 65)
     {
+        if (!m_spriteEvalCompleted)
+        {
+            Logger::GetInstance().Warn(std::format("sprites passed {} were not evaluated on scanline {}", 
+                static_cast<int>(m_spriteEvalOAMIndex), static_cast<int>(m_scanline)));
+        }
+        m_spriteEvalCompleted = false;
         m_spriteEvalState = SpriteEvaluationState::ReadY;
         m_spritesFoundDuringEval = 0;
         m_spriteEvalOAMIndex = 0;
@@ -592,22 +598,6 @@ void PPU::TickSpriteEvaluation()
         if (m_spriteEvalOAMIndex == 0) m_spriteZeroIsInSecondaryOAM = true;
         m_spriteEvalState = SpriteEvaluationState::IncrementOAMIndex;
         break;
-    case SpriteEvaluationState::IncrementOAMIndex:
-        m_spriteEvalOAMIndex++;
-        if (m_spriteEvalOAMIndex == 64)
-        {
-            m_spriteEvalOAMIndex = 0;
-            m_spriteEvalState = SpriteEvaluationState::ReadY;
-        }
-        else if (m_spritesFoundDuringEval < 8)
-        {
-            m_spriteEvalState = SpriteEvaluationState::ReadY;
-        }
-        else
-        {
-            m_spriteEvalState = SpriteEvaluationState::StartCheckForSpriteOverflow;
-        }
-        break;
     case SpriteEvaluationState::StartCheckForSpriteOverflow:
         m_spriteOverflowPointer = m_spriteEvalOAMIndex * 4;
         m_spriteEvalState = SpriteEvaluationState::CheckForSpriteOverflow;
@@ -625,7 +615,28 @@ void PPU::TickSpriteEvaluation()
             m_spriteOverflowPointer += 5;
             if (m_spriteOverflowPointer < 5) m_spriteEvalState = SpriteEvaluationState::ReadY;
         }
+        m_spriteEvalOAMIndex = m_spriteOverflowPointer / 4;
         break;
+    }
+
+    if (m_spriteEvalState == SpriteEvaluationState::IncrementOAMIndex)
+    {
+        m_spriteEvalOAMIndex++;
+        if (m_spriteEvalOAMIndex == 64)
+        {
+            m_spriteEvalOAMIndex = 0;
+            m_spriteEvalCompleted = true;
+            m_spriteEvalState = SpriteEvaluationState::ReadY;
+        }
+        else if (m_spritesFoundDuringEval < 8)
+        {
+            m_spriteEvalState = SpriteEvaluationState::ReadY;
+        }
+        else
+        {
+            m_spriteEvalCompleted = true;
+            m_spriteEvalState = SpriteEvaluationState::StartCheckForSpriteOverflow;
+        }
     }
 }
 
