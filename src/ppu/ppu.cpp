@@ -521,7 +521,7 @@ void PPU::ShiftShifters()
         m_attributeLowShifter <<= 1;
         m_attributeHighShifter <<= 1;
     }
-    if (m_mask.enableSprites && m_dot > 0 && m_dot <= DISPLAY_WIDTH)
+    if (m_mask.enableSprites && m_dot > 1 && m_dot <= DISPLAY_WIDTH)
     {
         for (char i = 0; i < m_spritesOnCurrentScanline; i++)
         {
