@@ -315,6 +315,11 @@ void PPU::PerformTickLogic()
     {
         TickSpriteFetches();
     }
+
+    if (m_scanline >= 0 && m_scanline < DISPLAY_HEIGHT && m_dot > 1 && m_dot < DISPLAY_WIDTH)
+    {
+        ShiftSprites();
+    }
 }
 
 uint32_t PPU::DeterminePixelColour()
@@ -514,26 +519,28 @@ void PPU::LoadShiftersLowByte()
 
 void PPU::ShiftShifters()
 {
-    if (m_mask.enableBackground)
+    if (!m_mask.enableBackground) return;
+
+    m_patternLowShifter <<= 1;
+    m_patternHighShifter <<= 1;
+    m_attributeLowShifter <<= 1;
+    m_attributeHighShifter <<= 1;
+}
+
+void PPU::ShiftSprites()
+{
+    if (!m_mask.enableSprites) return;
+
+    for (char i = 0; i < m_spritesOnCurrentScanline; i++)
     {
-        m_patternLowShifter <<= 1;
-        m_patternHighShifter <<= 1;
-        m_attributeLowShifter <<= 1;
-        m_attributeHighShifter <<= 1;
-    }
-    if (m_mask.enableSprites && m_dot > 1 && m_dot <= DISPLAY_WIDTH)
-    {
-        for (char i = 0; i < m_spritesOnCurrentScanline; i++)
+        if (m_spriteFragments[i].xPosition > 0)
         {
-            if (m_spriteFragments[i].xPosition > 0)
-            {
-                m_spriteFragments[i].xPosition--;
-            }
-            else
-            {
-                m_spriteFragments[i].patternLowShifter <<= 1;
-                m_spriteFragments[i].patternHighShifter <<= 1;
-            }
+            m_spriteFragments[i].xPosition--;
+        }
+        else
+        {
+            m_spriteFragments[i].patternLowShifter <<= 1;
+            m_spriteFragments[i].patternHighShifter <<= 1;
         }
     }
 }

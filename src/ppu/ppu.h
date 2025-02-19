@@ -195,6 +195,7 @@ private:
     void TransferVerticalPointer();
     void LoadShiftersLowByte();
     void ShiftShifters();
+    void ShiftSprites();
     void TickSpriteEvaluation();
     bool SpriteInRangeOfNextScanline(uint8_t yPosition);
     void TickSpriteFetches();
