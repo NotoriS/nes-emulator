@@ -166,10 +166,12 @@ private:
     uint8_t m_spriteEvalOAMIndex = 0;
     uint8_t m_spriteEvalByteBuffer = 0;
     uint8_t m_spriteOverflowPointer = 0;
+    bool m_spriteZeroIsInSecondaryOAM = false;
 
     uint16_t m_spritePatternAddressBuffer = 0;
     uint8_t m_spritesOnCurrentScanline = 0;
     SpriteFragment m_spriteFragments[8];
+    bool m_spriteZeroIsInSpriteFragments = false;
 
     uint8_t ReadByteFromOAM(uint8_t address) const;
     uint8_t ReadByteFromSecondaryOAM(uint8_t address) const;

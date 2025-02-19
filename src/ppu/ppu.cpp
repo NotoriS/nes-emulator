@@ -293,7 +293,11 @@ void PPU::PerformTickLogic()
     }
 
     // Sprite Preparation
-    if (m_dot == 0) m_spritesOnCurrentScanline = m_spritesFoundDuringEval;
+    if (m_dot == 0)
+    {
+        m_spritesOnCurrentScanline = m_spritesFoundDuringEval;
+        m_spriteZeroIsInSpriteFragments = m_spriteZeroIsInSecondaryOAM;
+    }
     if (m_scanline >= 0 && m_scanline < DISPLAY_HEIGHT)
     {
         // Secondary OAM Clear
@@ -341,6 +345,7 @@ uint32_t PPU::DeterminePixelColour()
     uint8_t foregroundPixel = 0;
     uint8_t foregroundPalette = 0;
     bool foregroundPriority = 0;
+    bool spriteZeroIsRendering = false;
 
     if (m_mask.enableSprites)
     {
@@ -357,7 +362,8 @@ uint32_t PPU::DeterminePixelColour()
 
             if (foregroundPixel != 0)
             {
-                break;
+                if (m_spriteZeroIsInSpriteFragments && i == 0) spriteZeroIsRendering = true;
+                //break;
             }
         }
     }
@@ -372,6 +378,13 @@ uint32_t PPU::DeterminePixelColour()
 
     if (backgroundPixel != 0 && foregroundPixel != 0)
     {
+        bool spriteZeroHit = spriteZeroIsRendering
+            && m_dot != 255
+            && !((!m_mask.showLeftmostSprites || !m_mask.showLeftmostBackground)
+                && m_dot >= 0 && m_dot <= 7);
+
+        if (spriteZeroHit) m_status.spriteZeroHit = 1;
+
         if (foregroundPriority) backgroundPixel == 0;
         else foregroundPixel = 0;
     }
@@ -538,6 +551,7 @@ void PPU::TickSpriteEvaluation()
         m_spriteEvalState = SpriteEvaluationState::ReadY;
         m_spritesFoundDuringEval = 0;
         m_spriteEvalOAMIndex = 0;
+        m_spriteZeroIsInSecondaryOAM = false;
     }
 
     switch (m_spriteEvalState)
@@ -581,6 +595,7 @@ void PPU::TickSpriteEvaluation()
     case SpriteEvaluationState::WriteX:
         m_secondaryOAM[m_spritesFoundDuringEval].xPosition = m_spriteEvalByteBuffer;
         m_spritesFoundDuringEval++;
+        if (m_spriteEvalOAMIndex == 0) m_spriteZeroIsInSecondaryOAM = true;
         m_spriteEvalState = SpriteEvaluationState::IncrementOAMIndex;
         break;
     case SpriteEvaluationState::IncrementOAMIndex:
