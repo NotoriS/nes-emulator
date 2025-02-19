@@ -370,9 +370,6 @@ uint32_t PPU::DeterminePixelColour()
     uint8_t pixel = 0;
     uint8_t palette = 0;
 
-    pixel = foregroundPixel;
-    palette = foregroundPalette;
-
     if (backgroundPixel != 0 && foregroundPixel != 0)
     {
         bool spriteZeroHit = spriteZeroIsRendering
