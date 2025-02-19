@@ -78,6 +78,14 @@ class PPU
         uint8_t xPosition;
     };
 
+    struct SpriteFragment
+    {
+        uint8_t patternLowShifter;
+        uint8_t patternHighShifter;
+        uint8_t attributes;
+        uint8_t xPosition;
+    };
+
     enum class SpriteEvaluationState
     {
         ReadY,
@@ -159,9 +167,8 @@ private:
     uint8_t m_spriteEvalByteBuffer = 0;
     uint8_t m_spriteOverflowPointer = 0;
 
-    uint8_t m_spritePatternLowShifters[8];
-    uint8_t m_spritePatternHighShifters[8];
     uint16_t m_spritePatternAddressBuffer = 0;
+    SpriteFragment m_spriteFragments[8];
 
     uint8_t ReadByteFromOAM(uint8_t address) const;
     uint8_t ReadByteFromSecondaryOAM(uint8_t address) const;

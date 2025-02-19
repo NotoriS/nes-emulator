@@ -314,20 +314,79 @@ void PPU::PerformTickLogic()
 
 uint32_t PPU::DeterminePixelColour()
 {
-    if (!m_mask.enableBackground) 
+    if (!m_mask.enableBackground && !m_mask.enableSprites) 
         return COLOUR_PALETTE[ReadFromBus(0x3F00) & 0x3F];
 
-    uint16_t selectedBit = 0x8000 >> m_fineXScroll;
+    // Determine the background pixel in this position
 
-    uint8_t pixelLow = (m_patternLowShifter & selectedBit) != 0;
-    uint8_t pixelHigh = (m_patternHighShifter & selectedBit) != 0;
-    uint8_t backgroundPixel = (pixelHigh << 1) | pixelLow;
+    uint8_t backgroundPixel = 0;
+    uint8_t backgroundPalette = 0;
 
-    uint8_t paletteLow = (m_attributeLowShifter & selectedBit) != 0;
-    uint8_t paletteHigh = (m_attributeHighShifter & selectedBit) != 0;
-    uint8_t backgroundPalette = (paletteHigh << 1) | paletteLow;
+    if (m_mask.enableBackground)
+    {
+        uint16_t selectedBit = 0x8000 >> m_fineXScroll;
 
-    uint16_t paletteIndexAddress = 0x3F00 + (backgroundPalette << 2) + backgroundPixel;
+        uint8_t pixelLow = (m_patternLowShifter & selectedBit) != 0;
+        uint8_t pixelHigh = (m_patternHighShifter & selectedBit) != 0;
+        backgroundPixel = (pixelHigh << 1) | pixelLow;
+
+        uint8_t paletteLow = (m_attributeLowShifter & selectedBit) != 0;
+        uint8_t paletteHigh = (m_attributeHighShifter & selectedBit) != 0;
+        backgroundPalette = (paletteHigh << 1) | paletteLow;
+    }
+
+    // Determine the foreground pixel in this position
+
+    uint8_t foregroundPixel = 0;
+    uint8_t foregroundPalette = 0;
+    bool foregroundPriority = 0;
+
+    if (m_mask.enableSprites)
+    {
+        for (char i = 0; i < m_spritesFound; i++)
+        {
+            if (m_spriteFragments[i].xPosition != 0) continue;
+
+            uint8_t pixelLow = (m_spriteFragments[i].patternLowShifter & 0x80) != 0;
+            uint8_t pixelHigh = (m_spriteFragments[i].patternHighShifter & 0x80) != 0;
+            foregroundPixel = (pixelHigh << 1) | pixelLow;
+
+            foregroundPalette = (m_spriteFragments[i].attributes & 0x03) | 0x04;
+            foregroundPriority = (m_spriteFragments[i].attributes & 0x20) == 0;
+
+            if (foregroundPixel != 0)
+            {
+                break;
+            }
+        }
+    }
+
+    // Determine whether the background or foreground should be rendered
+
+    uint8_t pixel = 0;
+    uint8_t palette = 0;
+
+    pixel = foregroundPixel;
+    palette = foregroundPalette;
+
+    if (backgroundPixel != 0 && foregroundPixel != 0)
+    {
+        if (foregroundPriority) backgroundPixel == 0;
+        else foregroundPixel = 0;
+    }
+    
+    if (backgroundPixel != 0 && foregroundPixel == 0)
+    {
+        pixel = backgroundPixel;
+        palette = backgroundPalette;
+    }
+    else if (backgroundPixel == 0 && foregroundPixel != 0)
+    {
+        pixel = foregroundPixel;
+        palette = foregroundPalette;
+    }
+
+    uint16_t paletteIndexAddress = 0x3F00 + (palette << 2) + pixel;
     return COLOUR_PALETTE[ReadFromBus(paletteIndexAddress) & 0x3F];
 }
 
@@ -456,16 +515,16 @@ void PPU::ShiftShifters()
     }
     if (m_mask.enableSprites && m_dot > 0 && m_dot <= DISPLAY_WIDTH)
     {
-        for (char i = 0; i < 8; i++)
+        for (char i = 0; i < m_spritesFound; i++)
         {
-            if (m_secondaryOAM[i].xPosition > 0)
+            if (m_spriteFragments[i].xPosition > 0)
             {
-                m_secondaryOAM[i].xPosition--;
+                m_spriteFragments[i].xPosition--;
             }
             else
             {
-                m_spritePatternLowShifters[i] <<= 1;
-                m_spritePatternHighShifters[i] <<= 1;
+                m_spriteFragments[i].patternLowShifter <<= 1;
+                m_spriteFragments[i].patternHighShifter <<= 1;
             }
         }
     }
@@ -584,18 +643,21 @@ void PPU::TickSpriteFetches()
 
         m_spritePatternAddressBuffer = spritePatternAddress;
 
-        m_spritePatternLowShifters[spriteIndex] = ReadFromBus(spritePatternAddress);
+        m_spriteFragments[spriteIndex].patternLowShifter = ReadFromBus(spritePatternAddress);
         if (m_secondaryOAM[spriteIndex].attributes & 0x40) 
-            HorizontallyFlipByte(m_spritePatternLowShifters[spriteIndex]);
+            HorizontallyFlipByte(m_spriteFragments[spriteIndex].patternLowShifter);
 
     }
     else if (fetchCycle == 7) // Fetch most significant bits
     {
         spritePatternAddress = m_spritePatternAddressBuffer + 8;
 
-        m_spritePatternHighShifters[spriteIndex] = ReadFromBus(spritePatternAddress);
+        m_spriteFragments[spriteIndex].patternHighShifter = ReadFromBus(spritePatternAddress);
         if (m_secondaryOAM[spriteIndex].attributes & 0x40)
-            HorizontallyFlipByte(m_spritePatternHighShifters[spriteIndex]);
+            HorizontallyFlipByte(m_spriteFragments[spriteIndex].patternHighShifter);
+
+        m_spriteFragments[spriteIndex].attributes = m_secondaryOAM[spriteIndex].attributes;
+        m_spriteFragments[spriteIndex].xPosition = m_secondaryOAM[spriteIndex].xPosition;
     }
 }
 
