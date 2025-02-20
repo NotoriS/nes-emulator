@@ -665,12 +665,7 @@ void PPU::TickSpriteFetches()
     uint16_t spritePatternAddress;
     if (fetchCycle == 5) // Fetch least significant bits
     {
-        spritePatternAddress =
-            (m_control.spritePatternTable << 12)
-            | (m_secondaryOAM[spriteIndex].tileIndex << 4)
-            | (m_scanline - m_secondaryOAM[spriteIndex].yPosition);
-        // TODO: Implement vertical flipping and 8x16 sprites
-
+        spritePatternAddress = GetSpritePatternAddress(spriteIndex);
         m_spritePatternAddressBuffer = spritePatternAddress;
 
         m_spriteFragments[spriteIndex].patternLowShifter = ReadFromBus(spritePatternAddress);
@@ -689,6 +684,34 @@ void PPU::TickSpriteFetches()
         m_spriteFragments[spriteIndex].attributes = m_secondaryOAM[spriteIndex].attributes;
         m_spriteFragments[spriteIndex].xPosition = m_secondaryOAM[spriteIndex].xPosition;
     }
+}
+
+uint16_t PPU::GetSpritePatternAddress(const char& spriteIndex)
+{
+    bool verticalFlip = m_secondaryOAM[spriteIndex].attributes & 0x80;
+    char diff = m_scanline - m_secondaryOAM[spriteIndex].yPosition;
+
+    uint8_t patternTable;
+    uint8_t cell;
+    uint8_t row;
+
+    if (m_control.spriteSize)
+    {
+        patternTable = m_secondaryOAM[spriteIndex].tileIndex & 0x01;
+        cell = (m_secondaryOAM[spriteIndex].tileIndex & 0xFE) + (diff < 8 ? 1 : 0);
+    }
+    else
+    {
+        patternTable = m_control.spritePatternTable;
+        cell = m_secondaryOAM[spriteIndex].tileIndex;
+    }
+
+    if (verticalFlip)
+        row = (7 - diff) & 0x07;
+    else 
+        row = diff & 0x07;
+
+    return (patternTable << 12) | (cell << 4) | row;
 }
 
 void PPU::HorizontallyFlipByte(uint8_t& byte)

@@ -199,5 +199,6 @@ private:
     void TickSpriteEvaluation();
     bool SpriteInRangeOfNextScanline(uint8_t yPosition);
     void TickSpriteFetches();
+    uint16_t GetSpritePatternAddress(const char& spriteIndex);
     static void HorizontallyFlipByte(uint8_t& byte);
 };
