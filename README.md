@@ -3,8 +3,14 @@
 This emulator replicates the functionality of the classic Nintendo Entertainment System (NES). The project focuses on achieving high accuracy while adhering to clean code practices. The project aims to provide support for emulating all official NES games.
 
 ## Table of Contents
+- [Screenshots](#screenshots)
 - [Outline and Progress](#outline-and-progress)
 - [Goals](#goals)
+
+## Screenshots
+
+![Screenshot 2025-02-20 161715](https://github.com/user-attachments/assets/61942b6f-8f9f-4308-88f4-a37aff9ff5b9)
+![Screenshot 2025-02-20 162329](https://github.com/user-attachments/assets/8476395a-06e1-433b-83c9-587697cf5aee)
 
 ## Outline and Progress
 
@@ -32,14 +38,14 @@ This emulator replicates the functionality of the classic Nintendo Entertainment
   
 **Progress:** Completed
 
-### Stage 5: PPU Implementation
+### Stage 5: User Input System
+- Add support for user input using the SDL library.
+
+**Progress:** Completed
+
+### Stage 6: PPU Implementation
 - Start implementing the Picture Processing Unit (PPU) to handle graphics rendering.
 - Focus on replicating the behavior of the NES’s graphics pipeline, including background layers, sprites, and color palettes.
-
-**Progress:** In Progress
-
-### Stage 6: User Input System
-- Add support for user input using the SDL library.
 
 **Progress:** Completed
 
@@ -63,4 +69,4 @@ This emulator replicates the functionality of the classic Nintendo Entertainment
    - The codebase follows best practices for writing clean, modular, and maintainable code. This involves clear naming conventions, well-defined functions, and consistent coding style, making it easy to contribute to and extend the project.
 
 3. **Functional Programming**
-   - The CPU implementation is being developed using functional programming principles. In order to ensure that the CPU emulation is as accurate and readable as possible, the CPU state will be managed using a queue of lambda expressions. Each time a new opcode is read, the queue will be populated with single cycle micro-instructions that will be dequeued each time the CPU is clocked.
+   - The CPU implementation is being developed using functional programming principles. In order to ensure that the CPU emulation is as accurate and readable as possible, the CPU state will be managed using a queue of method pointers. Each time a new opcode is read, the queue will be populated with single cycle micro-instructions that will be dequeued each time the CPU is clocked.
