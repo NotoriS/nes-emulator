@@ -12,8 +12,10 @@ endif()
 project ("nes-emulator")
 
 # Ensure consistent runtime library
-set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+if (MSVC)
+  set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+  set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+endif()
 
 # Include external libraries
 add_subdirectory(external/SDL)
