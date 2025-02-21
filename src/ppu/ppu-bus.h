@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../interfaces/i-bus.h"
-#include "../cartridge/cartridge.h"
-
 #include <array>
 #include <cstdint>
+
+#include "../interfaces/i-bus.h"
+#include "../cartridge/cartridge.h"
 
 class PpuBus : public IBus
 {

@@ -1,13 +1,12 @@
 #pragma once
 
+#include <cstdint>
+#include <memory>
+
 #include "../debug/logger.h"
 #include "../interfaces/i-bus.h"
 #include "ppu-bus.h"
 #include "colour-palette.h"
-
-#include <iomanip>
-#include <cstdint>
-#include <memory>
 
 class PPU
 {

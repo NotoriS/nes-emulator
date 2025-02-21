@@ -1,7 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <iomanip>
+#include <cstdint>
 
 #include "../../debug/logger.h"
 #include "mapper.h"

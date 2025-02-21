@@ -1,15 +1,13 @@
 #pragma once
 
+#include <cstdint>
+#include <array>
+#include <memory>
+
 #include "../debug/logger.h"
 #include "../interfaces/i-bus.h"
 #include "../cartridge/cartridge.h"
 #include "../ppu/ppu.h"
-
-#include <cstdint>
-#include <array>
-#include <memory>
-#include <iostream>
-#include <iomanip>
 
 class CpuBus : public IBus
 {
