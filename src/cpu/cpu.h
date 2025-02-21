@@ -80,8 +80,18 @@ private:
 
     void QueueNextInstuction();
 
-    inline void Write(uint16_t address, uint8_t data);
-    inline uint8_t Read(uint16_t address);
+    inline void Write(uint16_t address, uint8_t data)
+    {
+        if (m_bus != nullptr) m_bus->Write(address, data); return;
+        Logger::GetInstance().Error("CPU tried to write to the bus before it was connected.");
+    }
+
+    inline uint8_t Read(uint16_t address)
+    {
+        if (m_bus != nullptr) return m_bus->Read(address);
+        Logger::GetInstance().Error("CPU tried to read from the bus before it was connected.");
+        return 0;
+    }
 
     void SetFlag(Flag flag, bool value);
 
