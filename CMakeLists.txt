@@ -51,11 +51,13 @@ add_executable (nes-emulator
 # Link SDL2
 target_link_libraries(nes-emulator PRIVATE SDL2 SDL2main)
 
-# Copy DLL dependencies to the executable directory
-add_custom_command(TARGET nes-emulator POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:nes-emulator> $<TARGET_FILE_DIR:nes-emulator>
-  COMMAND_EXPAND_LISTS
-)
+# Copy DLL dependencies to the executable directory on Windows
+if (WIN32)
+    add_custom_command(TARGET nes-emulator POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:nes-emulator> $<TARGET_FILE_DIR:nes-emulator>
+      COMMAND_EXPAND_LISTS
+    )
+endif()
 
 set_property(TARGET nes-emulator PROPERTY CXX_STANDARD 20)
 
