@@ -15,7 +15,7 @@ This emulator replicates the functionality of the classic Nintendo Entertainment
 ## Outline and Progress
 
 ### Stage 1: Planning and Project Architecture
-- Design an outline for programming modules the emulate the CPU, main bus, memory, and game cartridge.
+- Design an outline for modules that emulate the CPU, main bus, memory, and game cartridge.
 
 **Progress:** Completed
 
