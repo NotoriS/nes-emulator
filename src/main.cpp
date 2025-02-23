@@ -2,37 +2,79 @@
 #include <stdexcept>
 #include <chrono>
 #include <thread>
-#include <unordered_set>
+#include <iostream>
 
 #include <SDL2/SDL.h>
 
 #include "debug/logger.h"
 #include "nes.h"
 
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#endif
+
+static std::string OpenFileDialog()
+{
+    std::string command;
+    std::string filename;
+
+#ifdef _WIN32  // Windows: Use PowerShell
+    command = "powershell -Command \"Add-Type -AssemblyName System.Windows.Forms; "
+        "$f = New-Object System.Windows.Forms.OpenFileDialog; "
+        "$f.Filter = 'All Files (*.*)|*.*'; "
+        "If ($f.ShowDialog() -eq 'OK') { $f.FileName }\"";
+#elif __APPLE__  // macOS: Use AppleScript
+    command = "osascript -e 'set filename to choose file' -e 'POSIX path of filename'";
+#elif __linux__  // Linux: Use Zenity
+    command = "zenity --file-selection";
+#endif
+
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "Error opening file dialog." << std::endl;
+        return "";
+    }
+
+    char buffer[1024];
+    if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        filename = buffer;
+        filename.erase(filename.find_last_not_of(" \n\r\t") + 1); // Trim newline
+    }
+    pclose(pipe);
+
+    return filename;
+}
+
 int main(int argc, char* argv[])
 {
-    std::unordered_set<std::string> flagSet;
+    Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Disabled);
     std::string romPath;
 
-    // Sort all program arguments
+    // Handle all program arguments
     for (int i = 1; i < argc; i++)
     {
         std::string arg = argv[i];
 
-        if (arg.compare(0, 2, "--") == 0)
+        if (arg == "--filename" || arg == "-f")
         {
-            flagSet.insert(arg);
-        }
-        else
-        {
-            if (!romPath.empty())
+            if (i + 1 >= argc)
             {
-                Logger::GetInstance().Error("more than one filename provided.");
+                std::cout << "Error: no filename provided." << std::endl;
                 return -1;
             }
-            romPath = arg;
+            i++;
+            romPath = argv[i];
+            continue;
+        }
+        else if (arg == "--console-logging")
+        {
+            Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Console);
+            continue;
         }
     }
+
+    if (romPath.empty()) romPath = OpenFileDialog();
 
     // Check if a filename was provided
     if (romPath.empty())
@@ -40,12 +82,6 @@ int main(int argc, char* argv[])
         Logger::GetInstance().Error("no filename provided.");
         return -1;
     }
-
-    // Configure logging mode
-    if (flagSet.count("--console-logging"))
-        Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Console);
-    else
-        Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Disabled);
 
     // Initialize SDL components
     SDL_Window* window = nullptr;
