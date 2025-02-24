@@ -10,6 +10,7 @@
 #include "cpu/cpu.h"
 #include "cpu/cpu-bus.h"
 #include "cartridge/cartridge.h"
+#include "audio/apu.h"
 
 class NES
 {
@@ -38,6 +39,7 @@ private:
     std::shared_ptr<Cartridge> m_cartridge;
     std::shared_ptr<PPU> m_ppu;
     std::shared_ptr<PpuBus> m_ppuBus;
+    std::shared_ptr<APU> m_apu;
     std::unique_ptr<CPU> m_cpu;
     std::shared_ptr<CpuBus> m_cpuBus;
 
@@ -48,6 +50,7 @@ private:
 
     void InitializeCartridge();
     void InitializePPU();
+    void InitializeAPU();
     void InitializeCPU();
 
     void SetControllerButtonState(uint8_t controllerNumber, ControllerButton button, bool newState) const;

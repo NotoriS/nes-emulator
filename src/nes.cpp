@@ -7,11 +7,13 @@ NES::NES(const std::string& romPath) : m_romPath(romPath)
 
     InitializeCartridge();
     InitializePPU();
+    InitializeAPU();
     InitializeCPU();
 }
 
 NES::~NES()
 {
+    SDL_CloseAudio();
 }
 
 void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
@@ -31,6 +33,8 @@ void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
         m_oddCpuCycle = !m_oddCpuCycle;
         if (!m_cpuBus->TryDirectMemoryAccess(m_oddCpuCycle));
             m_cpu->Clock();
+
+        m_apu->Clock();
     }
 
     uint32_t* pixelBuffer = m_ppu->GetPixelBuffer();
@@ -122,12 +126,44 @@ void NES::InitializePPU()
     m_ppu = std::make_shared<PPU>(m_ppuBus);
 }
 
+static void AudioSampleCallback(void* userdata, Uint8* stream, int len)
+{
+    APU* apu = (APU*)userdata;
+    int16_t* buffer = (int16_t*)stream;
+    int samples = len / sizeof(int16_t);
+
+    for (int i = 0; i < samples; i++)
+        buffer[i] = apu->Sample();
+}
+
+void NES::InitializeAPU()
+{
+    m_apu = std::make_shared<APU>();
+
+    SDL_AudioSpec audioSpec;
+
+    // Configure Audio Spec
+    SDL_zero(audioSpec);
+    audioSpec.freq = 44100;           // Sample rate
+    audioSpec.format = AUDIO_S16SYS;  // Signed 16-bit PCM
+    audioSpec.channels = 1;           // Mono
+    audioSpec.samples = 512;          // Buffer size
+    audioSpec.callback = AudioSampleCallback;
+    audioSpec.userdata = m_apu.get(); // Pass our NES APU instance
+
+    if (SDL_OpenAudio(&audioSpec, NULL) < 0)
+        Logger::GetInstance().Error("SDL Open Audio Failed");
+
+    SDL_PauseAudio(0);
+}
+
 void NES::InitializeCPU()
 {
     m_cpuBus = std::make_shared<CpuBus>();
     m_cpuBus->ConnectControllers(m_controllerOneState, m_controllerTwoState);
     m_cpuBus->ConnectCartridge(m_cartridge);
     m_cpuBus->ConnectPPU(m_ppu);
+    m_cpuBus->ConnectAPU(m_apu);
     m_cpu = std::make_unique<CPU>(m_cpuBus);
 }
 

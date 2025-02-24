@@ -46,6 +46,8 @@ add_executable (nes-emulator
     "src/cpu/cpu-micro-instructions.cpp"
     "src/nes.h"
     "src/nes.cpp"
+    "src/audio/apu.h" 
+    "src/audio/apu.cpp"
 )
 
 # Link SDL2
