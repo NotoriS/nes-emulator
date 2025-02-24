@@ -26,6 +26,7 @@ void PPU::Clock()
         {
             m_scanline = -1;
             m_frameCompleted = true;
+            m_oddFrame = !m_oddFrame;
         }
     }
 }
@@ -230,6 +231,10 @@ uint8_t PPU::ReadByteFromSecondaryOAM(uint8_t address) const
 
 void PPU::PerformTickLogic()
 {
+    bool oddFrameCycleSkipped = m_oddFrame && m_scanline == -1 && m_dot == 340
+        && (m_mask.enableBackground || m_mask.enableSprites);
+    if (oddFrameCycleSkipped) m_scanline = m_dot = 0;
+
     if (m_scanline >= -1 && m_scanline < DISPLAY_HEIGHT) // Rendering scanlines
     {
         if (m_dot > 0 && m_dot <= DISPLAY_WIDTH || m_dot >= 321 && m_dot <= 336) // Rendering Cycles
@@ -271,7 +276,7 @@ void PPU::PerformTickLogic()
                 FetchFromNametable();
             }
         }
-        if (m_dot == 338 || m_dot == 340) FetchFromNametable();
+        if (m_dot == 338 || m_dot == 340 || oddFrameCycleSkipped) FetchFromNametable();
     }
 
     if (m_scanline == -1)

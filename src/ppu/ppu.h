@@ -150,6 +150,7 @@ private:
 
     short m_scanline = 0;
     short m_dot = 0;
+    bool m_oddFrame = false;
 
     uint32_t m_pixelBuffer[DISPLAY_HEIGHT * DISPLAY_WIDTH];
     bool m_frameCompleted = false;
