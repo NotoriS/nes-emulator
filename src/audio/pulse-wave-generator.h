@@ -10,12 +10,17 @@ class PulseWaveGenerator
     uint8_t m_sequence = 0;
     uint8_t m_sequenceStep = 0;
 
+    bool m_isOddClockCycle = true;
+
 public:
     PulseWaveGenerator() {}
     ~PulseWaveGenerator() {}
 
     void Clock()
     {
+        m_isOddClockCycle = !m_isOddClockCycle;
+        if (m_isOddClockCycle) return;
+
         if (m_timer == 0)
         {
             m_timer = m_maxTimerValue;
