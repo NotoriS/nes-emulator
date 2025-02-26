@@ -7,16 +7,16 @@ void AudioUtils::AudioSampleCallback(void* userdata, Uint8* stream, int len)
     APU* apu = (APU*)userdata;
     std::vector<float>& apuSampleBuffer = apu->GetBuffer();
 
-    if (apuSampleBuffer.size() > APU_SAMPLE_RATE / OUTPUT_SAMPLE_RATE)
-    {
-        LowPassFilter(apuSampleBuffer, 13000.0, APU_SAMPLE_RATE);
-        ResampleAndAppend(apuSampleBuffer, audioBuffer, APU_SAMPLE_RATE, OUTPUT_SAMPLE_RATE);
-        apuSampleBuffer.clear();
-    }
+    int samplesToCopy = len / sizeof(float);
 
-    int samplesToCopy = std::min<int>(len / sizeof(float), (int)audioBuffer.size());
+    while (apuSampleBuffer.size() < samplesToCopy * APU_SAMPLE_RATE / OUTPUT_SAMPLE_RATE) apu->Clock();
+
+    LowPassFilter(apuSampleBuffer, 5000.0, APU_SAMPLE_RATE);
+    ResampleAndAppend(apuSampleBuffer, audioBuffer, APU_SAMPLE_RATE, OUTPUT_SAMPLE_RATE);
+    apuSampleBuffer.clear();
+
     memcpy(stream, audioBuffer.data(), samplesToCopy * sizeof(float));
-    audioBuffer.erase(audioBuffer.begin(), audioBuffer.begin() + samplesToCopy);
+    audioBuffer.clear();
 }
 
 void AudioUtils::LowPassFilter(std::vector<float>& buffer, double cutoffFreq, double sampleRate)

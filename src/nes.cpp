@@ -33,8 +33,6 @@ void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
         m_oddCpuCycle = !m_oddCpuCycle;
         if (!m_cpuBus->TryDirectMemoryAccess(m_oddCpuCycle));
             m_cpu->Clock();
-
-        m_apu->Clock();
     }
 
     uint32_t* pixelBuffer = m_ppu->GetPixelBuffer();
