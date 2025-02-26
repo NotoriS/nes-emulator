@@ -111,6 +111,27 @@ void NES::CheckControllerInput(const SDL_Event& event)
     }
 }
 
+void NES::AudioSampleCallback(void* userdata, Uint8* stream, int len)
+{
+    static std::vector<float> audioBuffer;
+
+    APU* apu = (APU*)userdata;
+    std::vector<float>& apuSampleBuffer = apu->GetBuffer();
+
+    int samplesToCopy = len / sizeof(float);
+
+    // Allow SDL_Audio to dictate when the APU is clocked
+    while (apuSampleBuffer.size() < samplesToCopy * APU_SAMPLE_RATE / OUTPUT_AUDIO_SAMPLE_RATE)
+        apu->Clock();
+
+    AudioUtils::LowPassFilter(apuSampleBuffer, 5000.0, APU_SAMPLE_RATE);
+    AudioUtils::ResampleAndAppend(apuSampleBuffer, audioBuffer, APU_SAMPLE_RATE, OUTPUT_AUDIO_SAMPLE_RATE);
+    apuSampleBuffer.clear();
+
+    memcpy(stream, audioBuffer.data(), samplesToCopy * sizeof(float));
+    audioBuffer.clear();
+}
+
 void NES::InitializeCartridge()
 {
     m_cartridge = std::make_shared<Cartridge>();
@@ -132,11 +153,11 @@ void NES::InitializeAPU()
 
     // Configure Audio Spec
     SDL_zero(audioSpec);
-    audioSpec.freq = AudioUtils::OUTPUT_SAMPLE_RATE;
-    audioSpec.format = AUDIO_F32;     // 32-bit float PCM
-    audioSpec.channels = 1;           // Mono
-    audioSpec.samples = 512;          // Buffer size
-    audioSpec.callback = AudioUtils::AudioSampleCallback;
+    audioSpec.freq = OUTPUT_AUDIO_SAMPLE_RATE;
+    audioSpec.format = AUDIO_F32;  // 32-bit float PCM
+    audioSpec.channels = 1;        // Mono
+    audioSpec.samples = 512;       // Buffer size
+    audioSpec.callback = AudioSampleCallback;
     audioSpec.userdata = m_apu.get();
 
     if (SDL_OpenAudio(&audioSpec, NULL) < 0)

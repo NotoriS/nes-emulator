@@ -35,6 +35,9 @@ public:
     void CheckControllerInput(const SDL_Event& event);
 
 private:
+    static constexpr int APU_SAMPLE_RATE = 1789773;
+    static constexpr int OUTPUT_AUDIO_SAMPLE_RATE = 44100;
+
     std::string m_romPath;
 
     std::shared_ptr<Cartridge> m_cartridge;
@@ -48,6 +51,8 @@ private:
     std::shared_ptr<uint8_t> m_controllerTwoState;
 
     bool m_oddCpuCycle = false;
+
+    static void AudioSampleCallback(void* userdata, Uint8* stream, int len);
 
     void InitializeCartridge();
     void InitializePPU();
