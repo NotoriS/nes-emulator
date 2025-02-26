@@ -11,8 +11,9 @@ APU::~APU()
 void APU::Clock()
 {
     m_pulseChannelOne.Clock();
+    m_pulseChannelTwo.Clock();
 
-    float pulseSample = 95.88 / ((8128.0 / m_pulseChannelOne.Sample()) + 100.0);
+    float pulseSample = 95.88 / ((8128.0 / (m_pulseChannelOne.Sample() + m_pulseChannelTwo.Sample())) + 100.0);
     m_sampleBuffer.push_back(pulseSample);
 }
 
@@ -37,12 +38,15 @@ void APU::Write(uint16_t address, uint8_t data)
         m_pulseChannelOne.SetTimerHigh(data & 0x07);
         break;
     case 0x4004:
+        m_pulseChannelTwo.SetDuty((data & 0xC0) >> 6);
         break;
     case 0x4005:
         break;
     case 0x4006:
+        m_pulseChannelTwo.SetTimerLow(data);
         break;
     case 0x4007:
+        m_pulseChannelTwo.SetTimerHigh(data & 0x07);
         break;
     case 0x4008:
         break;

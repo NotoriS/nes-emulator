@@ -10,6 +10,7 @@ class APU
     std::vector<float> m_sampleBuffer;
 
     PulseWaveGenerator m_pulseChannelOne;
+    PulseWaveGenerator m_pulseChannelTwo;
 public:
     APU();
     ~APU();
