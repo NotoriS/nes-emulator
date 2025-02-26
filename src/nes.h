@@ -11,6 +11,7 @@
 #include "cpu/cpu-bus.h"
 #include "cartridge/cartridge.h"
 #include "audio/apu.h"
+#include "audio/audio-utils.h"
 
 class NES
 {

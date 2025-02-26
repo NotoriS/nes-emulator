@@ -48,6 +48,9 @@ add_executable (nes-emulator
     "src/nes.cpp"
     "src/audio/apu.h" 
     "src/audio/apu.cpp"
+    "src/audio/pulse-wave-generator.h" 
+    "src/audio/audio-utils.h" 
+    "src/audio/audio-utils.cpp"
 )
 
 # Link SDL2

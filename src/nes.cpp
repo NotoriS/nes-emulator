@@ -126,16 +126,6 @@ void NES::InitializePPU()
     m_ppu = std::make_shared<PPU>(m_ppuBus);
 }
 
-static void AudioSampleCallback(void* userdata, Uint8* stream, int len)
-{
-    APU* apu = (APU*)userdata;
-    int16_t* buffer = (int16_t*)stream;
-    int samples = len / sizeof(int16_t);
-
-    for (int i = 0; i < samples; i++)
-        buffer[i] = apu->Sample();
-}
-
 void NES::InitializeAPU()
 {
     m_apu = std::make_shared<APU>();
@@ -144,12 +134,12 @@ void NES::InitializeAPU()
 
     // Configure Audio Spec
     SDL_zero(audioSpec);
-    audioSpec.freq = 44100;           // Sample rate
-    audioSpec.format = AUDIO_S16SYS;  // Signed 16-bit PCM
+    audioSpec.freq = AudioUtils::OUTPUT_SAMPLE_RATE;
+    audioSpec.format = AUDIO_F32;     // 32-bit float PCM
     audioSpec.channels = 1;           // Mono
     audioSpec.samples = 512;          // Buffer size
-    audioSpec.callback = AudioSampleCallback;
-    audioSpec.userdata = m_apu.get(); // Pass our NES APU instance
+    audioSpec.callback = AudioUtils::AudioSampleCallback;
+    audioSpec.userdata = m_apu.get();
 
     if (SDL_OpenAudio(&audioSpec, NULL) < 0)
         Logger::GetInstance().Error("SDL Open Audio Failed");
