@@ -49,6 +49,7 @@ add_executable (nes-emulator
     "src/audio/apu.h" 
     "src/audio/apu.cpp"
     "src/audio/pulse-wave-generator.h" 
+    "src/audio/pulse-wave-generator.cpp" 
     "src/audio/audio-utils.h" 
     "src/audio/audio-utils.cpp"
     "src/audio/frame-counter.h" 
