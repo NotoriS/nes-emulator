@@ -26,7 +26,7 @@ void PulseWaveGenerator::Clock()
 
 float PulseWaveGenerator::Sample() const
 {
-    if (m_sequence & (0x80 >> m_sequenceStep)) return 1.0;
+    if (m_sequence & (0x80 >> m_sequenceStep)) return m_volume;
     else return 0.0;
 }
 

@@ -16,7 +16,7 @@ void APU::Clock()
     m_pulseChannel[1].Clock();
 
     float pulseSample = 95.88F / ((8128.0F / (m_pulseChannel[0].Sample() + m_pulseChannel[1].Sample())) + 100.0F);
-    m_sampleBuffer.push_back(pulseSample);
+    m_sampleBuffer.push_back(pulseSample * AudioConstants::MASTER_VOLUME);
 }
 
 uint8_t APU::Read(uint16_t address)
@@ -30,6 +30,9 @@ void APU::Write(uint16_t address, uint8_t data)
     {
     case 0x4000:
         m_pulseChannel[0].SetDuty((data & 0xC0) >> 6);
+        m_pulseChannel[0].SetInfinitePlayFlag(data & 0x20);
+        m_pulseChannel[0].SetConstantVolumeFlag(data & 0x10);
+        m_pulseChannel[0].SetVolume(data & 0x0F);
         break;
     case 0x4001:
         break;
@@ -41,6 +44,9 @@ void APU::Write(uint16_t address, uint8_t data)
         break;
     case 0x4004:
         m_pulseChannel[1].SetDuty((data & 0xC0) >> 6);
+        m_pulseChannel[1].SetInfinitePlayFlag(data & 0x20);
+        m_pulseChannel[1].SetConstantVolumeFlag(data & 0x10);
+        m_pulseChannel[1].SetVolume(data & 0x0F);
         break;
     case 0x4005:
         break;
