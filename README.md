@@ -63,7 +63,7 @@ This emulator replicates the functionality of the classic Nintendo Entertainment
 ## Goals
 
 1. **Accuracy**
-   - The emulator aims to replicate the NES hardware as accurately as possible, with particular attention to the behavior of the 6502 CPU, the PPU’s rendering pipeline, and the APU's sound channels. The goal is to ensure that games run faithfully to their original versions.
+   - The emulator aims to replicate the NES hardware as accurately as possible, with particular attention to the behavior of the 6502 CPU, and the PPU’s rendering pipeline. The goal is to ensure that games run faithfully to their original versions.
 
 2. **Clean Code**
    - The codebase follows best practices for writing clean, modular, and maintainable code. This involves clear naming conventions, well-defined functions, and consistent coding style, making it easy to contribute to and extend the project.
