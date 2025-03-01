@@ -3,14 +3,18 @@
 #include <cstdint>
 #include <vector>
 
+#include "frame-counter.h"
 #include "pulse-wave-generator.h"
 
 class APU
 {
     std::vector<float> m_sampleBuffer;
 
+    FrameCounter m_frameCounter;
+
     PulseWaveGenerator m_pulseChannelOne;
     PulseWaveGenerator m_pulseChannelTwo;
+
 public:
     APU();
     ~APU();

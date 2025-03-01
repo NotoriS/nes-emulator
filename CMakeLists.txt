@@ -51,6 +51,9 @@ add_executable (nes-emulator
     "src/audio/pulse-wave-generator.h" 
     "src/audio/audio-utils.h" 
     "src/audio/audio-utils.cpp"
+    "src/audio/frame-counter.h" 
+    "src/audio/frame-counter.cpp" 
+    "src/audio/audio-constants.h"
 )
 
 # Link SDL2

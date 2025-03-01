@@ -31,7 +31,7 @@ void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
             m_cpu->Interrupt(CPU::InterruptType::NMI);
 
         m_oddCpuCycle = !m_oddCpuCycle;
-        if (!m_cpuBus->TryDirectMemoryAccess(m_oddCpuCycle));
+        if (!m_cpuBus->TryDirectMemoryAccess(m_oddCpuCycle))
             m_cpu->Clock();
     }
 
@@ -121,11 +121,11 @@ void NES::AudioSampleCallback(void* userdata, Uint8* stream, int len)
     int samplesToCopy = len / sizeof(float);
 
     // Allow SDL_Audio to dictate when the APU is clocked
-    while (apuSampleBuffer.size() < samplesToCopy * APU_SAMPLE_RATE / OUTPUT_AUDIO_SAMPLE_RATE)
+    while (apuSampleBuffer.size() < samplesToCopy * AudioConstants::CLOCK_RATE / OUTPUT_AUDIO_SAMPLE_RATE)
         apu->Clock();
 
-    AudioUtils::LowPassFilter(apuSampleBuffer, 5000.0, APU_SAMPLE_RATE);
-    AudioUtils::ResampleAndAppend(apuSampleBuffer, audioBuffer, APU_SAMPLE_RATE, OUTPUT_AUDIO_SAMPLE_RATE);
+    AudioUtils::LowPassFilter(apuSampleBuffer, 5000.0, AudioConstants::CLOCK_RATE);
+    AudioUtils::ResampleAndAppend(apuSampleBuffer, audioBuffer, AudioConstants::CLOCK_RATE, OUTPUT_AUDIO_SAMPLE_RATE);
     apuSampleBuffer.clear();
 
     memcpy(stream, audioBuffer.data(), samplesToCopy * sizeof(float));

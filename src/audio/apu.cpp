@@ -10,10 +10,12 @@ APU::~APU()
 
 void APU::Clock()
 {
+    m_frameCounter.Clock();
+
     m_pulseChannelOne.Clock();
     m_pulseChannelTwo.Clock();
 
-    float pulseSample = 95.88 / ((8128.0 / (m_pulseChannelOne.Sample() + m_pulseChannelTwo.Sample())) + 100.0);
+    float pulseSample = 95.88F / ((8128.0F / (m_pulseChannelOne.Sample() + m_pulseChannelTwo.Sample())) + 100.0F);
     m_sampleBuffer.push_back(pulseSample);
 }
 

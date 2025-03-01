@@ -12,6 +12,7 @@
 #include "cartridge/cartridge.h"
 #include "audio/apu.h"
 #include "audio/audio-utils.h"
+#include "audio/audio-constants.h"
 
 class NES
 {
@@ -35,7 +36,6 @@ public:
     void CheckControllerInput(const SDL_Event& event);
 
 private:
-    static constexpr int APU_SAMPLE_RATE = 1789773;
     static constexpr int OUTPUT_AUDIO_SAMPLE_RATE = 44100;
 
     std::string m_romPath;
