@@ -12,8 +12,7 @@ class APU
 
     FrameCounter m_frameCounter;
 
-    PulseWaveGenerator m_pulseChannelOne;
-    PulseWaveGenerator m_pulseChannelTwo;
+    PulseWaveGenerator m_pulseChannel[2];
 
 public:
     APU();
