@@ -10,7 +10,7 @@ class APU
 {
     std::vector<float> m_sampleBuffer;
 
-    FrameCounter m_frameCounter;
+    std::unique_ptr<FrameCounter> m_frameCounter;
 
     PulseWaveGenerator m_pulseChannel[2];
 

@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "audio-constants.h"
+#include "pulse-wave-generator.h"
 
 class FrameCounter
 {
@@ -13,8 +14,10 @@ class FrameCounter
     uint8_t m_frameStep = 0; // Value 1-5 holding most recent step given the current mode
     double m_clockAccumulator = 0;
 
+    PulseWaveGenerator (&m_pulseChannel)[2];
+
 public:
-    FrameCounter();
+    FrameCounter(PulseWaveGenerator (&pulseChannel)[2]);
     ~FrameCounter();
 
     void Clock();

@@ -2,12 +2,15 @@
 
 #include <cstdint>
 
+#include "length-counter-lookup.h"
 #include "../debug/logger.h"
 
 class PulseWaveGenerator
 {
     uint16_t m_maxTimerValue = 0;
     uint16_t m_timer = 0;
+
+    uint8_t m_lengthCounter = 0;
 
     uint8_t m_sequence = 0;
     uint8_t m_sequenceStep = 0;
@@ -32,4 +35,7 @@ public:
     inline void SetVolume(uint8_t volume) { m_volume = volume; }
     void SetTimerLow(uint8_t timerLow);
     void SetTimerHigh(uint8_t timerHigh);
+    void SetLengthCounter(uint8_t lookupIndex);
+
+    void DecrementLengthCounter();
 };

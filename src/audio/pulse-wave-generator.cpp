@@ -26,8 +26,10 @@ void PulseWaveGenerator::Clock()
 
 float PulseWaveGenerator::Sample() const
 {
-    if (m_sequence & (0x80 >> m_sequenceStep)) return m_volume;
-    else return 0.0;
+    if (!(m_sequence & (0x80 >> m_sequenceStep))) return 0.0F;
+    if (m_lengthCounter == 0) return 0.0F;
+    
+    return m_volume;
 }
 
 void PulseWaveGenerator::SetDuty(uint8_t duty)
@@ -52,4 +54,15 @@ void PulseWaveGenerator::SetTimerHigh(uint8_t timerHigh)
 {
     m_maxTimerValue &= 0x00FF;
     m_maxTimerValue |= (timerHigh << 8);
+}
+
+void PulseWaveGenerator::SetLengthCounter(uint8_t lookupIndex)
+{
+    m_lengthCounter = LENGTH_COUNTER_LOOKUP[lookupIndex];
+    m_sequenceStep = 0;
+}
+
+void PulseWaveGenerator::DecrementLengthCounter()
+{
+    if (m_lengthCounter > 0 && !m_infinitePlay) m_lengthCounter--;
 }

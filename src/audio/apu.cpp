@@ -2,6 +2,7 @@
 
 APU::APU()
 {
+    m_frameCounter = std::make_unique<FrameCounter>(m_pulseChannel);
 }
 
 APU::~APU()
@@ -10,7 +11,7 @@ APU::~APU()
 
 void APU::Clock()
 {
-    m_frameCounter.Clock();
+    m_frameCounter->Clock();
 
     m_pulseChannel[0].Clock();
     m_pulseChannel[1].Clock();
@@ -41,6 +42,7 @@ void APU::Write(uint16_t address, uint8_t data)
         break;
     case 0x4003:
         m_pulseChannel[0].SetTimerHigh(data & 0x07);
+        m_pulseChannel[0].SetLengthCounter(data >> 3);
         break;
     case 0x4004:
         m_pulseChannel[1].SetDuty((data & 0xC0) >> 6);
@@ -55,6 +57,7 @@ void APU::Write(uint16_t address, uint8_t data)
         break;
     case 0x4007:
         m_pulseChannel[1].SetTimerHigh(data & 0x07);
+        m_pulseChannel[1].SetLengthCounter(data >> 3);
         break;
     case 0x4008:
         break;

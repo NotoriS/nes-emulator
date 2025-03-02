@@ -1,6 +1,7 @@
 #include "frame-counter.h"
 
-FrameCounter::FrameCounter()
+FrameCounter::FrameCounter(PulseWaveGenerator (&pulseChannel)[2])
+    : m_pulseChannel(pulseChannel)
 {
 }
 
@@ -58,6 +59,8 @@ void FrameCounter::FiveStepTick()
 
 void FrameCounter::TickLengthCounterAndSweep()
 {
+    m_pulseChannel[0].DecrementLengthCounter();
+    m_pulseChannel[1].DecrementLengthCounter();
     // TODO
 }
 
