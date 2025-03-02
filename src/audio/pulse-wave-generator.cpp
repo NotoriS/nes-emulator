@@ -29,7 +29,7 @@ float PulseWaveGenerator::Sample() const
     if (!(m_sequence & (0x80 >> m_sequenceStep))) return 0.0F;
     if (m_lengthCounter == 0) return 0.0F;
     
-    return m_volume;
+    return m_constantVolume ? m_volume : m_envelope.GetVolume();
 }
 
 void PulseWaveGenerator::SetDuty(uint8_t duty)

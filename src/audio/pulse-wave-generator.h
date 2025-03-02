@@ -2,11 +2,14 @@
 
 #include <cstdint>
 
+#include "envelope.h"
 #include "length-counter-lookup.h"
 #include "../debug/logger.h"
 
 class PulseWaveGenerator
 {
+    Envelope m_envelope;
+
     uint16_t m_maxTimerValue = 0;
     uint16_t m_timer = 0;
 
@@ -30,12 +33,15 @@ public:
     float Sample() const;
 
     void SetDuty(uint8_t duty);
-    inline void SetInfinitePlayFlag(bool value) { m_infinitePlay = value; }
+    inline void SetInfinitePlayFlag(bool value) { m_infinitePlay = value; m_envelope.SetLoopMode(value); }
     inline void SetConstantVolumeFlag(bool value) { m_constantVolume = value; }
-    inline void SetVolume(uint8_t volume) { m_volume = volume; }
+    inline void SetVolume(uint8_t volume) { m_volume = volume; m_envelope.SetPeriod(volume); }
     void SetTimerLow(uint8_t timerLow);
     void SetTimerHigh(uint8_t timerHigh);
     void SetLengthCounter(uint8_t lookupIndex);
+
+    void ClockEnvelope() { m_envelope.Clock(); }
+    void RestartEnvelope() { m_envelope.Restart(); }
 
     void DecrementLengthCounter();
 };

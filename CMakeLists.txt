@@ -56,6 +56,8 @@ add_executable (nes-emulator
     "src/audio/frame-counter.cpp" 
     "src/audio/audio-constants.h"
     "src/audio/length-counter-lookup.h"
+    "src/audio/envelope.h" 
+    "src/audio/envelope.cpp"
 )
 
 # Link SDL2

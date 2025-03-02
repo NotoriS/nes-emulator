@@ -66,5 +66,7 @@ void FrameCounter::TickLengthCounterAndSweep()
 
 void FrameCounter::TickEnvelopeAndLinearCounter()
 {
+    m_pulseChannel[0].ClockEnvelope();
+    m_pulseChannel[1].ClockEnvelope();
     // TODO
 }

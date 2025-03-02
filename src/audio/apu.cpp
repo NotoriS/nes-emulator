@@ -43,6 +43,7 @@ void APU::Write(uint16_t address, uint8_t data)
     case 0x4003:
         m_pulseChannel[0].SetTimerHigh(data & 0x07);
         m_pulseChannel[0].SetLengthCounter(data >> 3);
+        m_pulseChannel[0].RestartEnvelope();
         break;
     case 0x4004:
         m_pulseChannel[1].SetDuty((data & 0xC0) >> 6);
@@ -58,6 +59,7 @@ void APU::Write(uint16_t address, uint8_t data)
     case 0x4007:
         m_pulseChannel[1].SetTimerHigh(data & 0x07);
         m_pulseChannel[1].SetLengthCounter(data >> 3);
+        m_pulseChannel[1].RestartEnvelope();
         break;
     case 0x4008:
         break;
