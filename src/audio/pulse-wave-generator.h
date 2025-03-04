@@ -54,6 +54,8 @@ public:
     void SetLengthCounter(uint8_t lookupIndex);
     void SetChannelNumber(uint8_t number) { m_channelNumber = number; }
 
+    void RestartSequencer() { m_sequenceStep = 0; }
+
     void ClockEnvelope() { m_envelope.Clock(); }
     void RestartEnvelope() { m_envelope.Restart(); }
 
