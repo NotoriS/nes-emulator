@@ -101,7 +101,11 @@ void PulseWaveGenerator::ClockSweepUnit()
     if (m_sweepDivider == 0 && m_sweepEnabled && m_sweepShiftCount != 0)
     {
         bool sweepIsMuting = m_timerPeriod < 8 || m_sweepTargetPeriod > 0x7FF;
-        if (!sweepIsMuting) m_timerPeriod = m_sweepTargetPeriod;
+        if (!sweepIsMuting)
+        {
+            m_timerPeriod = m_sweepTargetPeriod;
+            CalculateSweepTargetPeriod();
+        }
     }
 
     if (m_sweepDivider == 0 || m_sweepReloadFlag)
