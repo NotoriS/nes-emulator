@@ -61,12 +61,13 @@ void FrameCounter::TickLengthCounterAndSweep()
 {
     m_pulseChannel[0].DecrementLengthCounter();
     m_pulseChannel[1].DecrementLengthCounter();
-    // TODO
+    
+    m_pulseChannel[0].ClockSweepUnit();
+    m_pulseChannel[1].ClockSweepUnit();
 }
 
 void FrameCounter::TickEnvelopeAndLinearCounter()
 {
     m_pulseChannel[0].ClockEnvelope();
     m_pulseChannel[1].ClockEnvelope();
-    // TODO
 }

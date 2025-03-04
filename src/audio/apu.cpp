@@ -3,6 +3,8 @@
 APU::APU()
 {
     m_frameCounter = std::make_unique<FrameCounter>(m_pulseChannel);
+    m_pulseChannel[0].SetChannelNumber(1);
+    m_pulseChannel[1].SetChannelNumber(2);
 }
 
 APU::~APU()
@@ -36,6 +38,7 @@ void APU::Write(uint16_t address, uint8_t data)
         m_pulseChannel[0].SetVolume(data & 0x0F);
         break;
     case 0x4001:
+        m_pulseChannel[0].UpdateSweepSettings(data);
         break;
     case 0x4002:
         m_pulseChannel[0].SetTimerLow(data);
@@ -52,6 +55,7 @@ void APU::Write(uint16_t address, uint8_t data)
         m_pulseChannel[1].SetVolume(data & 0x0F);
         break;
     case 0x4005:
+        m_pulseChannel[1].UpdateSweepSettings(data);
         break;
     case 0x4006:
         m_pulseChannel[1].SetTimerLow(data);
@@ -86,8 +90,11 @@ void APU::Write(uint16_t address, uint8_t data)
     case 0x4013:
         break;
     case 0x4015:
+        m_pulseChannel[0].SetEnabled(data & 0x01);
+        m_pulseChannel[1].SetEnabled(data & 0x02);
         break;
     case 0x4017:
+        m_frameCounter->SetFiveStepMode(data & 0x80);
         break;
     default:
         Logger::GetInstance().Warn("unexpected write to APU at address " + static_cast<int>(address));
