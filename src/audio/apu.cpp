@@ -99,7 +99,7 @@ void APU::Write(uint16_t address, uint8_t data)
         m_frameCounter->SetFiveStepMode(data & 0x80);
         break;
     default:
-        Logger::GetInstance().Warn("unexpected write to APU at address " + static_cast<int>(address));
+        Logger::GetInstance().Warn(std::format("unexpected write to APU at address {}", static_cast<int>(address)));
         break;
     }
 }

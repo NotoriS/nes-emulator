@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <vector>
+#include <memory>
+#include <format>
 
 #include "frame-counter.h"
 #include "pulse-wave-generator.h"
