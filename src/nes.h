@@ -10,6 +10,9 @@
 #include "cpu/cpu.h"
 #include "cpu/cpu-bus.h"
 #include "cartridge/cartridge.h"
+#include "audio/apu.h"
+#include "audio/audio-utils.h"
+#include "audio/audio-constants.h"
 
 class NES
 {
@@ -33,11 +36,14 @@ public:
     void CheckControllerInput(const SDL_Event& event);
 
 private:
+    static constexpr int OUTPUT_AUDIO_SAMPLE_RATE = 44100;
+
     std::string m_romPath;
 
     std::shared_ptr<Cartridge> m_cartridge;
     std::shared_ptr<PPU> m_ppu;
     std::shared_ptr<PpuBus> m_ppuBus;
+    std::shared_ptr<APU> m_apu;
     std::unique_ptr<CPU> m_cpu;
     std::shared_ptr<CpuBus> m_cpuBus;
 
@@ -46,8 +52,11 @@ private:
 
     bool m_oddCpuCycle = false;
 
+    static void AudioSampleCallback(void* userdata, Uint8* stream, int len);
+
     void InitializeCartridge();
     void InitializePPU();
+    void InitializeAPU();
     void InitializeCPU();
 
     void SetControllerButtonState(uint8_t controllerNumber, ControllerButton button, bool newState) const;

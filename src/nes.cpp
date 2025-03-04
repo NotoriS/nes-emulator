@@ -7,11 +7,13 @@ NES::NES(const std::string& romPath) : m_romPath(romPath)
 
     InitializeCartridge();
     InitializePPU();
+    InitializeAPU();
     InitializeCPU();
 }
 
 NES::~NES()
 {
+    SDL_CloseAudio();
 }
 
 void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
@@ -29,7 +31,7 @@ void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
             m_cpu->Interrupt(CPU::InterruptType::NMI);
 
         m_oddCpuCycle = !m_oddCpuCycle;
-        if (!m_cpuBus->TryDirectMemoryAccess(m_oddCpuCycle));
+        if (!m_cpuBus->TryDirectMemoryAccess(m_oddCpuCycle))
             m_cpu->Clock();
     }
 
@@ -109,6 +111,27 @@ void NES::CheckControllerInput(const SDL_Event& event)
     }
 }
 
+void NES::AudioSampleCallback(void* userdata, Uint8* stream, int len)
+{
+    static std::vector<float> audioBuffer;
+
+    APU* apu = (APU*)userdata;
+    std::vector<float>& apuSampleBuffer = apu->GetBuffer();
+
+    int samplesToCopy = len / sizeof(float);
+
+    // Allow SDL_Audio to dictate when the APU is clocked
+    while (apuSampleBuffer.size() < samplesToCopy * AudioConstants::CLOCK_RATE / OUTPUT_AUDIO_SAMPLE_RATE)
+        apu->Clock();
+
+    AudioUtils::LowPassFilter(apuSampleBuffer, 5000.0, AudioConstants::CLOCK_RATE);
+    AudioUtils::ResampleAndAppend(apuSampleBuffer, audioBuffer, AudioConstants::CLOCK_RATE, OUTPUT_AUDIO_SAMPLE_RATE);
+    apuSampleBuffer.clear();
+
+    memcpy(stream, audioBuffer.data(), samplesToCopy * sizeof(float));
+    audioBuffer.clear();
+}
+
 void NES::InitializeCartridge()
 {
     m_cartridge = std::make_shared<Cartridge>();
@@ -122,12 +145,34 @@ void NES::InitializePPU()
     m_ppu = std::make_shared<PPU>(m_ppuBus);
 }
 
+void NES::InitializeAPU()
+{
+    m_apu = std::make_shared<APU>();
+
+    SDL_AudioSpec audioSpec;
+
+    // Configure Audio Spec
+    SDL_zero(audioSpec);
+    audioSpec.freq = OUTPUT_AUDIO_SAMPLE_RATE;
+    audioSpec.format = AUDIO_F32;  // 32-bit float PCM
+    audioSpec.channels = 1;        // Mono
+    audioSpec.samples = 512;       // Buffer size
+    audioSpec.callback = AudioSampleCallback;
+    audioSpec.userdata = m_apu.get();
+
+    if (SDL_OpenAudio(&audioSpec, NULL) < 0)
+        Logger::GetInstance().Error("SDL Open Audio Failed");
+
+    SDL_PauseAudio(0);
+}
+
 void NES::InitializeCPU()
 {
     m_cpuBus = std::make_shared<CpuBus>();
     m_cpuBus->ConnectControllers(m_controllerOneState, m_controllerTwoState);
     m_cpuBus->ConnectCartridge(m_cartridge);
     m_cpuBus->ConnectPPU(m_ppu);
+    m_cpuBus->ConnectAPU(m_apu);
     m_cpu = std::make_unique<CPU>(m_cpuBus);
 }
 

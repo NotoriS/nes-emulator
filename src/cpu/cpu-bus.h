@@ -8,6 +8,7 @@
 #include "../interfaces/i-bus.h"
 #include "../cartridge/cartridge.h"
 #include "../ppu/ppu.h"
+#include "../audio/apu.h"
 
 class CpuBus : public IBus
 {
@@ -21,6 +22,7 @@ public:
 	void ConnectControllers(std::shared_ptr<uint8_t> controllerOneState, std::shared_ptr<uint8_t> controllerTwoState);
 	void ConnectCartridge(std::shared_ptr<Cartridge> cartridge) { m_cartridge = cartridge; }
 	void ConnectPPU(std::shared_ptr<PPU> ppu) { m_ppu = ppu; }
+	void ConnectAPU(std::shared_ptr<APU> apu) { m_apu = apu; }
 
 	bool TryDirectMemoryAccess(bool cycleIsOdd);
 
@@ -31,6 +33,7 @@ private:
     std::shared_ptr<uint8_t> m_controllerTwoState;
 	std::shared_ptr<Cartridge> m_cartridge;
 	std::shared_ptr<PPU> m_ppu;
+	std::shared_ptr<APU> m_apu;
 
 	uint8_t m_controllerOneShifter = 0x00;
 	uint8_t m_controllerTwoShifter = 0x00;

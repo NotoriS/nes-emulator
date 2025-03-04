@@ -46,6 +46,18 @@ add_executable (nes-emulator
     "src/cpu/cpu-micro-instructions.cpp"
     "src/nes.h"
     "src/nes.cpp"
+    "src/audio/apu.h" 
+    "src/audio/apu.cpp"
+    "src/audio/pulse-wave-generator.h" 
+    "src/audio/pulse-wave-generator.cpp" 
+    "src/audio/audio-utils.h" 
+    "src/audio/audio-utils.cpp"
+    "src/audio/frame-counter.h" 
+    "src/audio/frame-counter.cpp" 
+    "src/audio/audio-constants.h"
+    "src/audio/length-counter-lookup.h"
+    "src/audio/envelope.h" 
+    "src/audio/envelope.cpp"
 )
 
 # Link SDL2
