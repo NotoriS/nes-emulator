@@ -44,7 +44,7 @@ public:
     void Clock();
     float Sample() const;
 
-    void SetEnabled(bool value) { m_enabled = value; }
+    void SetEnabled(bool value);
     void SetDuty(uint8_t duty);
     inline void SetInfinitePlayFlag(bool value) { m_infinitePlay = value; m_envelope.SetLoopMode(value); }
     inline void SetConstantVolumeFlag(bool value) { m_constantVolume = value; }

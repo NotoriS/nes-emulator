@@ -35,6 +35,12 @@ float PulseWaveGenerator::Sample() const
     return m_constantVolume ? m_volume : m_envelope.GetVolume();
 }
 
+void PulseWaveGenerator::SetEnabled(bool value)
+{
+    m_enabled = value;
+    if (!m_enabled) m_lengthCounter = 0;
+}
+
 void PulseWaveGenerator::SetDuty(uint8_t duty)
 {
     switch (duty)
@@ -65,6 +71,8 @@ void PulseWaveGenerator::SetTimerHigh(uint8_t timerHigh)
 
 void PulseWaveGenerator::SetLengthCounter(uint8_t lookupIndex)
 {
+    if (!m_enabled) return;
+
     m_lengthCounter = LENGTH_COUNTER_LOOKUP[lookupIndex];
     m_sequenceStep = 0;
 }
