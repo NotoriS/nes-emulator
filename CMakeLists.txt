@@ -58,6 +58,8 @@ add_executable (nes-emulator
     "src/audio/length-counter-lookup.h"
     "src/audio/envelope.h" 
     "src/audio/envelope.cpp"
+    "src/audio/triangle-wave-generator.h" 
+    "src/audio/triangle-wave-generator.cpp"
 )
 
 # Link SDL2
