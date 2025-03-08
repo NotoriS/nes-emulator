@@ -79,7 +79,7 @@ void PulseWaveGenerator::SetLengthCounter(uint8_t lookupIndex)
 
 void PulseWaveGenerator::DecrementLengthCounter()
 {
-    if (m_lengthCounter > 0 && !m_infinitePlay && m_enabled) m_lengthCounter--;
+    if (m_lengthCounter > 0 && !m_infinitePlay) m_lengthCounter--;
 }
 
 void PulseWaveGenerator::UpdateSweepSettings(uint8_t settings)
