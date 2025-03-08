@@ -29,6 +29,6 @@ private:
     void FourStepTick();
     void FiveStepTick();
 
-    void TickLengthCounterAndSweep();
-    void TickEnvelopeAndLinearCounter();
+    void ClockLengthCounterAndSweep();
+    void ClockEnvelopeAndLinearCounter();
 };

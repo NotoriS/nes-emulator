@@ -40,34 +40,34 @@ void FrameCounter::SetFiveStepMode(bool value)
 
     if (m_fiveStepModeEnabled)
     {
-        TickLengthCounterAndSweep();
-        TickEnvelopeAndLinearCounter();
+        ClockLengthCounterAndSweep();
+        ClockEnvelopeAndLinearCounter();
     }
 }
 
 void FrameCounter::FourStepTick()
 {
-    if (m_frameStep == 2 || m_frameStep == 4) TickLengthCounterAndSweep();
-    TickEnvelopeAndLinearCounter();
+    if (m_frameStep == 2 || m_frameStep == 4) ClockLengthCounterAndSweep();
+    ClockEnvelopeAndLinearCounter();
 }
 
 void FrameCounter::FiveStepTick()
 {
-    if (m_frameStep == 2 || m_frameStep == 5) TickLengthCounterAndSweep();
-    if (m_frameStep != 4) TickEnvelopeAndLinearCounter();
+    if (m_frameStep == 2 || m_frameStep == 5) ClockLengthCounterAndSweep();
+    if (m_frameStep != 4) ClockEnvelopeAndLinearCounter();
 }
 
-void FrameCounter::TickLengthCounterAndSweep()
+void FrameCounter::ClockLengthCounterAndSweep()
 {
-    m_pulseChannel[0].DecrementLengthCounter();
-    m_pulseChannel[1].DecrementLengthCounter();
+    m_pulseChannel[0].ClockLengthCounter();
+    m_pulseChannel[1].ClockLengthCounter();
     m_triangleChannel.ClockLengthCounter();
     
     m_pulseChannel[0].ClockSweepUnit();
     m_pulseChannel[1].ClockSweepUnit();
 }
 
-void FrameCounter::TickEnvelopeAndLinearCounter()
+void FrameCounter::ClockEnvelopeAndLinearCounter()
 {
     m_pulseChannel[0].ClockEnvelope();
     m_pulseChannel[1].ClockEnvelope();
