@@ -59,7 +59,7 @@ public:
     void ClockEnvelope() { m_envelope.Clock(); }
     void RestartEnvelope() { m_envelope.Restart(); }
 
-    void DecrementLengthCounter();
+    void ClockLengthCounter();
 
     void UpdateSweepSettings(uint8_t settings);
     void CalculateSweepTargetPeriod();
