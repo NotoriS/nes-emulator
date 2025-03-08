@@ -4,6 +4,7 @@
 
 #include "audio-constants.h"
 #include "pulse-wave-generator.h"
+#include "triangle-wave-generator.h"
 
 class FrameCounter
 {
@@ -15,9 +16,10 @@ class FrameCounter
     double m_clockAccumulator = 0;
 
     PulseWaveGenerator (&m_pulseChannel)[2];
+    TriangleWaveGenerator& m_triangleChannel;
 
 public:
-    FrameCounter(PulseWaveGenerator (&pulseChannel)[2]);
+    FrameCounter(PulseWaveGenerator (&pulseChannel)[2], TriangleWaveGenerator& triangleChannel);
     ~FrameCounter();
 
     void Clock();

@@ -7,6 +7,7 @@
 
 #include "frame-counter.h"
 #include "pulse-wave-generator.h"
+#include "triangle-wave-generator.h"
 
 class APU
 {
@@ -15,6 +16,7 @@ class APU
     std::unique_ptr<FrameCounter> m_frameCounter;
 
     PulseWaveGenerator m_pulseChannel[2];
+    TriangleWaveGenerator m_triangleChannel;
 
 public:
     APU();
