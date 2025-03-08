@@ -60,6 +60,8 @@ add_executable (nes-emulator
     "src/audio/envelope.cpp"
     "src/audio/triangle-wave-generator.h" 
     "src/audio/triangle-wave-generator.cpp"
+    "src/audio/noise-generator.h" 
+    "src/audio/noise-generator.cpp"
 )
 
 # Link SDL2
