@@ -5,7 +5,7 @@
 #include "envelope.h"
 #include "length-counter-lookup.h"
 
-const uint8_t NOISE_TIMER_PEROID_LOOKUP[]
+const uint16_t NOISE_TIMER_PEROID_LOOKUP[]
     { 4, 8, 16, 32, 64, 96, 128, 160, 202, 
     254, 380, 508, 762, 1016, 2034, 4068 };
 
