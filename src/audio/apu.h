@@ -8,6 +8,7 @@
 #include "frame-counter.h"
 #include "pulse-wave-generator.h"
 #include "triangle-wave-generator.h"
+#include "noise-generator.h"
 
 class APU
 {
@@ -17,6 +18,7 @@ class APU
 
     PulseWaveGenerator m_pulseChannel[2];
     TriangleWaveGenerator m_triangleChannel;
+    NoiseGenerator m_noiseChannel;
 
 public:
     APU();

@@ -5,6 +5,7 @@
 #include "audio-constants.h"
 #include "pulse-wave-generator.h"
 #include "triangle-wave-generator.h"
+#include "noise-generator.h"
 
 class FrameCounter
 {
@@ -17,9 +18,10 @@ class FrameCounter
 
     PulseWaveGenerator (&m_pulseChannel)[2];
     TriangleWaveGenerator& m_triangleChannel;
+    NoiseGenerator& m_noiseChannel;
 
 public:
-    FrameCounter(PulseWaveGenerator (&pulseChannel)[2], TriangleWaveGenerator& triangleChannel);
+    FrameCounter(PulseWaveGenerator (&pulseChannel)[2], TriangleWaveGenerator& triangleChannel, NoiseGenerator& noiseChannel);
     ~FrameCounter();
 
     void Clock();
