@@ -3,6 +3,9 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include <cstdlib>
+#include <algorithm>
+#include <format>
 
 #include <SDL2/SDL.h>
 
@@ -71,8 +74,16 @@ static void SetFullscreen(SDL_Window* window)
 
 int main(int argc, char* argv[])
 {
+    SDL_Init(SDL_INIT_EVERYTHING);
+
     Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Disabled);
     std::string romPath;
+
+    // Determine max window scale
+    SDL_Rect displayBounds;
+    SDL_GetDisplayBounds(0, &displayBounds);
+    int maxScale = std::min<int>(displayBounds.w / PPU::DISPLAY_WIDTH, displayBounds.h / PPU::DISPLAY_HEIGHT);
+    int windowScale = maxScale;
 
     // Handle all program arguments
     for (int i = 1; i < argc; i++)
@@ -84,6 +95,13 @@ int main(int argc, char* argv[])
             if (i + 1 >= argc) continue;
             i++;
             romPath = argv[i];
+            continue;
+        }
+        else if (arg == "--scale" || arg == "-s")
+        {
+            if (i + 1 >= argc) continue;
+            i++;
+            windowScale = std::atoi(argv[i]);
             continue;
         }
         else if (arg == "--console-logging")
@@ -102,15 +120,25 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    // Check for issues with the initial window scale
+    if (windowScale <= 0)
+    {
+        windowScale = 1;
+        Logger::GetInstance().Warn("Window scale must be greater than 0. Setting the window scale to 1.");
+    }
+    else if (windowScale > maxScale)
+    {
+        windowScale = maxScale;
+        Logger::GetInstance().Warn(std::format("The selected window scale it too large for the current display. Setting the window scale to {}.", maxScale));
+    }
+
     // Initialize SDL components
-    int initialScale = 3;
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
     SDL_Event event;
-    SDL_Init(SDL_INIT_EVERYTHING);
     SDL_CreateWindowAndRenderer(
-        PPU::DISPLAY_WIDTH * initialScale, 
-        PPU::DISPLAY_HEIGHT * initialScale,
+        PPU::DISPLAY_WIDTH * windowScale, 
+        PPU::DISPLAY_HEIGHT * windowScale,
         SDL_WINDOW_RESIZABLE, 
         &window, &renderer
     );
@@ -138,7 +166,7 @@ int main(int argc, char* argv[])
             {
                 if (event.type == SDL_QUIT) running = false;
                 if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) 
-                    ResizeRenderer(window, renderer, initialScale);
+                    ResizeRenderer(window, renderer, windowScale);
                 if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F11) SetFullscreen(window);
                 else nes->CheckControllerInput(event);
             }
