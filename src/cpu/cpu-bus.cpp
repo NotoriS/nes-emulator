@@ -126,4 +126,22 @@ void CpuBus::PollControllerState()
 {
     m_controllerOneShifter = *m_controllerOneState;
     m_controllerTwoShifter = *m_controllerTwoState;
+
+    // Prevent conflicting d-pad inputs (left + right or up + down)
+    if ((m_controllerOneShifter & 0x03) == 0x03)
+    {
+        m_controllerOneShifter &= ~0x03;
+    }
+    if ((m_controllerOneShifter & 0x0C) == 0x0C)
+    {
+        m_controllerOneShifter &= ~0x0C;
+    }
+    if ((m_controllerTwoShifter & 0x03) == 0x03)
+    {
+        m_controllerTwoShifter &= ~0x03;
+    }
+    if ((m_controllerTwoShifter & 0x0C) == 0x0C)
+    {
+        m_controllerTwoShifter &= ~0x0C;
+    }
 }
