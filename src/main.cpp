@@ -58,6 +58,17 @@ static void ResizeRenderer(SDL_Window* window, SDL_Renderer* renderer, int initi
     SDL_RenderSetLogicalSize(renderer, PPU::DISPLAY_WIDTH * initialScale * scale, PPU::DISPLAY_HEIGHT * initialScale * scale);
 }
 
+static void SetFullscreen(SDL_Window* window)
+{
+    static bool isFullscreen = false;
+    isFullscreen = !isFullscreen;
+
+    if (isFullscreen)
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    else
+        SDL_SetWindowFullscreen(window, 0);
+}
+
 int main(int argc, char* argv[])
 {
     Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Disabled);
@@ -132,6 +143,7 @@ int main(int argc, char* argv[])
                 if (event.type == SDL_QUIT) running = false;
                 if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) 
                     ResizeRenderer(window, renderer, initialScale);
+                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F11) SetFullscreen(window);
                 else nes->CheckControllerInput(event);
             }
 
