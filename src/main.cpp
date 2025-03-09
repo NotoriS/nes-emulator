@@ -81,11 +81,7 @@ int main(int argc, char* argv[])
 
         if (arg == "--filename" || arg == "-f")
         {
-            if (i + 1 >= argc)
-            {
-                std::cout << "Error: no filename provided." << std::endl;
-                return -1;
-            }
+            if (i + 1 >= argc) continue;
             i++;
             romPath = argv[i];
             continue;
