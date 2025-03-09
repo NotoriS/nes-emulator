@@ -46,6 +46,18 @@ static std::string OpenFileDialog()
     return filename;
 }
 
+static void ResizeRenderer(SDL_Window* window, SDL_Renderer* renderer, int initialScale)
+{
+    int window_width, window_height;
+    SDL_GetWindowSize(window, &window_width, &window_height);
+
+    float scale_x = (float)window_width / (PPU::DISPLAY_WIDTH * 3);
+    float scale_y = (float)window_height / (PPU::DISPLAY_HEIGHT * 3);
+    float scale = (scale_x < scale_y) ? scale_x : scale_y;
+
+    SDL_RenderSetLogicalSize(renderer, PPU::DISPLAY_WIDTH * initialScale * scale, PPU::DISPLAY_HEIGHT * initialScale * scale);
+}
+
 int main(int argc, char* argv[])
 {
     Logger::GetInstance().SetLoggingMode(Logger::LoggingMode::Disabled);
@@ -84,12 +96,14 @@ int main(int argc, char* argv[])
     }
 
     // Initialize SDL components
+    int initialScale = 3;
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
     SDL_Event event;
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_CreateWindowAndRenderer(
-        PPU::DISPLAY_WIDTH*3, PPU::DISPLAY_HEIGHT*3, 
+        PPU::DISPLAY_WIDTH * initialScale, 
+        PPU::DISPLAY_HEIGHT * initialScale,
         SDL_WINDOW_RESIZABLE, 
         &window, &renderer
     );
@@ -116,6 +130,8 @@ int main(int argc, char* argv[])
             while (SDL_PollEvent(&event))
             {
                 if (event.type == SDL_QUIT) running = false;
+                if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) 
+                    ResizeRenderer(window, renderer, initialScale);
                 else nes->CheckControllerInput(event);
             }
 
