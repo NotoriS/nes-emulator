@@ -1,7 +1,7 @@
 #include "frame-counter.h"
 
-FrameCounter::FrameCounter(PulseWaveGenerator (&pulseChannel)[2], TriangleWaveGenerator& triangleChannel)
-    : m_pulseChannel(pulseChannel), m_triangleChannel(triangleChannel)
+FrameCounter::FrameCounter(PulseWaveGenerator (&pulseChannel)[2], TriangleWaveGenerator& triangleChannel, NoiseGenerator& noiseChannel)
+    : m_pulseChannel(pulseChannel), m_triangleChannel(triangleChannel), m_noiseChannel(noiseChannel)
 {
 }
 
@@ -62,6 +62,7 @@ void FrameCounter::ClockLengthCounterAndSweep()
     m_pulseChannel[0].ClockLengthCounter();
     m_pulseChannel[1].ClockLengthCounter();
     m_triangleChannel.ClockLengthCounter();
+    m_noiseChannel.ClockLengthCounter();
     
     m_pulseChannel[0].ClockSweepUnit();
     m_pulseChannel[1].ClockSweepUnit();
@@ -71,6 +72,7 @@ void FrameCounter::ClockEnvelopeAndLinearCounter()
 {
     m_pulseChannel[0].ClockEnvelope();
     m_pulseChannel[1].ClockEnvelope();
+    m_noiseChannel.ClockEnvelope();
 
     m_triangleChannel.ClockLinearCounter();
 }

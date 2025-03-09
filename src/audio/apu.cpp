@@ -2,7 +2,7 @@
 
 APU::APU()
 {
-    m_frameCounter = std::make_unique<FrameCounter>(m_pulseChannel, m_triangleChannel);
+    m_frameCounter = std::make_unique<FrameCounter>(m_pulseChannel, m_triangleChannel, m_noiseChannel);
     m_pulseChannel[0].SetChannelNumber(1);
     m_pulseChannel[1].SetChannelNumber(2);
 }
@@ -18,9 +18,10 @@ void APU::Clock()
     m_pulseChannel[0].Clock();
     m_pulseChannel[1].Clock();
     m_triangleChannel.Clock();
+    m_noiseChannel.Clock();
 
     float pulseSample = 95.88F / ((8128.0F / (m_pulseChannel[0].Sample() + m_pulseChannel[1].Sample())) + 100.0F);
-    float tndSample = 159.79F / ((1.0F / ((m_triangleChannel.Sample() / 8227.0F) /* Add other channels here */)) + 100.0F);
+    float tndSample = 159.79F / ((1.0F / ((m_triangleChannel.Sample() / 8227.0F) + (m_noiseChannel.Sample() / 12241.0F) /* Add other channels here */)) + 100.0F);
     float mixedSample = pulseSample + tndSample;
 
     m_sampleBuffer.push_back(mixedSample * AudioConstants::MASTER_VOLUME);
@@ -86,12 +87,20 @@ void APU::Write(uint16_t address, uint8_t data)
         m_triangleChannel.SetLengthCounter(data >> 3);
         break;
     case 0x400C:
+        m_noiseChannel.SetInfinitePlayFlag(data & 0x20);
+        m_noiseChannel.SetConstantVolumeFlag(data & 0x10);
+        m_noiseChannel.SetVolume(data & 0x0F);
         break;
     case 0x400D:
+        // Unused but assigned to the noise channel
         break;
     case 0x400E:
+        m_noiseChannel.SetMode(data & 0x80);
+        m_noiseChannel.SetTimerPeriod(data & 0x0F);
         break;
     case 0x400F:
+        m_noiseChannel.SetLengthCounter(data >> 3);
+        m_noiseChannel.RestartEnvelope();
         break;
     case 0x4010:
         break;
@@ -105,6 +114,7 @@ void APU::Write(uint16_t address, uint8_t data)
         m_pulseChannel[0].SetEnabled(data & 0x01);
         m_pulseChannel[1].SetEnabled(data & 0x02);
         m_triangleChannel.SetEnabled(data & 0x04);
+        m_noiseChannel.SetEnabled(data & 0x08);
         break;
     case 0x4017:
         m_frameCounter->SetFiveStepMode(data & 0x80);
