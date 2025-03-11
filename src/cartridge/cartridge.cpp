@@ -64,7 +64,7 @@ void Cartridge::CreateMapper(uint8_t mapperID)
         m_mapper = std::make_unique<Mapper000>(m_prgRom, m_chrRom);
         break;
     default:
-        Logger::GetInstance().Error("the mapper required by this ROM is unsuported");
+        throw std::runtime_error(std::format("mapper {} (required by this ROM) is unsuported.", static_cast<int>(mapperID)));
         break;
     }
 }
