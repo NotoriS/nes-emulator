@@ -161,7 +161,7 @@ void NES::InitializeAPU()
     audioSpec.userdata = m_apu.get();
 
     if (SDL_OpenAudio(&audioSpec, NULL) < 0)
-        Logger::GetInstance().Error("SDL Open Audio Failed");
+        throw std::runtime_error("SDL Open Audio Failed");
 
     SDL_PauseAudio(0);
 }

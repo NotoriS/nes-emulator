@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <format>
+#include <stdexcept>
 
 #include "../debug/logger.h"
 #include "mappers/mapper.h"

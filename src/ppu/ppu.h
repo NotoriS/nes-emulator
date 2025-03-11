@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <stdexcept>
 
 #include "../debug/logger.h"
 #include "../interfaces/i-bus.h"
