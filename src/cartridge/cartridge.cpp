@@ -50,7 +50,7 @@ void Cartridge::LoadROM(const std::string& filename)
     file.close();
 
     // Fetch the mapper ID and create the mapper
-    uint8_t mapperID = (m_header.flags6 & 0xF0) | (m_header.flags7 >> 4);
+    uint8_t mapperID = (m_header.flags7 & 0xF0) | (m_header.flags6 >> 4);
     CreateMapper(mapperID);
 
     Logger::GetInstance().Log(std::format("Loaded {} bytes of PRG ROM and {} bytes of CHR ROM from {}", prgSize, chrSize, filename));
