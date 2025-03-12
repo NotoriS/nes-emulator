@@ -52,13 +52,13 @@ This emulator replicates the functionality of the classic Nintendo Entertainment
 ### Stage 7: APU Implementation
 - Set up the Audio Processing Unit (APU) for sound generation, aiming to support the basic channels for sound effects and music.
 
-**Progress:** In Progress
+**Progress:** 80% Completed
 
 ### Stage 8: Additional Mappers for Extended Game Support
 - Add support for additional mappers to handle more complex ROMs.
 - Ensure compatibility with a wider range of NES games that use different mappers for memory management.
 
-**Progress:** Planned
+**Progress:** In Progress
 
 ## Goals
 
