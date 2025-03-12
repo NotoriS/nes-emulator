@@ -62,6 +62,8 @@ add_executable (nes-emulator
     "src/audio/triangle-wave-generator.cpp"
     "src/audio/noise-generator.h" 
     "src/audio/noise-generator.cpp"
+    "src/cartridge/mappers/mapper-002.h" 
+    "src/cartridge/mappers/mapper-002.cpp"
 )
 
 # Link SDL2

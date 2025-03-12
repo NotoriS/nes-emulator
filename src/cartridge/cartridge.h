@@ -12,6 +12,7 @@
 #include "../debug/logger.h"
 #include "mappers/mapper.h"
 #include "mappers/mapper-000.h"
+#include "mappers/mapper-002.h"
 
 class Cartridge
 {
