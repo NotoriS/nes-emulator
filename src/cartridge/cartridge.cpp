@@ -44,13 +44,14 @@ void Cartridge::LoadROM(const std::string& filename)
 
     // Load CHR ROM (if present)
     size_t chrSize = m_header.chrRomSize * 8 * 1024;
+    if (chrSize == 0) chrSize = 8 * 1024;
     m_chrRom.resize(chrSize);
     file.read(reinterpret_cast<char*>(m_chrRom.data()), chrSize);
 
     file.close();
 
     // Fetch the mapper ID and create the mapper
-    uint8_t mapperID = (m_header.flags6 & 0xF0) | (m_header.flags7 >> 4);
+    uint8_t mapperID = (m_header.flags7 & 0xF0) | (m_header.flags6 >> 4);
     CreateMapper(mapperID);
 
     Logger::GetInstance().Log(std::format("Loaded {} bytes of PRG ROM and {} bytes of CHR ROM from {}", prgSize, chrSize, filename));
@@ -63,8 +64,11 @@ void Cartridge::CreateMapper(uint8_t mapperID)
     case 0:
         m_mapper = std::make_unique<Mapper000>(m_prgRom, m_chrRom);
         break;
+    case 2:
+        m_mapper = std::make_unique<Mapper002>(m_prgRom, m_chrRom);
+        break;
     default:
-        Logger::GetInstance().Error("the mapper required by this ROM is unsuported");
+        throw std::runtime_error(std::format("mapper {} (required by this ROM) is unsuported.", static_cast<int>(mapperID)));
         break;
     }
 }

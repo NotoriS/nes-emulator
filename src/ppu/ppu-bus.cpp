@@ -47,7 +47,7 @@ uint8_t PpuBus::Read(uint16_t address)
             else
                 return m_nameTables[1][address & 0x03FF];
         default:
-            Logger::GetInstance().Error("unsupported mirror mode encoutered while reading from the name table");
+            throw std::runtime_error("unsupported mirror mode encoutered while reading from the name table");
         }
     }
     else if (address < 0x4000) // Read from palette RAM
@@ -95,7 +95,7 @@ void PpuBus::Write(uint16_t address, uint8_t data)
                 m_nameTables[1][address & 0x03FF] = data;
             break;
         default:
-            Logger::GetInstance().Error("unsupported mirror mode encoutered while reading from the name table");
+            throw std::runtime_error("unsupported mirror mode encoutered while reading from the name table");
         }
         return;
     }

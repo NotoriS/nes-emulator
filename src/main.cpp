@@ -184,8 +184,15 @@ int main(int argc, char* argv[])
     catch (const std::runtime_error& e)
     {
         Logger::GetInstance().Error(e.what());
+        SDL_DestroyTexture(texture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
         return -1;
     }
 
-    return 0;
+    SDL_DestroyTexture(texture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }

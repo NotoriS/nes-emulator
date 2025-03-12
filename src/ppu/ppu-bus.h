@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <stdexcept>
 
 #include "../interfaces/i-bus.h"
 #include "../cartridge/cartridge.h"

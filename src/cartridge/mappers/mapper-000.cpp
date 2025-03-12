@@ -27,5 +27,11 @@ uint8_t Mapper000::PpuRead(uint16_t address)
 
 void Mapper000::PpuWrite(uint16_t address, uint8_t data)
 {
+    if (address >= 0x0000 && address <= 0x1FFF)
+    {
+        m_chrRom[address] = data;
+        return;
+    }
+
     Logger::GetInstance().Warn("PPU tried to write to the cartridge at an unexpected address " + Logger::DecmialToHex(address));
 }

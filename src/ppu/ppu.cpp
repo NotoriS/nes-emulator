@@ -157,7 +157,7 @@ void PPU::WriteByteToSecondaryOAM(uint8_t address, uint8_t data)
 {
     if (address >= 32)
     {
-        Logger::GetInstance().Error("address out of bounds for PPU::WriteByteToSecondaryOAM(uint8_t address, uint8_t data)");
+        throw std::runtime_error("address out of bounds for PPU::WriteByteToSecondaryOAM(uint8_t address, uint8_t data)");
         return;
     }
 
@@ -197,7 +197,7 @@ uint8_t PPU::ReadByteFromOAM(uint8_t address) const
     case 3:
         return m_OAM[translatedAddress].xPosition;
     default:
-        Logger::GetInstance().Error("unexpected path reached in PPU::ReadByteFromOAM(uint8_t address).");
+        throw std::runtime_error("unexpected path reached in PPU::ReadByteFromOAM(uint8_t address).");
         return 0;
     }
 }
@@ -206,7 +206,7 @@ uint8_t PPU::ReadByteFromSecondaryOAM(uint8_t address) const
 {
     if (address >= 32)
     {
-        Logger::GetInstance().Error("address out of bounds for PPU::ReadByteFromSecondaryOAM(uint8_t address)");
+        throw std::runtime_error("address out of bounds for PPU::ReadByteFromSecondaryOAM(uint8_t address)");
         return 0;
     }
 
@@ -224,7 +224,7 @@ uint8_t PPU::ReadByteFromSecondaryOAM(uint8_t address) const
     case 3:
         return m_secondaryOAM[translatedAddress].xPosition;
     default:
-        Logger::GetInstance().Error("unexpected path reached in PPU::ReadByteFromSecondaryOAM(uint8_t address).");
+        throw std::runtime_error("unexpected path reached in PPU::ReadByteFromSecondaryOAM(uint8_t address).");
         return 0;
     }
 }

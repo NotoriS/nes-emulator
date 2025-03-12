@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <cstdint>
+#include <stdexcept>
 
 #include <SDL2/SDL.h>
 
