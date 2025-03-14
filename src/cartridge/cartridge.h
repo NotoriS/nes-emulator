@@ -13,6 +13,7 @@
 #include "mappers/mapper.h"
 #include "mappers/mapper-000.h"
 #include "mappers/mapper-002.h"
+#include "mappers/mapper-003.h"
 
 class Cartridge
 {
