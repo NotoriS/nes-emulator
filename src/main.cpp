@@ -163,8 +163,6 @@ int main(int argc, char* argv[])
 
         while (running)
         {
-            const auto frameStart = std::chrono::high_resolution_clock().now();
-
             while (SDL_PollEvent(&event))
             {
                 if (event.type == SDL_QUIT) running = false;
@@ -184,11 +182,6 @@ int main(int argc, char* argv[])
     catch (const std::runtime_error& e)
     {
         Logger::GetInstance().Error(e.what());
-        SDL_DestroyTexture(texture);
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return -1;
     }
 
     SDL_DestroyTexture(texture);
