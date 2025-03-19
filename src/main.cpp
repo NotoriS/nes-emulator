@@ -158,6 +158,9 @@ int main(int argc, char* argv[])
         auto nes = std::make_unique<NES>(romPath);
         bool running = true;
 
+        constexpr std::chrono::nanoseconds interval(16639267);  // Target loop interval (~60 fps)
+        auto next_wakeup = std::chrono::steady_clock::now() + interval;
+
         while (running)
         {
             const auto frameStart = std::chrono::high_resolution_clock().now();
@@ -174,11 +177,8 @@ int main(int argc, char* argv[])
             nes->DrawFrame(renderer, texture);
 
             // Wait for the next frame to keep a consistent framerate
-            const auto frameEnd = std::chrono::high_resolution_clock().now();
-            const auto frameDuration = frameEnd - frameStart;
-            const auto targetFrameDuration = std::chrono::duration<double, std::milli>(16.67);
-            if (frameDuration < targetFrameDuration)
-                std::this_thread::sleep_for(targetFrameDuration - frameDuration);
+            std::this_thread::sleep_until(next_wakeup);
+            next_wakeup += interval;
         }
     }
     catch (const std::runtime_error& e)

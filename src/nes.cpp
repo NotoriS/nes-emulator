@@ -128,7 +128,7 @@ void NES::AudioSampleCallback(void* userdata, Uint8* stream, int len)
         apuSampleBuffer.clear();
     }
 
-    const int BUFFER_DELAY = 4096;
+    const int BUFFER_DELAY = 1536;
     if (resetDelay)
     {
         if (audioBuffer.size() < BUFFER_DELAY) return;
