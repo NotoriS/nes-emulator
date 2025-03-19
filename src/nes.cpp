@@ -33,8 +33,6 @@ void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
         m_oddCpuCycle = !m_oddCpuCycle;
         if (!m_cpuBus->TryDirectMemoryAccess(m_oddCpuCycle))
             m_cpu->Clock();
-
-        m_apu->Clock();
     }
 
     uint32_t* pixelBuffer = m_ppu->GetPixelBuffer();
@@ -116,33 +114,22 @@ void NES::CheckControllerInput(const SDL_Event& event)
 void NES::AudioSampleCallback(void* userdata, Uint8* stream, int len)
 {
     static std::vector<float> audioBuffer;
-    static bool resetDelay = true;
 
     APU* apu = (APU*)userdata;
     std::vector<float>& apuSampleBuffer = apu->GetBuffer();
 
-    if (apuSampleBuffer.size() > AudioConstants::CLOCK_RATE / OUTPUT_AUDIO_SAMPLE_RATE)
-    {
-        AudioUtils::LowPassFilter(apuSampleBuffer, 5000.0, AudioConstants::CLOCK_RATE);
-        AudioUtils::ResampleAndAppend(apuSampleBuffer, audioBuffer, AudioConstants::CLOCK_RATE, OUTPUT_AUDIO_SAMPLE_RATE);
-        apuSampleBuffer.clear();
-    }
+    int samplesToCopy = len / sizeof(float);
 
-    const int BUFFER_DELAY = 1536;
-    if (resetDelay)
-    {
-        if (audioBuffer.size() < BUFFER_DELAY) return;
-        else resetDelay = false;
-    }
+    // Allow SDL_Audio to dictate when the APU is clocked
+    while (apuSampleBuffer.size() < samplesToCopy * AudioConstants::CLOCK_RATE / OUTPUT_AUDIO_SAMPLE_RATE)
+        apu->Clock();
 
-    if (audioBuffer.size() < len / sizeof(float))
-    {
-        resetDelay = true;
-        return;
-    }
+    AudioUtils::LowPassFilter(apuSampleBuffer, 5000.0, AudioConstants::CLOCK_RATE);
+    AudioUtils::ResampleAndAppend(apuSampleBuffer, audioBuffer, AudioConstants::CLOCK_RATE, OUTPUT_AUDIO_SAMPLE_RATE);
+    apuSampleBuffer.clear();
 
-    memcpy(stream, audioBuffer.data(), len);
-    audioBuffer.erase(audioBuffer.begin(), audioBuffer.begin() + (len / sizeof(float)));
+    memcpy(stream, audioBuffer.data(), samplesToCopy * sizeof(float));
+    audioBuffer.clear();
 }
 
 void NES::InitializeCartridge()
