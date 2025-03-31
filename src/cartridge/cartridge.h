@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include "../debug/logger.h"
+#include "mirror-mode.h"
 #include "mappers/mapper.h"
 #include "mappers/mapper-000.h"
 #include "mappers/mapper-002.h"
@@ -30,13 +31,6 @@ class Cartridge
     };
 
 public:
-    // TODO: Add other mirror modes
-    enum class MirrorMode : uint8_t
-    {
-        Horizontal = 0,
-        Vertical = 1
-    };
-
     Cartridge();
     ~Cartridge();
 
