@@ -30,6 +30,9 @@ void NES::DrawFrame(SDL_Renderer* renderer, SDL_Texture* texture)
         if (nmiInterruptRaised)
             m_cpu->Interrupt(CPU::InterruptType::NMI);
 
+        if (m_cartridge->PollIrqInterrupt())
+            m_cpu->Interrupt(CPU::InterruptType::IRQ);
+
         m_oddCpuCycle = !m_oddCpuCycle;
         if (!m_cpuBus->TryDirectMemoryAccess(m_oddCpuCycle))
             m_cpu->Clock();

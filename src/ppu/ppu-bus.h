@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "../interfaces/i-bus.h"
+#include "../cartridge/mirror-mode.h"
 #include "../cartridge/cartridge.h"
 
 class PpuBus : public IBus

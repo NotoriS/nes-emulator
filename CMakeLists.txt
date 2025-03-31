@@ -66,6 +66,7 @@ add_executable (nes-emulator
     "src/cartridge/mappers/mapper-002.cpp"
     "src/cartridge/mappers/mapper-003.h" 
     "src/cartridge/mappers/mapper-003.cpp"
+    "src/cartridge/mirror-mode.h"
 )
 
 # Link SDL2

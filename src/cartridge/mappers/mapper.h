@@ -2,6 +2,9 @@
 
 #include <cstdint>
 #include <vector>
+#include <optional>
+
+#include "../mirror-mode.h"
 
 class Mapper
 {
@@ -14,6 +17,10 @@ public:
 
 	virtual uint8_t PpuRead(uint16_t address) = 0;
 	virtual void PpuWrite(uint16_t address, uint8_t data) = 0;
+
+	virtual std::optional<MirrorMode> GetMirrorMode() { return {}; }
+
+	virtual bool PollIrqInterrupt() { return false; }
 
 protected:
 	std::vector<uint8_t>& m_prgRom;  // PRG ROM data

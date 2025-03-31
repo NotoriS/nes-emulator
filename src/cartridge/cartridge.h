@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include "../debug/logger.h"
+#include "mirror-mode.h"
 #include "mappers/mapper.h"
 #include "mappers/mapper-000.h"
 #include "mappers/mapper-002.h"
@@ -30,13 +31,6 @@ class Cartridge
     };
 
 public:
-    // TODO: Add other mirror modes
-    enum class MirrorMode : uint8_t
-    {
-        Horizontal = 0,
-        Vertical = 1
-    };
-
     Cartridge();
     ~Cartridge();
 
@@ -48,7 +42,9 @@ public:
     uint8_t PpuRead(uint16_t address) { return m_mapper->PpuRead(address); }
     void PpuWrite(uint16_t address, uint8_t data) { m_mapper->PpuWrite(address, data); }
 
-    MirrorMode GetMirrorMode() { return m_mirrorMode; }
+    MirrorMode GetMirrorMode() { return m_mapper->GetMirrorMode().value_or(m_mirrorMode); }
+
+    bool PollIrqInterrupt() { return m_mapper->PollIrqInterrupt(); }
 
 private:
     RomHeader m_header{};
