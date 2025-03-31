@@ -44,6 +44,8 @@ public:
 
     MirrorMode GetMirrorMode() { return m_mapper->GetMirrorMode().value_or(m_mirrorMode); }
 
+    bool PollIrqInterrupt() { return m_mapper->PollIrqInterrupt(); }
+
 private:
     RomHeader m_header{};
 

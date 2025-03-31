@@ -20,6 +20,8 @@ public:
 
 	virtual std::optional<MirrorMode> GetMirrorMode() { return {}; }
 
+	virtual bool PollIrqInterrupt() { return false; }
+
 protected:
 	std::vector<uint8_t>& m_prgRom;  // PRG ROM data
 	std::vector<uint8_t>& m_chrRom;  // CHR ROM data
