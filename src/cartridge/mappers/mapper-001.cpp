@@ -48,11 +48,35 @@ void Mapper001::CpuWrite(uint16_t address, uint8_t data)
 
 uint8_t Mapper001::PpuRead(uint16_t address)
 {
-    return 0;
+    if (address >= 0x2000)
+    {
+        Logger::GetInstance().Warn("PPU tried to write to the cartridge at an unexpected address " + Logger::DecmialToHex(address));
+        return 0;
+    }
+
+    uint32_t translatedAddress;
+    if (m_controlReg & 0b10000) // Split 4 KB bank mode
+    {
+        if (address < 0x1000) translatedAddress = m_chrBankZeroReg * 4096 + address;
+        else translatedAddress = m_chrBankOneReg * 4096 + (address & 0x0FFF);
+    }
+    else // Single 8 KB bank mode
+    {
+        translatedAddress = (m_chrBankZeroReg & 0b11110) * 8192 + address;
+    }
+
+    return m_chrRom[translatedAddress];
 }
 
 void Mapper001::PpuWrite(uint16_t address, uint8_t data)
 {
+    if (address >= 0x0000 && address <= 0x1FFF)
+    {
+        m_chrRom[address] = data;
+        return;
+    }
+
+    Logger::GetInstance().Warn("PPU tried to write to the cartridge at an unexpected address " + Logger::DecmialToHex(address));
 }
 
 std::optional<MirrorMode> Mapper001::GetMirrorMode()
