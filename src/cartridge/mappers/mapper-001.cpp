@@ -6,15 +6,42 @@ Mapper001::Mapper001(std::vector<uint8_t>& prgRom, std::vector<uint8_t>& chrRom)
 
 uint8_t Mapper001::CpuRead(uint16_t address)
 {
+    if (address < 0x6000)
+        throw std::runtime_error("unexpected read in mapper 1 below 0x6000");
+
+    // TODO: Add support for PRG RAM
+    if (address >= 0x6000 && address < 0x8000)
+    {
+        Logger::GetInstance().Warn("a read from PRG RAMs address range was made, but it is not currently supported.");
+        return 0;
+    }
+
+    address -= 0x8000;
+    uint32_t translatedAddress;
+    if ((m_controlReg & 0b01100) == 2) // Fix first 16 KB bank (0x8000 - 0xBFFF)
+    {
+        if (address < 0x4000) translatedAddress = address;
+        else translatedAddress = (m_prgBankReg & 0b01111) * 0x4000 + (address & 0x3FFF);
+    }
+    else if ((m_controlReg & 0b01100) == 3) // Fix second 16 KB bank (0xC000 - 0xFFFF)
+    {
+        if (address >= 0x4000) translatedAddress = (m_prgRom.size() - 0x4000) + (address & 0x3FFF);
+        else translatedAddress = (m_prgBankReg & 0b01111) * 0x4000 + address;
+    }
+    else // Use one 32 KB bank
+    {
+        translatedAddress = (m_prgBankReg & 0b01110) * 0x8000 + address;
+    }
+
     return 0;
 }
 
 void Mapper001::CpuWrite(uint16_t address, uint8_t data)
 {
     // TODO: Add support for PRG RAM
-    if (address < 0x8000)
+    if (address >= 0x6000 && address < 0x8000)
     {
-        Logger::GetInstance().Warn("A write to PRG RAMs address range was made, but it is not currently supported.");
+        Logger::GetInstance().Warn("a write to PRG RAMs address range was made, but it is not currently supported.");
         return;
     }
 
@@ -22,6 +49,7 @@ void Mapper001::CpuWrite(uint16_t address, uint8_t data)
     if (data & 0x80)
     {
         m_loadReg = 0b10000;
+        m_controlReg |= 0b01100;
         return;
     }
 
