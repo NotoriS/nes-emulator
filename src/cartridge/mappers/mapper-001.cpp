@@ -8,7 +8,10 @@ Mapper001::Mapper001(std::vector<uint8_t>& prgRom, std::vector<uint8_t>& chrRom)
 uint8_t Mapper001::CpuRead(uint16_t address)
 {
     if (address < 0x6000)
-        throw std::runtime_error("unexpected read in mapper 1 below 0x6000");
+    {
+        Logger::GetInstance().Warn("unexpected CPU read in mapper 1 below 0x6000");
+        return 0;
+    }
 
     if (address >= 0x6000 && address < 0x8000) return m_prgRam[address & 0x1FFF];
 
@@ -37,7 +40,10 @@ uint8_t Mapper001::CpuRead(uint16_t address)
 void Mapper001::CpuWrite(uint16_t address, uint8_t data)
 {
     if (address < 0x6000)
-        throw std::runtime_error("unexpected read in mapper 1 below 0x6000");
+    {
+        Logger::GetInstance().Warn("unexpected CPU write in mapper 1 below 0x6000");
+        return;
+    }
 
     if (address >= 0x6000 && address < 0x8000)
     {
