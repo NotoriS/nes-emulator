@@ -57,5 +57,18 @@ void Mapper001::PpuWrite(uint16_t address, uint8_t data)
 
 std::optional<MirrorMode> Mapper001::GetMirrorMode()
 {
-    return {};
+    uint8_t nametableArrangement = m_controlReg & 0b00011;
+    switch (nametableArrangement)
+    {
+    case 0:
+        return MirrorMode::OneScreenLow;
+    case 1:
+        return MirrorMode::OneScreenHigh;
+    case 2:
+        return MirrorMode::Horizontal;
+    case 3:
+        return MirrorMode::Vertical;
+    }
+
+    throw std::runtime_error("no mirror mode returned by MMC1.");
 }

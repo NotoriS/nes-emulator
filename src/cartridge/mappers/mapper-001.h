@@ -5,6 +5,7 @@
 
 #include "../../debug/logger.h"
 #include "mapper.h"
+#include "../mirror-mode.h"
 
 class Mapper001 : public Mapper
 {
