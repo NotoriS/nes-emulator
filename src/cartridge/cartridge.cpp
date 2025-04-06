@@ -64,6 +64,9 @@ void Cartridge::CreateMapper(uint8_t mapperID)
     case 0:
         m_mapper = std::make_unique<Mapper000>(m_prgRom, m_chrRom);
         break;
+    case 1:
+        m_mapper = std::make_unique<Mapper001>(m_prgRom, m_chrRom);
+        break;
     case 2:
         m_mapper = std::make_unique<Mapper002>(m_prgRom, m_chrRom);
         break;
