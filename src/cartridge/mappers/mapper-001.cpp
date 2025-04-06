@@ -1,6 +1,7 @@
 #include "mapper-001.h"
 
-Mapper001::Mapper001(std::vector<uint8_t>& prgRom, std::vector<uint8_t>& chrRom) : Mapper(prgRom, chrRom)
+Mapper001::Mapper001(std::vector<uint8_t>& prgRom, std::vector<uint8_t>& chrRom) 
+    : Mapper(prgRom, chrRom), m_prgRam(0x2000)
 {
 }
 
@@ -9,39 +10,38 @@ uint8_t Mapper001::CpuRead(uint16_t address)
     if (address < 0x6000)
         throw std::runtime_error("unexpected read in mapper 1 below 0x6000");
 
-    // TODO: Add support for PRG RAM
-    if (address >= 0x6000 && address < 0x8000)
-    {
-        Logger::GetInstance().Warn("a read from PRG RAMs address range was made, but it is not currently supported.");
-        return 0;
-    }
+    if (address >= 0x6000 && address < 0x8000) return m_prgRam[address & 0x1FFF];
 
     address -= 0x8000;
+    const uint8_t prgRomBankMode = (m_controlReg >> 2) & 3;
     uint32_t translatedAddress;
-    if ((m_controlReg & 0b01100) == 2) // Fix first 16 KB bank (0x8000 - 0xBFFF)
+
+    if (prgRomBankMode == 2) // Fix first 16 KB bank (0x8000 - 0xBFFF)
     {
         if (address < 0x4000) translatedAddress = address;
         else translatedAddress = (m_prgBankReg & 0b01111) * 0x4000 + (address & 0x3FFF);
     }
-    else if ((m_controlReg & 0b01100) == 3) // Fix second 16 KB bank (0xC000 - 0xFFFF)
+    else if (prgRomBankMode == 3) // Fix second 16 KB bank (0xC000 - 0xFFFF)
     {
         if (address >= 0x4000) translatedAddress = (m_prgRom.size() - 0x4000) + (address & 0x3FFF);
         else translatedAddress = (m_prgBankReg & 0b01111) * 0x4000 + address;
     }
     else // Use one 32 KB bank
     {
-        translatedAddress = (m_prgBankReg & 0b01110) * 0x8000 + address;
+        translatedAddress = ((m_prgBankReg & 0b01111) >> 1) * 0x8000 + address;
     }
 
-    return 0;
+    return m_prgRom[translatedAddress];
 }
 
 void Mapper001::CpuWrite(uint16_t address, uint8_t data)
 {
-    // TODO: Add support for PRG RAM
+    if (address < 0x6000)
+        throw std::runtime_error("unexpected read in mapper 1 below 0x6000");
+
     if (address >= 0x6000 && address < 0x8000)
     {
-        Logger::GetInstance().Warn("a write to PRG RAMs address range was made, but it is not currently supported.");
+        m_prgRam[address & 0x1FFF] = data;
         return;
     }
 
@@ -85,12 +85,12 @@ uint8_t Mapper001::PpuRead(uint16_t address)
     uint32_t translatedAddress;
     if (m_controlReg & 0b10000) // Split 4 KB bank mode
     {
-        if (address < 0x1000) translatedAddress = m_chrBankZeroReg * 4096 + address;
-        else translatedAddress = m_chrBankOneReg * 4096 + (address & 0x0FFF);
+        if (address < 0x1000) translatedAddress = m_chrBankZeroReg * 0x1000 + address;
+        else translatedAddress = m_chrBankOneReg * 0x1000 + (address & 0x0FFF);
     }
     else // Single 8 KB bank mode
     {
-        translatedAddress = (m_chrBankZeroReg & 0b11110) * 8192 + address;
+        translatedAddress = (m_chrBankZeroReg >> 1) * 0x2000 + address;
     }
 
     return m_chrRom[translatedAddress];

@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <vector>
 
 #include "../../debug/logger.h"
 #include "mapper.h"
@@ -14,6 +15,8 @@ class Mapper001 : public Mapper
 	uint8_t m_chrBankZeroReg = 0;
 	uint8_t m_chrBankOneReg = 0;
 	uint8_t m_prgBankReg = 0;
+
+	std::vector<uint8_t> m_prgRam;
 
 public:
 	Mapper001(std::vector<uint8_t>& prgRom, std::vector<uint8_t>& chrRom);
