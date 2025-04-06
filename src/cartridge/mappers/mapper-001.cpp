@@ -117,9 +117,9 @@ std::optional<MirrorMode> Mapper001::GetMirrorMode()
     case 1:
         return MirrorMode::OneScreenHigh;
     case 2:
-        return MirrorMode::Horizontal;
-    case 3:
         return MirrorMode::Vertical;
+    case 3:
+        return MirrorMode::Horizontal;
     }
 
     throw std::runtime_error("no mirror mode returned by MMC1.");
