@@ -3,5 +3,7 @@
 enum class MirrorMode
 {
     Horizontal,
-    Vertical
+    Vertical,
+    OneScreenLow,
+    OneScreenHigh
 };

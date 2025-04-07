@@ -703,7 +703,7 @@ uint16_t PPU::GetSpritePatternAddress(const char& spriteIndex)
     if (m_control.spriteSize)
     {
         patternTable = m_secondaryOAM[spriteIndex].tileIndex & 0x01;
-        cell = (m_secondaryOAM[spriteIndex].tileIndex & 0xFE) + (diff < 8 ? 1 : 0);
+        cell = (m_secondaryOAM[spriteIndex].tileIndex & 0xFE) + ((diff < 8) ^ verticalFlip ? 0 : 1);
     }
     else
     {

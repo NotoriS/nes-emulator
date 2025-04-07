@@ -46,6 +46,10 @@ uint8_t PpuBus::Read(uint16_t address)
                 return m_nameTables[1][address & 0x03FF];
             else
                 return m_nameTables[1][address & 0x03FF];
+        case MirrorMode::OneScreenLow:
+            return m_nameTables[0][address & 0x03FF];
+        case MirrorMode::OneScreenHigh:
+            return m_nameTables[1][address & 0x03FF];
         default:
             throw std::runtime_error("unsupported mirror mode encoutered while reading from the name table");
         }
@@ -93,6 +97,12 @@ void PpuBus::Write(uint16_t address, uint8_t data)
                 m_nameTables[1][address & 0x03FF] = data;
             else
                 m_nameTables[1][address & 0x03FF] = data;
+            break;
+        case MirrorMode::OneScreenLow:
+            m_nameTables[0][address & 0x03FF] = data;
+            break;
+        case MirrorMode::OneScreenHigh:
+            m_nameTables[1][address & 0x03FF] = data;
             break;
         default:
             throw std::runtime_error("unsupported mirror mode encoutered while reading from the name table");
